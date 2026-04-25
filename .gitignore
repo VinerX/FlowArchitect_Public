@@ -1,0 +1,19 @@
+/.idea
+__pycache__/
+*.pyc
+*.log
+
+# API keys — never commit real keys; use config/api_presets.json.example as template
+config/api_presets.json
+src/config/settings.json
+/src/SavedMessages
+/src/SavedMessages
+src/config/flowarchitect.db-shm
+src/config/flowarchitect.db-wal
+src/config/flowarchitect.db
+src/SavedMessages/last_attempt_log/combined_messages.json
+.claude/settings.local.json
+CLAUDE.md
+AGENTS.md
+/test_runs
+config/settings.json

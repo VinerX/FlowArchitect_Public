@@ -1,0 +1,51 @@
+flow:
+  id: huggingface_coding_llms
+  name: Hugging Face Top Coding LLMs Extraction
+  description: Extract top-ranked LLMs for coding tasks from Hugging Face leaderboards
+    and store in CSV
+triggers:
+- id: trigger_daily
+  type: schedule
+  condition: daily at 00:00
+sources:
+- id: source_hf_models
+  name: Hugging Face Models API
+  type: API
+  location: https://huggingface.co/api/models
+  connection:
+    properties:
+      token: '{{HF_API_TOKEN}}'
+processing_elements:
+- id: process_filter_coding
+  name: Filter and Sort Coding Models
+  operation: Filter
+  config:
+    filter: tags contains 'code-generation' OR tags contains 'text-to-code' OR leaderboard_scores.humaneval
+      is not null OR leaderboard_scores.mbpp is not null
+    sort_by: COALESCE(leaderboard_scores.humaneval, 0) + COALESCE(leaderboard_scores.mbpp,
+      0) DESC
+    limit: 50
+    fields:
+    - id
+    - name
+    - author
+    - downloads
+    - likes
+    - leaderboard_scores.humaneval
+    - leaderboard_scores.mbpp
+    - tags
+sinks:
+- id: sink_csv_output
+  name: CSV File Sink
+  type: CSV
+  location: best_coding_llms.csv
+processed_data:
+- id: models_json
+  format: json
+links:
+- from_id: source_hf_models
+  to_id: process_filter_coding
+  data_ref: models_json
+- from_id: process_filter_coding
+  to_id: sink_csv_output
+  data_ref: models_json

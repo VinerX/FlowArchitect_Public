@@ -1,0 +1,49 @@
+# Пример PIM (YAML)
+# Запрос пользователя:
+# "Читай данные из Kafka топика orders, фильтруй заказы с суммой больше 100 и сохраняй в Postgres в таблицу high_value_orders."
+# Сгенерированный LLM PIM (YAML):
+
+flow:
+  id: "flow_high_value_orders"
+  name: "High Value Orders Pipeline"
+  description: "Extracts orders from Kafka, filters by amount > 100, and loads them into Postgres."
+
+triggers:
+  - id: "trigger_orders_schedule"
+    type: "schedule"
+    condition: "every 5 minutes"
+
+sources:
+  - id: "source_orders_kafka"
+    name: "Read Kafka Orders"
+    type: "Kafka"
+    location: "orders"
+    connection:
+      properties:
+        brokers: "kafka-broker:9092"
+        group_id: "flow_architect_group"
+
+processing_elements:
+  - id: "process_filter_amount"
+    name: "Filter Orders Above 100"
+    operation: "Filter"
+    config:
+      condition: "amount > 100"
+
+sinks:
+  - id: "sink_postgres_high_value_orders"
+    name: "Write to Postgres"
+    type: "PostgreSQL"
+    location: "public.high_value_orders"
+    connection:
+      properties:
+        host: "db-host"
+        port: 5432
+        database: "wh"
+
+# 3. Слой потока (Связи)
+links:
+  - from: "src_orders"
+    to: "tr_filter_amount"
+  - from: "tr_filter_amount"
+    to: "sink_pg"

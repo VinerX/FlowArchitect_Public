@@ -1,0 +1,42 @@
+{
+  "flow": {
+    "id": "postgres_to_kafka",
+    "name": "PostgreSQL to Kafka",
+    "description": "Periodically read products table from PostgreSQL and publish changes to Kafka"
+  },
+  "triggers": [
+    {"id": "t1", "type": "schedule", "condition": "every 5 minutes"}
+  ],
+  "sources": [
+    {
+      "id": "src1",
+      "name": "PostgreSQL products",
+      "type": "Database",
+      "location": "products",
+      "connection": {
+        "properties": {
+          "db_url": "jdbc:postgresql://localhost:5432/mydb",
+          "db_user": "postgres"
+        }
+      }
+    }
+  ],
+  "processing_elements": [],
+  "sinks": [
+    {
+      "id": "sink1",
+      "name": "Kafka product-updates",
+      "type": "Kafka",
+      "location": "product-updates",
+      "connection": {
+        "properties": {
+          "bootstrap.servers": "localhost:9092"
+        }
+      }
+    }
+  ],
+  "processed_data": [],
+  "links": [
+    {"from_id": "src1", "to_id": "sink1"}
+  ]
+}

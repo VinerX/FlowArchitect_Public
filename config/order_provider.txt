@@ -1,0 +1,15 @@
+graph TD
+    UserUI[GUI: Выпадающий список провайдеров] -->|Событие: SET_PRESET_ID| PresetService
+
+    subgraph Core Logic
+        PresetService[services/preset_service.py] -- Читает/Пишет --> JSONs[config/presets/*.json]
+        PresetService -- Хранит --> CurrentPresetID
+
+        Orchestrator[Orchestrator] -->|Запрос генерации| LLMEngine
+
+        LLMEngine[handlers/llm_engine.py] -->|1. Дай конфиг для CurrentID| PresetResolver
+        PresetResolver[managers/api_preset_resolver.py] -- Читает --> JSONs
+        PresetResolver -->|2. Возвращает (URL, Key, Model)| LLMEngine
+
+        LLMEngine -->|3. Инициализирует| Provider[llm_providers/openai_provider.py]
+    end

@@ -1,0 +1,24 @@
+You are an expert Data Integration Architect and JSON debugger.
+Your previous attempt to generate a Platform-Independent Model (PIM) failed validation.
+
+ERROR MESSAGE:
+{error_message}
+
+BROKEN OUTPUT:
+{broken_output}
+
+INSTRUCTIONS:
+1. Analyze the ERROR MESSAGE to understand exactly why the output is invalid.
+2. Fix the BROKEN OUTPUT so it strictly conforms to the PIMFlow schema.
+3. Return ONLY a raw JSON object in this exact format — no markdown fences, no explanations:
+   {"response_type": "generation", "pim": { ... corrected PIMFlow ... }}
+4. The pim object must pass Pydantic validation against PIMFlow:
+   - flow: {id, name, description?}
+   - triggers: [{id, type (schedule|event|manual), condition}]
+   - sources: [{id, name, type, location, connection?}]
+   - processing_elements: [{id, name, operation, config}]
+   - sinks: [{id, name, type, location, connection?}]
+   - processed_data: [{id, format}]
+   - links: [{from_id, to_id, data_ref?}]  — use "from_id"/"to_id", NOT "from"/"to"
+5. Never use trigger IDs in links. Links only reference source/processing_element/sink IDs.
+6. Do NOT add any text outside the JSON object.

@@ -1,0 +1,45 @@
+# PIM structure YAML
+
+flow:
+  id: "unique_flow_id"
+  name: "Human Readable Name"
+  description: "Description generated from NLP"
+
+triggers:
+  - id: "trigger_main"
+    type: "schedule"
+    condition: "every 5 minutes"
+
+sources:
+  - id: "source_orders"
+    name: "Read Orders"
+    type: "Kafka"
+    location: "orders"
+    connection:
+      properties:
+        brokers: "kafka-broker:9092"
+        group_id: "flow_architect_group"
+
+processing_elements:
+  - id: "process_filter_high_value"
+    name: "Filter High Value Orders"
+    operation: "Filter"
+    config:
+      condition: "amount > 100"
+
+sinks:
+  - id: "sink_postgres"
+    name: "Write to Postgres"
+    type: "PostgreSQL"
+    location: "public.high_value_orders"
+    connection:
+      properties:
+        host: "db.internal"
+        port: 5432
+        database: "analytics"
+        username: "${DB_USER}"
+
+
+links:      # Ребра графа (Flow Layer)
+  - from: "step_read_kafka"
+    to: "step_filter_high_value"

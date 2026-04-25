@@ -1,0 +1,41 @@
+{
+  "flow": {
+    "id": "s3_to_hdfs",
+    "name": "S3 to HDFS",
+    "description": "Download files from S3 bucket and store in HDFS"
+  },
+  "triggers": [
+    {"id": "t1", "type": "schedule", "condition": "every 15 minutes"}
+  ],
+  "sources": [
+    {
+      "id": "src1",
+      "name": "S3 raw-data bucket",
+      "type": "S3",
+      "location": "s3://raw-data",
+      "connection": {
+        "properties": {
+          "region": "us-east-1"
+        }
+      }
+    }
+  ],
+  "processing_elements": [],
+  "sinks": [
+    {
+      "id": "sink1",
+      "name": "HDFS storage",
+      "type": "HDFS",
+      "location": "/data/raw",
+      "connection": {
+        "properties": {
+          "hdfs_url": "hdfs://namenode:9000"
+        }
+      }
+    }
+  ],
+  "processed_data": [],
+  "links": [
+    {"from_id": "src1", "to_id": "sink1"}
+  ]
+}

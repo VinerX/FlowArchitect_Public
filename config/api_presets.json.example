@@ -1,0 +1,259 @@
+{
+  "presets": {
+    "11": {
+      "id": 11,
+      "name": "Google",
+      "base": 3,
+      "pricing": "mixed",
+      "default_model": "gemini-2.5-flash",
+      "url": "",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "12": {
+      "id": 12,
+      "name": "Local mistral",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "liquid/lfm2-1.2b",
+      "url": "http://127.0.0.1:1234/v1/chat/completions",
+      "key": "",
+      "reserve_keys": [],
+      "protocol_id": "openai_compatible_default",
+      "protocol_overrides": {}
+    },
+    "13": {
+      "id": 13,
+      "name": "ProxiOpenrouter",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "mistralai/1",
+      "url": "https://api.proxyapi.ru/openrouter/v1",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "14": {
+      "id": 14,
+      "name": "ProxiOpenAI",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "gpt-oss-20b",
+      "url": "https://api.proxyapi.ru/openai/v1/chat/completions",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "15": {
+      "id": 15,
+      "name": "ProxiFree",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "amazon/nova-2-lite-v1:free",
+      "url": "https://api.proxyapi.ru/openrouter/v1/chat/completions",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "16": {
+      "id": 16,
+      "name": "ProxiGemini",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "gemini-2.0-flash",
+      "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "google_gemini_default",
+      "protocol_overrides": {
+        "transforms": [
+          {
+            "id": "system_to_user_prefix"
+          }
+        ]
+      }
+    },
+    "17": {
+      "id": 17,
+      "name": "2",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "gemini-2.0-flash-lite",
+      "url": "https://api.proxyapi.ru/google/v1/models/gemini-2.0-flash-lite:generateContent",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "18": {
+      "id": 18,
+      "name": "3",
+      "base": 2,
+      "pricing": "mixed",
+      "default_model": "gemma-3-27b-it:free",
+      "url": "",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "19": {
+      "id": 19,
+      "name": "4",
+      "base": 5,
+      "pricing": "paid",
+      "default_model": "gemini-2.0-flash-lite",
+      "url": "",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "20": {
+      "id": 20,
+      "name": "Groq",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "groq/compound",
+      "url": "https://api.groq.com/openai/v1/chat/completions",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "21": {
+      "id": 21,
+      "name": "Mistral",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "mistral-large-2512",
+      "url": "https://api.mistral.ai/v1/chat/completions",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "mistral_default",
+      "protocol_overrides": {}
+    },
+    "22": {
+      "id": 22,
+      "name": "Ollama",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "gpt-oss:120b",
+      "url": "https://ollama.com/api/chat/completions",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "23": {
+      "id": 23,
+      "name": "LongCat",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "LongCat-Flash-Thinking",
+      "url": "https://api.longcat.chat/openai/v1/chat/completions",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "24": {
+      "id": 24,
+      "name": "ModelScope",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "Qwen/Qwen3-VL-235B-A22B-Instruct",
+      "url": "https://api.openai.com/v1/chat/completions",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "25": {
+      "id": 25,
+      "name": "Qwen",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "qwen-plus",
+      "url": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1/chat/completions",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "26": {
+      "id": 26,
+      "name": "Migrated Legacy API",
+      "base": 1,
+      "pricing": "mixed",
+      "default_model": "mistral-large-2512",
+      "url": "",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "27": {
+      "id": 27,
+      "name": "Test",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "",
+      "url": "",
+      "key": "",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "28": {
+      "id": 28,
+      "name": "Gemma",
+      "base": 3,
+      "pricing": "mixed",
+      "default_model": "gemma-3-12b-it",
+      "url": "",
+      "key": "YOUR_API_KEY_HERE",
+      "reserve_keys": [],
+      "protocol_id": "",
+      "protocol_overrides": {}
+    },
+    "29": {
+      "id": 29,
+      "name": "Local gemma small",
+      "base": null,
+      "pricing": "mixed",
+      "default_model": "liquid/lfm2-1.2b",
+      "url": "http://127.0.0.1:1234/v1/chat/completions",
+      "key": "",
+      "reserve_keys": [],
+      "protocol_id": "openai_compatible_default",
+      "protocol_overrides": {}
+    }
+  },
+  "order": [
+    11,
+    13,
+    12,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "flow": {
+    "id": "currency_http_to_file",
+    "name": "Currency HTTP to File",
+    "description": "Fetch exchange rates from REST API and write to file"
+  },
+  "triggers": [
+    {"id": "t1", "type": "schedule", "condition": "every 1 hour"}
+  ],
+  "sources": [
+    {
+      "id": "src1",
+      "name": "ExchangeRate API",
+      "type": "HTTP",
+      "location": "https://api.exchangerate.host/latest"
+    }
+  ],
+  "processing_elements": [],
+  "sinks": [
+    {
+      "id": "sink1",
+      "name": "Rates File",
+      "type": "File",
+      "location": "/data/rates.json"
+    }
+  ],
+  "processed_data": [],
+  "links": [
+    {"from_id": "src1", "to_id": "sink1"}
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "flow": {
+    "id": "kafka_to_postgres",
+    "name": "Kafka to PostgreSQL",
+    "description": "Read messages from Kafka topic and store in PostgreSQL"
+  },
+  "triggers": [
+    {"id": "t1", "type": "event", "condition": "on message arrival"}
+  ],
+  "sources": [
+    {
+      "id": "src1",
+      "name": "Kafka Orders Topic",
+      "type": "Kafka",
+      "location": "orders",
+      "connection": {
+        "properties": {
+          "bootstrap.servers": "localhost:9092",
+          "group.id": "nifi-consumer"
+        }
+      }
+    }
+  ],
+  "processing_elements": [],
+  "sinks": [
+    {
+      "id": "sink1",
+      "name": "PostgreSQL orders_archive",
+      "type": "Database",
+      "location": "orders_archive",
+      "connection": {
+        "properties": {
+          "db_url": "jdbc:postgresql://localhost:5432/mydb",
+          "db_user": "postgres"
+        }
+      }
+    }
+  ],
+  "processed_data": [],
+  "links": [
+    {"from_id": "src1", "to_id": "sink1"}
+  ]
+}
