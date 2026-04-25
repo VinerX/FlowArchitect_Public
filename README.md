@@ -4,6 +4,13 @@
 **Автор:** Макаров Дмитрий · **Научный руководитель:** Бабкин Эдуард Александрович
 
 ---
+<img width="1919" height="1041" alt="image" src="https://github.com/user-attachments/assets/cf987187-2831-4685-8205-6806fa0601ad" />
+<img width="1920" height="1038" alt="image" src="https://github.com/user-attachments/assets/09ce1b04-adf1-41fd-8004-8dd9bfcf3971" />
+<img width="903" height="886" alt="image" src="https://github.com/user-attachments/assets/28a34dd6-d7c5-433b-aece-14fa5ab010da" />
+
+
+
+---
 
 ## Обзор
 
