@@ -6,6 +6,7 @@ from PyQt6.QtWidgets import QApplication
 
 from src.managers.settings_manager import SettingsManager
 from src.managers.api_preset_manager import ensure_api_presets_manager
+from src.managers.app_paths import db_path, settings_path
 from src.core.events import EventBus, set_event_bus
 from src.services.llm_service import LLMService
 from src.services.orchestrator import Orchestrator
@@ -47,10 +48,10 @@ def main():
     event_bus = EventBus()
     set_event_bus(event_bus)
 
-    settings_mgr = SettingsManager("config/settings.json")
+    settings_mgr = SettingsManager(str(settings_path()))
 
     # Database
-    _db = init_db_service("config/flowarchitect.db")
+    _db = init_db_service(str(db_path()))
 
     # Services
     llm_service = LLMService(settings=settings_mgr, event_bus=event_bus)

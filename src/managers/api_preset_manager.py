@@ -1,10 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 from main_logger import logger
-from src.core.events import get_event_bus, Events
+from src.core.events import Events, get_event_bus
 from src.managers.settings_manager import SettingsManager
 
 
@@ -17,10 +17,8 @@ class PresetMeta:
 
 class ApiPresetsManager:
     """
-    Минимальная реализация пресетов поверх SettingsManager + EventBus.
-    ApiPresetResolver сможет работать, потому что появляются подписчики на:
-      - Events.ApiPresets.GET_PRESET_LIST
-      - Events.ApiPresets.GET_PRESET_FULL
+    Lightweight preset storage over SettingsManager + EventBus.
+    Builtins are fixed for the public thesis demo; custom presets stay optional.
     """
 
     SETTINGS_CUSTOM_KEY = "API_PRESETS_CUSTOM"
@@ -31,7 +29,6 @@ class ApiPresetsManager:
         self.settings = settings
         self.bus = get_event_bus()
 
-        # подписываемся (ВАЖНО: weak=False, чтобы обработчики не умерли)
         self.bus.subscribe(Events.ApiPresets.GET_PRESET_LIST, self._on_get_preset_list, weak=False)
         self.bus.subscribe(Events.ApiPresets.GET_PRESET_FULL, self._on_get_preset_full, weak=False)
         self.bus.subscribe(Events.ApiPresets.SAVE_CUSTOM_PRESET, self._on_save_custom_preset, weak=False)
@@ -41,15 +38,46 @@ class ApiPresetsManager:
 
         self._ensure_defaults()
 
-    # ---------------------------
-    # Builtins
-    # ---------------------------
-
     def _builtin_presets(self) -> List[Dict[str, Any]]:
-        # Можно расширять список под ваши провайдеры
+        openrouter_headers = {
+            "headers": {
+                "HTTP-Referer": "https://github.com/VinerX/FlowArchitect",
+                "X-Title": "FlowArchitect",
+            }
+        }
         return [
             {
                 "id": 1,
+                "name": "OpenRouter DeepSeek V4 Pro",
+                "protocol_id": "openai_http",
+                "url": "https://openrouter.ai/api/v1/chat/completions",
+                "default_model": "deepseek/deepseek-v4-pro",
+                "key": "",
+                "reserve_keys": [],
+                "protocol_overrides": openrouter_headers,
+            },
+            {
+                "id": 2,
+                "name": "OpenRouter Qwen 3.6 Plus",
+                "protocol_id": "openai_http",
+                "url": "https://openrouter.ai/api/v1/chat/completions",
+                "default_model": "qwen/qwen3.6-plus",
+                "key": "",
+                "reserve_keys": [],
+                "protocol_overrides": openrouter_headers,
+            },
+            {
+                "id": 3,
+                "name": "OpenRouter Claude Sonnet 4.6",
+                "protocol_id": "openai_http",
+                "url": "https://openrouter.ai/api/v1/chat/completions",
+                "default_model": "anthropic/claude-sonnet-4.6",
+                "key": "",
+                "reserve_keys": [],
+                "protocol_overrides": openrouter_headers,
+            },
+            {
+                "id": 4,
                 "name": "OpenAI",
                 "protocol_id": "openai_http",
                 "url": "https://api.openai.com/v1/chat/completions",
@@ -59,44 +87,18 @@ class ApiPresetsManager:
                 "protocol_overrides": {},
             },
             {
-                "id": 2,
-                "name": "DeepSeek (OpenAI-compatible)",
-                "protocol_id": "openai_http",
-                "url": "https://api.deepseek.com/chat/completions",
-                "default_model": "deepseek-chat",
+                "id": 5,
+                "name": "Google Gemini",
+                "protocol_id": "google_gemini_default",
+                "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+                "default_model": "gemini-2.5-flash",
                 "key": "",
                 "reserve_keys": [],
                 "protocol_overrides": {},
-            },
-            {
-                "id": 3,
-                "name": "Ollama (local, OpenAI-compatible)",
-                "protocol_id": "openai_http",
-                "url": "http://localhost:11434/v1/chat/completions",
-                "default_model": "llama3.1",
-                "key": "",
-                "reserve_keys": [],
-                "protocol_overrides": {},
-            },
-            {
-                "id": 4,
-                "name": "OpenRouter",
-                "protocol_id": "openai_http",
-                "url": "https://openrouter.ai/api/v1/chat/completions",
-                "default_model": "openai/gpt-4o-mini",
-                "key": "",
-                "reserve_keys": [],
-                "protocol_overrides": {
-                    "headers": {
-                        "HTTP-Referer": "https://github.com/VinerX/FlowArchitect",
-                        "X-Title": "FlowArchitect",
-                    }
-                },
             },
         ]
 
     def _ensure_defaults(self) -> None:
-        # гарантируем структуру в settings.json
         if not isinstance(self.settings.get(self.SETTINGS_CUSTOM_KEY), list):
             self.settings.set(self.SETTINGS_CUSTOM_KEY, [])
         if not isinstance(self.settings.get(self.SETTINGS_BUILTIN_OVERRIDES_KEY), dict):
@@ -104,11 +106,7 @@ class ApiPresetsManager:
 
         last_id = self.settings.get(self.SETTINGS_LAST_ID_KEY, 0)
         if not isinstance(last_id, int) or last_id <= 0:
-            self.settings.set(self.SETTINGS_LAST_ID_KEY, 1)
-
-    # ---------------------------
-    # Storage helpers
-    # ---------------------------
+            self.settings.set(self.SETTINGS_LAST_ID_KEY, 4)
 
     def _load_custom(self) -> List[Dict[str, Any]]:
         items = self.settings.get(self.SETTINGS_CUSTOM_KEY, [])
@@ -118,11 +116,11 @@ class ApiPresetsManager:
         self.settings.set(self.SETTINGS_CUSTOM_KEY, items)
 
     def _load_builtin_overrides(self) -> Dict[str, Dict[str, Any]]:
-        d = self.settings.get(self.SETTINGS_BUILTIN_OVERRIDES_KEY, {})
-        return d if isinstance(d, dict) else {}
+        data = self.settings.get(self.SETTINGS_BUILTIN_OVERRIDES_KEY, {})
+        return data if isinstance(data, dict) else {}
 
-    def _save_builtin_overrides(self, d: Dict[str, Dict[str, Any]]) -> None:
-        self.settings.set(self.SETTINGS_BUILTIN_OVERRIDES_KEY, d)
+    def _save_builtin_overrides(self, data: Dict[str, Dict[str, Any]]) -> None:
+        self.settings.set(self.SETTINGS_BUILTIN_OVERRIDES_KEY, data)
 
     def _allocate_custom_id(self) -> int:
         custom = self._load_custom()
@@ -134,52 +132,44 @@ class ApiPresetsManager:
         return cid
 
     def _get_full_by_id(self, preset_id: int) -> Optional[Dict[str, Any]]:
-        # builtin + overrides
-        for b in self._builtin_presets():
-            if int(b.get("id", -1)) == int(preset_id):
-                ov = self._load_builtin_overrides().get(str(preset_id), {}) or {}
-                merged = dict(b)
-                merged.update({k: v for k, v in ov.items()})
+        for builtin in self._builtin_presets():
+            if int(builtin.get("id", -1)) == int(preset_id):
+                overrides = self._load_builtin_overrides().get(str(preset_id), {}) or {}
+                merged = dict(builtin)
+                merged.update({k: v for k, v in overrides.items()})
                 return merged
 
-        # custom
-        for c in self._load_custom():
-            if isinstance(c, dict) and int(c.get("id", -1)) == int(preset_id):
-                return c
+        for custom in self._load_custom():
+            if isinstance(custom, dict) and int(custom.get("id", -1)) == int(preset_id):
+                return custom
         return None
-
-    # ---------------------------
-    # Event handlers
-    # ---------------------------
 
     def _on_get_preset_list(self, event) -> Dict[str, Any]:
         builtin_meta = [PresetMeta(id=int(x["id"]), name=str(x.get("name", "")), builtin=True) for x in self._builtin_presets()]
         custom_meta = []
-        for x in self._load_custom():
-            if isinstance(x, dict) and isinstance(x.get("id"), int):
-                custom_meta.append(PresetMeta(id=int(x["id"]), name=str(x.get("name", "Custom")), builtin=False))
-
+        for item in self._load_custom():
+            if isinstance(item, dict) and isinstance(item.get("id"), int):
+                custom_meta.append(PresetMeta(id=int(item["id"]), name=str(item.get("name", "Custom")), builtin=False))
         return {"builtin": builtin_meta, "custom": custom_meta}
 
     def _on_get_preset_full(self, event) -> Optional[Dict[str, Any]]:
         data = getattr(event, "data", None) or {}
-        pid = data.get("id")
-        if not isinstance(pid, int):
+        preset_id = data.get("id")
+        if not isinstance(preset_id, int):
             return None
-        return self._get_full_by_id(pid)
+        return self._get_full_by_id(preset_id)
 
     def _on_save_custom_preset(self, event) -> Optional[int]:
         payload = getattr(event, "data", None) or {}
         if not isinstance(payload, dict):
             return None
 
-        pid = payload.get("id")
+        preset_id = payload.get("id")
         name = str(payload.get("name", "") or "Custom").strip()
 
-        # если это builtin id -> сохраняем OVERRIDES
-        if isinstance(pid, int) and any(int(b["id"]) == pid for b in self._builtin_presets()):
+        if isinstance(preset_id, int) and any(int(b["id"]) == preset_id for b in self._builtin_presets()):
             overrides = self._load_builtin_overrides()
-            overrides[str(pid)] = {
+            overrides[str(preset_id)] = {
                 "name": name,
                 "protocol_id": payload.get("protocol_id", "openai_http"),
                 "url": payload.get("url", ""),
@@ -188,21 +178,19 @@ class ApiPresetsManager:
                 "key": payload.get("key", ""),
                 "reserve_keys": payload.get("reserve_keys", []) or [],
                 "protocol_overrides": payload.get("protocol_overrides", {}) or {},
-                "template_id":         payload.get("template_id", "custom"),
-                "price_input_per_1m":  payload.get("price_input_per_1m"),
+                "template_id": payload.get("template_id", "custom"),
+                "price_input_per_1m": payload.get("price_input_per_1m"),
                 "price_output_per_1m": payload.get("price_output_per_1m"),
             }
             self._save_builtin_overrides(overrides)
-            return pid
+            return preset_id
 
-        # иначе custom
         custom = self._load_custom()
-        if not isinstance(pid, int):
-            pid = self._allocate_custom_id()
+        if not isinstance(preset_id, int):
+            preset_id = self._allocate_custom_id()
 
-        # upsert
         out = {
-            "id": int(pid),
+            "id": int(preset_id),
             "name": name,
             "protocol_id": payload.get("protocol_id", "openai_http"),
             "url": payload.get("url", ""),
@@ -211,52 +199,50 @@ class ApiPresetsManager:
             "key": payload.get("key", ""),
             "reserve_keys": payload.get("reserve_keys", []) or [],
             "protocol_overrides": payload.get("protocol_overrides", {}) or {},
-            "price_input_per_1m":  payload.get("price_input_per_1m"),
+            "price_input_per_1m": payload.get("price_input_per_1m"),
             "price_output_per_1m": payload.get("price_output_per_1m"),
         }
 
         replaced = False
-        for i, item in enumerate(custom):
-            if isinstance(item, dict) and int(item.get("id", -1)) == int(pid):
-                custom[i] = out
+        for index, item in enumerate(custom):
+            if isinstance(item, dict) and int(item.get("id", -1)) == int(preset_id):
+                custom[index] = out
                 replaced = True
                 break
         if not replaced:
             custom.append(out)
 
         self._save_custom(custom)
-        return int(pid)
+        return int(preset_id)
 
     def _on_delete_custom_preset(self, event) -> bool:
         data = getattr(event, "data", None) or {}
-        pid = data.get("id")
-        if not isinstance(pid, int):
+        preset_id = data.get("id")
+        if not isinstance(preset_id, int):
             return False
 
-        # builtin -> удаляем overrides
-        if any(int(b["id"]) == pid for b in self._builtin_presets()):
+        if any(int(b["id"]) == preset_id for b in self._builtin_presets()):
             overrides = self._load_builtin_overrides()
-            if str(pid) in overrides:
-                overrides.pop(str(pid), None)
+            if str(preset_id) in overrides:
+                overrides.pop(str(preset_id), None)
                 self._save_builtin_overrides(overrides)
             return True
 
-        # custom -> remove
         custom = self._load_custom()
-        new_custom = [x for x in custom if not (isinstance(x, dict) and int(x.get("id", -1)) == pid)]
+        new_custom = [x for x in custom if not (isinstance(x, dict) and int(x.get("id", -1)) == preset_id)]
         self._save_custom(new_custom)
         return True
 
     def _on_get_current_preset_id(self, event) -> int:
-        pid = self.settings.get(self.SETTINGS_LAST_ID_KEY, 1)
-        return pid if isinstance(pid, int) else 1
+        preset_id = self.settings.get(self.SETTINGS_LAST_ID_KEY, 4)
+        return preset_id if isinstance(preset_id, int) else 4
 
     def _on_set_current_preset_id(self, event) -> bool:
         data = getattr(event, "data", None) or {}
-        pid = data.get("id")
-        if not isinstance(pid, int) or pid <= 0:
+        preset_id = data.get("id")
+        if not isinstance(preset_id, int) or preset_id <= 0:
             return False
-        self.settings.set(self.SETTINGS_LAST_ID_KEY, pid)
+        self.settings.set(self.SETTINGS_LAST_ID_KEY, preset_id)
         return True
 
 

@@ -42,6 +42,8 @@ class MainWindow(QMainWindow):
         self.bus = get_event_bus()
 
         splitter = QSplitter(Qt.Orientation.Horizontal)
+        splitter.setObjectName("main_splitter")
+        splitter.setHandleWidth(6)
         splitter.addWidget(self.history_panel)
         splitter.addWidget(self.chat_widget)
         splitter.addWidget(self.code_editor)
@@ -58,8 +60,13 @@ class MainWindow(QMainWindow):
         root_layout.setSpacing(0)
         root_layout.addWidget(self._build_header())
         root_layout.addWidget(splitter, 1)
+        self.splitter = splitter
 
         self.setCentralWidget(root)
+        self._history_expanded_width = HistoryPanel.EXPANDED_WIDTH
+        self._editor_expanded_width = 420
+        self.history_panel.collapse_toggled.connect(self._on_history_panel_toggled)
+        self.code_editor.collapse_toggled.connect(self._on_editor_panel_toggled)
 
         # ── Status bar ──────────────────────────────────────────────
         sb = self.statusBar()
@@ -74,6 +81,47 @@ class MainWindow(QMainWindow):
         self._update_theme_btn(tm.current)
         self.bus.subscribe(Events.Settings.SETTING_CHANGED, self._on_setting_changed, weak=False)
         self._refresh_stage_provider_button()
+
+    def _chat_min_width(self) -> int:
+        return max(self.chat_widget.minimumWidth(), 360)
+
+    def _on_history_panel_toggled(self, collapsed: bool) -> None:
+        sizes = self.splitter.sizes()
+        if len(sizes) != 3:
+            return
+
+        target = self.history_panel.COLLAPSED_WIDTH if collapsed else max(
+            self._history_expanded_width, self.history_panel.EXPANDED_WIDTH
+        )
+        if collapsed and sizes[0] > self.history_panel.COLLAPSED_WIDTH:
+            self._history_expanded_width = sizes[0]
+        elif not collapsed:
+            available = sizes[0] + max(0, sizes[1] - self._chat_min_width())
+            target = min(target, max(self.history_panel.EXPANDED_WIDTH, available))
+
+        delta = target - sizes[0]
+        sizes[0] = target
+        sizes[1] = max(self._chat_min_width(), sizes[1] - delta)
+        self.splitter.setSizes(sizes)
+
+    def _on_editor_panel_toggled(self, collapsed: bool) -> None:
+        sizes = self.splitter.sizes()
+        if len(sizes) != 3:
+            return
+
+        target = self.code_editor.COLLAPSED_WIDTH if collapsed else max(
+            self._editor_expanded_width, self.code_editor.EXPANDED_MIN_WIDTH
+        )
+        if collapsed and sizes[2] > self.code_editor.COLLAPSED_WIDTH:
+            self._editor_expanded_width = sizes[2]
+        elif not collapsed:
+            available = sizes[2] + max(0, sizes[1] - self._chat_min_width())
+            target = min(target, max(self.code_editor.EXPANDED_MIN_WIDTH, available))
+
+        delta = target - sizes[2]
+        sizes[2] = target
+        sizes[1] = max(self._chat_min_width(), sizes[1] - delta)
+        self.splitter.setSizes(sizes)
 
     def _build_header(self) -> QFrame:
         header = QFrame()

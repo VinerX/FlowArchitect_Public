@@ -1,6 +1,5 @@
 """
-CLI: list all configured LLM presets from src/config/settings.json
-(the file the app writes to when run from src/).
+CLI: list all configured LLM presets from config/settings.json.
 
 Usage:
     python scripts/list_presets.py
@@ -14,20 +13,27 @@ import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from src.managers.app_paths import settings_path
 
 _BUILTIN_PRESETS = [
-    {"id": 1, "name": "OpenAI",                      "default_model": "gpt-4o-mini",
+    {"id": 1, "name": "OpenRouter DeepSeek V4 Pro", "default_model": "deepseek/deepseek-v4-pro",
+     "url": "https://openrouter.ai/api/v1/chat/completions", "key": ""},
+    {"id": 2, "name": "OpenRouter Qwen 3.6 Plus", "default_model": "qwen/qwen3.6-plus",
+     "url": "https://openrouter.ai/api/v1/chat/completions", "key": ""},
+    {"id": 3, "name": "OpenRouter Claude Sonnet 4.6", "default_model": "anthropic/claude-sonnet-4.6",
+     "url": "https://openrouter.ai/api/v1/chat/completions", "key": ""},
+    {"id": 4, "name": "OpenAI", "default_model": "gpt-4o-mini",
      "url": "https://api.openai.com/v1/chat/completions", "key": ""},
-    {"id": 2, "name": "DeepSeek (OpenAI-compatible)", "default_model": "deepseek-chat",
-     "url": "https://api.deepseek.com/chat/completions",  "key": ""},
-    {"id": 3, "name": "Ollama (local)",               "default_model": "llama3.1",
-     "url": "http://localhost:11434/v1/chat/completions",  "key": ""},
+    {"id": 5, "name": "Google Gemini", "default_model": "gemini-2.5-flash",
+     "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent", "key": ""},
 ]
 
 
 def _load_presets() -> dict[str, dict]:
-    """Return {str(id): preset_dict} from src/config/settings.json."""
-    path = PROJECT_ROOT / "src" / "config" / "settings.json"
+    """Return {str(id): preset_dict} from config/settings.json."""
+    path = settings_path()
     if not path.exists():
         print(f"ERROR: {path} not found. Run the app at least once to create it.", file=sys.stderr)
         sys.exit(1)
@@ -35,14 +41,14 @@ def _load_presets() -> dict[str, dict]:
 
     result: dict[str, dict] = {}
 
-    # Built-in presets (IDs 1-3), may have overrides
+    # Built-in presets, may have overrides
     overrides = data.get("API_PRESETS_BUILTIN_OVERRIDES", {}) or {}
     for b in _BUILTIN_PRESETS:
         merged = dict(b)
         merged.update(overrides.get(str(b["id"]), {}) or {})
         result[str(b["id"])] = merged
 
-    # Custom presets (IDs 1000+)
+    # Custom presets
     for p in data.get("API_PRESETS_CUSTOM", []) or []:
         if isinstance(p, dict) and "id" in p:
             result[str(p["id"])] = p
@@ -75,7 +81,7 @@ def main() -> None:
         return
 
     if not presets:
-        print("No presets found in src/config/settings.json")
+        print("No presets found in config/settings.json")
         return
 
     # Table header

@@ -3,6 +3,7 @@ import colorlog
 import os
 import sys
 from typing import Any, Optional
+from src.managers.app_paths import app_root, log_path
 
 # -----------------------------------------------------------------------------
 # Кастомные уровни логирования
@@ -21,7 +22,7 @@ logging.addLevelName(PROGRESS_LEVEL, "PROGRESS")
 class ProjectFilter(logging.Filter):
     def __init__(self):
         super().__init__()
-        self.project_path = os.path.dirname(os.path.abspath(__file__))
+        self.project_path = str(app_root())
 
     def filter(self, record):
         if hasattr(sys, '_MEIPASS'):  # запущено из exe
@@ -98,7 +99,7 @@ class CustomLogger(logging.Logger):
         console_handler.addFilter(LocationFilter())
         
         # Файловый обработчик
-        file_handler = logging.FileHandler('NeuroMitaLogs.log', encoding='utf-8')
+        file_handler = logging.FileHandler(str(log_path()), encoding='utf-8')
         file_handler.setFormatter(
             logging.Formatter(
                 '%(asctime)s - %(levelname)-8s '

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from PyQt6.QtCore import Qt, QPoint, pyqtSignal
+from PyQt6.QtCore import QPoint, Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QFrame,
     QHBoxLayout,
@@ -26,94 +26,81 @@ _MODE_LABELS = {0: "Direct", 1: "Adapter", 2: "LLM"}
 class HistoryPanel(QWidget):
     """
     Collapsible left panel showing session history and analytics.
-
-    Signals:
-        session_selected(int)          — user clicked a session row (session_id)
-        new_session_requested()        — user clicked "New Session"
-        session_rename_requested(int, str) — user renamed a session
-        session_delete_requested(int)  — user deleted a session
-        run_ui_task_signal             — used by BaseController._ui() for thread-safe updates
     """
 
     session_selected = pyqtSignal(int)
     new_session_requested = pyqtSignal()
-    session_rename_requested = pyqtSignal(int, str)  # session_id, new_name
-    session_delete_requested = pyqtSignal(int)        # session_id
-    run_ui_task_signal = pyqtSignal(object)           # BaseController._ui() hook
+    session_rename_requested = pyqtSignal(int, str)
+    session_delete_requested = pyqtSignal(int)
+    run_ui_task_signal = pyqtSignal(object)
+    collapse_toggled = pyqtSignal(bool)
 
-    EXPANDED_WIDTH  = 230
-    COLLAPSED_WIDTH = 38
+    EXPANDED_WIDTH = 230
+    COLLAPSED_WIDTH = 28
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
         self.setObjectName("sidebar")
+        self.setProperty("collapsed", False)
         self._collapsed = False
         self._sessions: list[dict[str, Any]] = []
 
         self.run_ui_task_signal.connect(self._run_ui_task)
 
         self.setSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Expanding)
-        self.setMinimumWidth(self.EXPANDED_WIDTH)
-        self.setMaximumWidth(self.EXPANDED_WIDTH)
-
+        self._set_panel_width(self.EXPANDED_WIDTH)
         self._build_ui()
-
-    # ------------------------------------------------------------------
-    # UI construction
-    # ------------------------------------------------------------------
 
     def _build_ui(self) -> None:
         root = QVBoxLayout(self)
         root.setContentsMargins(0, 0, 0, 0)
         root.setSpacing(0)
 
-        # ── Header bar ──────────────────────────────────────────────
         header = QFrame()
         header.setFixedHeight(40)
         hbox = QHBoxLayout(header)
         hbox.setContentsMargins(12, 0, 6, 0)
         hbox.setSpacing(4)
+        self._header_layout = hbox
 
-        lbl = QLabel("SESSIONS")
-        lbl.setStyleSheet(
+        self._header_label = QLabel("SESSIONS")
+        self._header_label.setStyleSheet(
             "font-size: 11px; font-weight: 700; letter-spacing: 0.8px;"
         )
-        hbox.addWidget(lbl)
-        self._header_label = lbl
-
+        hbox.addWidget(self._header_label)
         hbox.addStretch()
 
         self._btn_new = QToolButton()
+        self._btn_new.setObjectName("sidebar_action")
         self._btn_new.setText("+")
         self._btn_new.setToolTip("New session")
+        self._btn_new.setFixedSize(24, 24)
         self._btn_new.setStyleSheet(
             "QToolButton { font-size: 18px; font-weight: 300; "
             "background: transparent; border: none; padding: 2px 4px; border-radius: 4px; }"
-            "QToolButton:hover { background: #252D40; }"
         )
         self._btn_new.clicked.connect(self.new_session_requested)
         hbox.addWidget(self._btn_new)
 
         self._btn_toggle = QToolButton()
-        self._btn_toggle.setText("\u00ab")  # «  collapse
+        self._btn_toggle.setObjectName("sidebar_toggle")
+        self._btn_toggle.setText("\u00ab")
         self._btn_toggle.setToolTip("Collapse panel")
+        self._btn_toggle.setFixedSize(24, 24)
         self._btn_toggle.setStyleSheet(
             "QToolButton { font-size: 14px; font-weight: 700; background: transparent; border: none; "
             "padding: 2px 4px; border-radius: 4px; }"
-            "QToolButton:hover { background: #252D40; }"
         )
         self._btn_toggle.clicked.connect(self.toggle_collapse)
         hbox.addWidget(self._btn_toggle)
 
         root.addWidget(header)
 
-        # ── Separator ───────────────────────────────────────────────
-        sep = QFrame()
-        sep.setFrameShape(QFrame.Shape.HLine)
-        sep.setStyleSheet("background: #252D40; max-height: 1px;")
-        root.addWidget(sep)
+        self._separator = QFrame()
+        self._separator.setFrameShape(QFrame.Shape.HLine)
+        self._separator.setStyleSheet("background: #252D40; max-height: 1px;")
+        root.addWidget(self._separator)
 
-        # ── Content (hidden when collapsed) ─────────────────────────
         self._content = QWidget()
         content_layout = QVBoxLayout(self._content)
         content_layout.setContentsMargins(0, 0, 0, 0)
@@ -121,7 +108,6 @@ class HistoryPanel(QWidget):
 
         tabs = QTabWidget()
 
-        # Sessions tab
         sessions_tab = QWidget()
         sl = QVBoxLayout(sessions_tab)
         sl.setContentsMargins(4, 6, 4, 4)
@@ -131,12 +117,12 @@ class HistoryPanel(QWidget):
         self._session_list.setAlternatingRowColors(False)
         self._session_list.itemClicked.connect(self._on_item_clicked)
         self._session_list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self._session_list.customContextMenuRequested.connect(self._show_session_context_menu)
+        self._session_list.customContextMenuRequested.connect(
+            self._show_session_context_menu
+        )
         sl.addWidget(self._session_list)
-
         tabs.addTab(sessions_tab, "Sessions")
 
-        # Stats tab
         stats_tab = QWidget()
         stl = QVBoxLayout(stats_tab)
         stl.setContentsMargins(4, 4, 4, 4)
@@ -144,23 +130,14 @@ class HistoryPanel(QWidget):
         self._stats_view = QTextEdit()
         self._stats_view.setReadOnly(True)
         stl.addWidget(self._stats_view)
-
         tabs.addTab(stats_tab, "Stats")
 
         content_layout.addWidget(tabs)
         root.addWidget(self._content, 1)
 
-    # ------------------------------------------------------------------
-    # Thread-safe UI dispatch
-    # ------------------------------------------------------------------
-
     def _run_ui_task(self, fn) -> None:
         if callable(fn):
             fn()
-
-    # ------------------------------------------------------------------
-    # Collapse / expand
-    # ------------------------------------------------------------------
 
     def toggle_collapse(self) -> None:
         if self._collapsed:
@@ -170,46 +147,65 @@ class HistoryPanel(QWidget):
 
     def _collapse(self) -> None:
         self._collapsed = True
+        self.setProperty("collapsed", True)
         self._content.hide()
         self._header_label.hide()
         self._btn_new.hide()
-        self._btn_toggle.setText("\u00bb")  # »  expand
+        self._btn_toggle.setText("\u00bb")
         self._btn_toggle.setToolTip("Expand panel")
-        self.setMinimumWidth(self.COLLAPSED_WIDTH)
-        self.setMaximumWidth(self.COLLAPSED_WIDTH)
+        self._separator.hide()
+        self._header_layout.setContentsMargins(0, 0, 0, 0)
+        self._header_layout.setSpacing(0)
+        self._set_panel_width(self.COLLAPSED_WIDTH)
+        self._refresh_style()
+        self.collapse_toggled.emit(True)
 
     def _expand(self) -> None:
         self._collapsed = False
+        self.setProperty("collapsed", False)
         self._content.show()
         self._header_label.show()
         self._btn_new.show()
-        self._btn_toggle.setText("\u00ab")  # «  collapse
+        self._btn_toggle.setText("\u00ab")
         self._btn_toggle.setToolTip("Collapse panel")
-        self.setMinimumWidth(self.EXPANDED_WIDTH)
-        self.setMaximumWidth(self.EXPANDED_WIDTH)
+        self._separator.show()
+        self._header_layout.setContentsMargins(12, 0, 6, 0)
+        self._header_layout.setSpacing(4)
+        self._set_panel_width(self.EXPANDED_WIDTH)
+        self._refresh_style()
+        self.collapse_toggled.emit(False)
 
-    # ------------------------------------------------------------------
-    # Public update API (called by HistoryController)
-    # ------------------------------------------------------------------
+    def _set_panel_width(self, width: int) -> None:
+        self.setMinimumWidth(width)
+        self.setMaximumWidth(width)
+        self.resize(width, self.height())
+
+    def _refresh_style(self) -> None:
+        style = self.style()
+        style.unpolish(self)
+        style.polish(self)
+        self.update()
 
     def load_sessions(self, sessions: list[dict[str, Any]]) -> None:
         self._sessions = sessions
         self._session_list.clear()
 
-        for s in sessions:
-            mode_label = _MODE_LABELS.get(s.get("mode", 1), "?")
-            name = s.get("name") or "New Session"
-            updated = (s.get("updated_at") or "")[:10]
+        for session in sessions:
+            mode_label = _MODE_LABELS.get(session.get("mode", 1), "?")
+            name = session.get("name") or "New Session"
+            updated = (session.get("updated_at") or "")[:10]
             display = f"{name}\n{mode_label}  \u00b7  {updated}"
 
             item = QListWidgetItem(display)
-            item.setData(Qt.ItemDataRole.UserRole, s["id"])
-            item.setToolTip(f"Session #{s['id']} | Mode: {mode_label} | Updated: {updated}")
+            item.setData(Qt.ItemDataRole.UserRole, session["id"])
+            item.setToolTip(
+                f"Session #{session['id']} | Mode: {mode_label} | Updated: {updated}"
+            )
             self._session_list.addItem(item)
 
     def update_session_name(self, session_id: int, name: str) -> None:
-        for i in range(self._session_list.count()):
-            item = self._session_list.item(i)
+        for index in range(self._session_list.count()):
+            item = self._session_list.item(index)
             if item and item.data(Qt.ItemDataRole.UserRole) == session_id:
                 lines = item.text().split("\n")
                 suffix = lines[1] if len(lines) > 1 else ""
@@ -230,26 +226,22 @@ class HistoryPanel(QWidget):
         top_models = stats.get("top_models", [])
         if top_models:
             lines.append("\nTop models:")
-            for m in top_models:
-                lines.append(f"  {m['model'] or '?':30s} {m['count']}")
+            for model in top_models:
+                lines.append(f"  {model['model'] or '?':30s} {model['count']}")
 
         top_providers = stats.get("top_providers", [])
         if top_providers:
             lines.append("\nProviders:")
-            for p in top_providers:
-                lines.append(f"  {p['provider'] or '?':20s} {p['count']}")
+            for provider in top_providers:
+                lines.append(f"  {provider['provider'] or '?':20s} {provider['count']}")
 
         by_purpose = stats.get("calls_by_purpose", [])
         if by_purpose:
             lines.append("\nCalls by purpose:")
-            for p in by_purpose:
-                lines.append(f"  {p['purpose']:20s} {p['count']}")
+            for purpose in by_purpose:
+                lines.append(f"  {purpose['purpose']:20s} {purpose['count']}")
 
         self._stats_view.setPlainText("\n".join(lines))
-
-    # ------------------------------------------------------------------
-    # Internal slots
-    # ------------------------------------------------------------------
 
     def _on_item_clicked(self, item: QListWidgetItem) -> None:
         session_id = item.data(Qt.ItemDataRole.UserRole)
@@ -261,13 +253,12 @@ class HistoryPanel(QWidget):
         if item is None:
             return
 
-        session_id: int = int(item.data(Qt.ItemDataRole.UserRole))
+        session_id = int(item.data(Qt.ItemDataRole.UserRole))
         current_name = item.text().split("\n")[0]
 
         menu = QMenu(self)
         act_rename = menu.addAction("Rename")
         act_delete = menu.addAction("Delete")
-
         chosen = menu.exec(self._session_list.mapToGlobal(pos))
 
         if chosen == act_rename:
@@ -279,12 +270,11 @@ class HistoryPanel(QWidget):
             )
             if ok and new_name.strip():
                 self.session_rename_requested.emit(session_id, new_name.strip())
-
         elif chosen == act_delete:
             reply = QMessageBox.question(
                 self,
                 "Delete Session",
-                f"Delete session \"{current_name}\"?\nThis action cannot be undone.",
+                f'Delete session "{current_name}"?\nThis action cannot be undone.',
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
                 QMessageBox.StandardButton.No,
             )

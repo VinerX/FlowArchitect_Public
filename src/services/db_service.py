@@ -5,6 +5,7 @@ import logging
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
+from src.managers.app_paths import db_path as default_db_path
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +18,7 @@ def get_db_service() -> "DbService":
     return _db_service_instance
 
 
-def init_db_service(db_path: str = "config/flowarchitect.db") -> "DbService":
+def init_db_service(db_path: str | None = None) -> "DbService":
     global _db_service_instance
     _db_service_instance = DbService(db_path)
     return _db_service_instance
@@ -33,10 +34,10 @@ class DbService:
     Stores sessions, chat messages, PIM/NiFi snapshots, and LLM call logs.
     """
 
-    def __init__(self, db_path: str = "config/flowarchitect.db"):
-        self.db_path = db_path
-        Path(db_path).parent.mkdir(parents=True, exist_ok=True)
-        self._conn = sqlite3.connect(db_path, check_same_thread=False)
+    def __init__(self, db_path: str | None = None):
+        self.db_path = str(Path(db_path) if db_path is not None else default_db_path())
+        Path(self.db_path).parent.mkdir(parents=True, exist_ok=True)
+        self._conn = sqlite3.connect(self.db_path, check_same_thread=False)
         self._conn.row_factory = sqlite3.Row
         self._conn.execute("PRAGMA foreign_keys = ON")
         self._conn.execute("PRAGMA journal_mode = WAL")

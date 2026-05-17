@@ -162,19 +162,23 @@ QStatusBar::item {{
 QSplitter {{
     background: {p['bg_base']};
 }}
-QSplitter::handle {{
+QSplitter#main_splitter::handle {{
     background: {p['border']};
-    width: 1px;
-    height: 1px;
 }}
-QSplitter::handle:hover {{
-    background: {p['accent']};
+QSplitter#main_splitter::handle:horizontal {{
+    width: 6px;
+}}
+QSplitter#main_splitter::handle:hover {{
+    background: {p['bg_hover']};
 }}
 
 /* ── Sidebar (history panel) ──────────────────────────────────────────────── */
 QWidget#sidebar {{
     background: {p['bg_sidebar']};
     border-right: 1px solid {p['border_strong']};
+}}
+QWidget#sidebar[collapsed="true"] {{
+    border-right: none;
 }}
 QWidget#sidebar QLabel {{
     color: {p['text_secondary']};
@@ -319,11 +323,31 @@ QPlainTextEdit#chat_input:focus {{
 QWidget#editor_panel {{
     background: {p['bg_panel']};
 }}
+QWidget#editor_panel[collapsed="true"] {{
+    border-left: none;
+}}
 QFrame#editor_toolbar {{
     background: {p['bg_sidebar']};
     border-bottom: 1px solid {p['border_strong']};
-    min-height: 44px;
-    max-height: 44px;
+}}
+QWidget#editor_toolbar_body {{
+    background: transparent;
+}}
+QToolButton#panel_toggle {{
+    background: transparent;
+    border: 1px solid {p['border_strong']};
+    border-radius: 6px;
+    color: {p['text_secondary']};
+    min-width: 24px;
+    min-height: 24px;
+    padding: 2px;
+    font-size: 14px;
+    font-weight: 700;
+}}
+QToolButton#panel_toggle:hover {{
+    background: {p['bg_hover']};
+    color: {p['text_primary']};
+    border-color: {p['text_muted']};
 }}
 QPlainTextEdit#code_view {{
     background: {p['bg_panel']};

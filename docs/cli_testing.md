@@ -50,7 +50,7 @@ Basic run:
 Full run with NiFi import:
 
 ```powershell
-$s = Get-Content src\config\settings.json -Raw | ConvertFrom-Json
+$s = Get-Content config\settings.json -Raw | ConvertFrom-Json
 $env:NIFI_URL = $s.nifi_url
 $env:NIFI_USER = $s.nifi_username
 $env:NIFI_PASS = $s.nifi_password
@@ -106,11 +106,13 @@ Stage mapping:
 - `--psm-preset`: provider for YAML -> JSON in mode `2`.
 - `--corrector-preset`: provider for PIM correction and NiFi JSON correction.
 
-Known useful local setup:
+Current public preset set:
 
-- `1000`: `openrouter qwen/qwen3.6-plus`, API provider via OpenRouter.
-- `1001`: `Local`, local endpoint at `127.0.0.1:1234`, not the OpenRouter Qwen API.
-- `1003`: `google/gemini-2.5-flash-lite` through OpenRouter, useful as a corrector.
+- `1`: `OpenRouter DeepSeek V4 Pro`
+- `2`: `OpenRouter Qwen 3.6 Plus`
+- `3`: `OpenRouter Claude Sonnet 4.6`
+- `4`: `OpenAI`
+- `5`: `Google Gemini`
 
 Check current presets:
 

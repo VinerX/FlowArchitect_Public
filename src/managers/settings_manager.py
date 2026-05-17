@@ -2,6 +2,7 @@ import json
 import os
 from typing import Any
 from src.core.events import get_event_bus, Events
+from src.managers.app_paths import settings_path
 from main_logger import logger
 
 
@@ -13,11 +14,11 @@ class SettingsManager:
             cls._instance = super(SettingsManager, cls).__new__(cls)
         return cls._instance
 
-    def __init__(self, config_path: str = "config/settings.json"):
+    def __init__(self, config_path: str | None = None):
         if hasattr(self, "_initialized") and self._initialized:
             return
 
-        self.config_path = config_path
+        self.config_path = config_path or str(settings_path())
         self.settings: dict = {}
         self.event_bus = get_event_bus()
         self.load()

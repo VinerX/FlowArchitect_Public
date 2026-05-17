@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Any
+from src.managers.app_paths import prompts_dir as default_prompts_dir
 
 
 class PromptService:
@@ -10,9 +11,7 @@ class PromptService:
     """
 
     def __init__(self, prompts_dir: str | Path | None = None):
-        # src/services/prompt_service.py -> src -> project_root
-        default_dir = Path(__file__).resolve().parents[2] / "config" / "prompts"
-        self.prompts_dir = Path(prompts_dir) if prompts_dir is not None else default_dir
+        self.prompts_dir = Path(prompts_dir) if prompts_dir is not None else default_prompts_dir()
 
     def get_prompt(self, filename: str, context: dict[str, Any] | None = None) -> str:
         context = context or {}

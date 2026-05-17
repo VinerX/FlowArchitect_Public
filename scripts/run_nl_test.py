@@ -51,6 +51,7 @@ logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(mes
 # --- Backend imports (order matters: events before services) ---
 from src.core.events import EventBus, set_event_bus           # noqa: E402
 from src.core.event_defines import Events                     # noqa: E402
+from src.managers.app_paths import db_path, settings_path     # noqa: E402
 from src.managers.settings_manager import SettingsManager     # noqa: E402
 from src.services.db_service import init_db_service           # noqa: E402
 from src.services.db_service import get_db_service            # noqa: E402
@@ -76,20 +77,22 @@ RUNS_ROOT = PROJECT_ROOT / "test_runs"
 # ---------------------------------------------------------------------------
 
 _BUILTIN_PRESETS = [
-    {"id": 1, "name": "OpenAI",                      "default_model": "gpt-4o-mini",
-     "url": "https://api.openai.com/v1/chat/completions", "key": ""},
-    {"id": 2, "name": "DeepSeek (OpenAI-compatible)", "default_model": "deepseek-chat",
-     "url": "https://api.deepseek.com/chat/completions",  "key": ""},
-    {"id": 3, "name": "Ollama (local)",               "default_model": "llama3.1",
-     "url": "http://localhost:11434/v1/chat/completions",  "key": ""},
-    {"id": 4, "name": "OpenRouter",                   "default_model": "openai/gpt-4o-mini",
+    {"id": 1, "name": "OpenRouter DeepSeek V4 Pro", "default_model": "deepseek/deepseek-v4-pro",
      "url": "https://openrouter.ai/api/v1/chat/completions", "key": ""},
+    {"id": 2, "name": "OpenRouter Qwen 3.6 Plus", "default_model": "qwen/qwen3.6-plus",
+     "url": "https://openrouter.ai/api/v1/chat/completions", "key": ""},
+    {"id": 3, "name": "OpenRouter Claude Sonnet 4.6", "default_model": "anthropic/claude-sonnet-4.6",
+     "url": "https://openrouter.ai/api/v1/chat/completions", "key": ""},
+    {"id": 4, "name": "OpenAI", "default_model": "gpt-4o-mini",
+     "url": "https://api.openai.com/v1/chat/completions", "key": ""},
+    {"id": 5, "name": "Google Gemini", "default_model": "gemini-2.5-flash",
+     "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent", "key": ""},
 ]
 
 
 def _load_presets() -> dict[str, dict]:
-    """Return {str(id): preset_dict} from src/config/settings.json (app's real storage)."""
-    path = PROJECT_ROOT / "src" / "config" / "settings.json"
+    """Return {str(id): preset_dict} from config/settings.json (app's real storage)."""
+    path = settings_path()
     if not path.exists():
         print(f"ERROR: {path} not found. Run the app at least once.", file=sys.stderr)
         sys.exit(1)
@@ -172,7 +175,7 @@ def _init_backend() -> tuple[EventBus, Orchestrator]:
         except Exception:
             pass
 
-    settings_mgr = SettingsManager(str(PROJECT_ROOT / "src" / "config" / "settings.json"))
+    settings_mgr = SettingsManager(str(settings_path()))
 
     # 'src.managers.settings_manager.SettingsManager' is a *separate* singleton class from
     # 'managers.settings_manager.SettingsManager' (dual sys.path import).  Patch its _instance
@@ -183,7 +186,7 @@ def _init_backend() -> tuple[EventBus, Orchestrator]:
     except Exception:
         pass
 
-    init_db_service(str(PROJECT_ROOT / "src" / "config" / "flowarchitect.db"))
+    init_db_service(str(db_path()))
     llm_service = LLMService(settings=settings_mgr, event_bus=event_bus)
     orchestrator = Orchestrator(event_bus=event_bus, llm_service=llm_service)
     ensure_api_presets_manager()
@@ -627,7 +630,7 @@ def main() -> None:
     print("Initialising backend...", flush=True)
     event_bus, _ = _init_backend()
     if stage_preset_ids:
-        sm = SettingsManager(str(PROJECT_ROOT / "src" / "config" / "settings.json"))
+        sm = SettingsManager(str(settings_path()))
         key_map = {
             "pim": "LLM_STAGE_PIM_PRESET_ID",
             "psm": "LLM_STAGE_PSM_PRESET_ID",

@@ -41,16 +41,9 @@ _PROVIDER_TEMPLATES = [
     {"id": "openrouter", "name": "OpenRouter",
      "url": "https://openrouter.ai/api/v1/chat/completions",        "protocol_id": "openai_http",
      "protocol_overrides": {"headers": {"HTTP-Referer": "https://github.com/VinerX/FlowArchitect", "X-Title": "FlowArchitect"}}},
-    {"id": "deepseek",   "name": "DeepSeek",
-     "url": "https://api.deepseek.com/chat/completions",            "protocol_id": "openai_http",     "protocol_overrides": {}},
-    {"id": "ollama",     "name": "Ollama (local)",
-     "url": "http://localhost:11434/v1/chat/completions",           "protocol_id": "openai_http",     "protocol_overrides": {}},
-    {"id": "mistral",    "name": "Mistral AI",
-     "url": "https://api.mistral.ai/v1/chat/completions",           "protocol_id": "mistral_default", "protocol_overrides": {}},
-    {"id": "groq",       "name": "Groq",
-     "url": "https://api.groq.com/openai/v1/chat/completions",      "protocol_id": "openai_http",     "protocol_overrides": {}},
-    {"id": "together",   "name": "Together AI",
-     "url": "https://api.together.xyz/v1/chat/completions",         "protocol_id": "openai_http",     "protocol_overrides": {}},
+    {"id": "google",     "name": "Google Gemini",
+     "url": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent",
+     "protocol_id": "google_gemini_default",                        "protocol_overrides": {}},
 ]
 
 

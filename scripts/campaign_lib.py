@@ -563,7 +563,7 @@ def load_state(campaign_dir: Path) -> dict[str, Any]:
 
 
 def _load_nifi_settings() -> dict[str, Any]:
-    settings_path = PROJECT_ROOT / "src" / "config" / "settings.json"
+    settings_path = PROJECT_ROOT / "config" / "settings.json"
     if not settings_path.exists():
         return {}
     try:
@@ -580,7 +580,7 @@ def _resolve_nifi_credentials() -> tuple[str, str, str]:
     if not user or not pwd:
         raise RuntimeError(
             "NiFi credentials are missing. Set NIFI_URL/NIFI_USER/NIFI_PASS "
-            "or configure them in src/config/settings.json."
+            "or configure them in config/settings.json."
         )
     return str(url), str(user), str(pwd)
 
