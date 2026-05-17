@@ -1,0 +1,208 @@
+{
+  "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-12T17:39:43.599306+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flow": {
+          "processGroups": [
+            {
+              "id": "pg-001",
+              "name": "Pending Transactions to Kafka",
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "processors": [
+                {
+                  "id": "proc-db-001",
+                  "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+                  "name": "Query Pending Transactions",
+                  "position": {
+                    "x": 100,
+                    "y": 100
+                  },
+                  "config": {
+                    "properties": {
+                      "Database Connection Pool": "cs-dbcp-001",
+                      "Table Name": "public.transactions",
+                      "Where Clause": "status = 'PENDING'",
+                      "Record Writer": "cs-json-001",
+                      "Stateful Cache": "",
+                      "Maximum-value Columns": ""
+                    },
+                    "autoTerminatedRelationships": [],
+                    "schedulingPeriod": "10 sec",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "executionNode": "ALL",
+                    "penaltyDuration": "30 sec",
+                    "yieldDuration": "1 sec",
+                    "bulletinLevel": "WARN",
+                    "runDurationMillis": 0,
+                    "concurrentlySchedulableTaskCount": 1,
+                    "comments": "",
+                    "lossTolerant": false,
+                    "scheduledState": "ENABLED",
+                    "annotationData": ""
+                  }
+                },
+                {
+                  "id": "proc-kafka-001",
+                  "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+                  "name": "Publish to Kafka",
+                  "position": {
+                    "x": 100,
+                    "y": 300
+                  },
+                  "config": {
+                    "properties": {
+                      "Kafka Brokers": "localhost:9092",
+                      "Topic Name": "transactions.overdue",
+                      "Use Transactions": "false",
+                      "Delivery Guarantee": "best-effort",
+                      "Client Name": "nifi-kafka-publisher"
+                    },
+                    "autoTerminatedRelationships": [
+                      "failure",
+                      "success"
+                    ],
+                    "schedulingPeriod": "0 sec",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "executionNode": "ALL",
+                    "penaltyDuration": "30 sec",
+                    "yieldDuration": "1 sec",
+                    "bulletinLevel": "WARN",
+                    "runDurationMillis": 0,
+                    "concurrentlySchedulableTaskCount": 1,
+                    "comments": "",
+                    "lossTolerant": false,
+                    "scheduledState": "ENABLED",
+                    "annotationData": ""
+                  }
+                }
+              ],
+              "connections": [
+                {
+                  "id": "conn-001",
+                  "source": {
+                    "id": "proc-db-001",
+                    "type": "PROCESSOR",
+                    "groupId": "pg-001"
+                  },
+                  "destination": {
+                    "id": "proc-kafka-001",
+                    "type": "PROCESSOR",
+                    "groupId": "pg-001"
+                  },
+                  "selectedRelationships": [
+                    "success"
+                  ],
+                  "name": "success",
+                  "backPressureObjectThreshold": 10000,
+                  "backPressureDataSizeThreshold": "1 GB",
+                  "flowFileExpiration": "0 sec",
+                  "prioritizers": [],
+                  "bends": [],
+                  "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
+                  "partitioningAttribute": "",
+                  "loadBalanceCompression": "DO_NOT_COMPRESS"
+                }
+              ],
+              "remoteProcessGroups": [],
+              "labels": [],
+              "funnels": []
+            }
+          ],
+          "controllerServices": [
+            {
+              "id": "cs-dbcp-001",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "name": "DBCPConnectionPool",
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://localhost:5432/your_database",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database User": "your_username",
+                "Password": "your_password",
+                "Max Wait Time": "500 millis",
+                "Max Total Connections": "8",
+                "Validation-query": "SELECT 1"
+              },
+              "state": "ENABLED",
+              "bulletinLevel": "WARN",
+              "comments": ""
+            },
+            {
+              "id": "cs-json-001",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "name": "JsonRecordSetWriter",
+              "properties": {
+                "Schema Access Strategy": "use-string-fields-from-avro-schema",
+                "Schema Write Strategy": "no-schema",
+                "Pretty Print JSON": "false"
+              },
+              "state": "ENABLED",
+              "bulletinLevel": "WARN",
+              "comments": ""
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "1d479141-019e-1000-7a90-417eff52eafe",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 124.81,
+      "stage1_duration_sec": 90.5,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 171,
+      "completion_tokens": 6368,
+      "total_tokens": 6539,
+      "cost_usd": 0.008334,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 93,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 99,
+          "completion_tokens": 1441,
+          "total_tokens": 1540,
+          "duration_ms": 90140,
+          "cost_usd": 0.001905
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 99,
+          "completion_tokens": 1441,
+          "total_tokens": 1540,
+          "duration_ms": 90140,
+          "cost_usd": 0.001905
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

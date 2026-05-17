@@ -1,0 +1,42 @@
+
+================================================================
+Query  : ������� ����� ����� � https://api.exchangerate.host/latest � �������� ��...
+Mode   : 2 � LLMx2 (NL->YAML->LLM->JSON)
+Presets: [1000]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1000, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1000: openrouter qwen/qwen3.6-plus  [qwen/qwen3.6-plus] ---
+  [1/2] USER_QUERY  mode=2  preset=1000
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  ... waiting for YAML PIM (20s elapsed, timeout=300s)
+  ... waiting for YAML PIM (30s elapsed, timeout=300s)
+  ... waiting for YAML PIM (40s elapsed, timeout=300s)
+  [1/2] PIM ready  (742 chars, 46.88s)
+  [2/2] REQUEST_CONVERSION  mode=2  preset=1000
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (40s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (50s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (60s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (70s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (80s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (90s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (100s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (110s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (2 proc, 1 conn, 117.82s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: FAILED: HTTP 500: An unexpected error has occurred. Please check the logs for additional details.
+  tokens: 2023 in / 9881 out / 11904 total  |  cost: $0.013503
+  Result : [OK]  (180.84s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage1-pilot-qwen36\runs\currency-http-to-file__m2__p1000__a1__sp329ea448\raw_report.json

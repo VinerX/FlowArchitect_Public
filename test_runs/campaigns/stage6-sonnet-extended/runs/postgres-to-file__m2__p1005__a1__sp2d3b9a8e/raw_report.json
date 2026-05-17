@@ -1,0 +1,328 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T20:30:22.205807+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: postgres_to_json_orders\n  name: PostgreSQL Orders to JSON Export\n  description: Периодически выбирает новые записи из таблицы public.orders в PostgreSQL\n    и сохраняет их в JSON-файл /data/output/orders_export.json\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 5 minutes\nsources:\n- id: source_postgres\n  name: Read New Orders from PostgreSQL\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{POSTGRES_HOST}}'\n      port: '{{POSTGRES_PORT}}'\n      database: '{{POSTGRES_DATABASE}}'\n      username: '{{POSTGRES_USERNAME}}'\n      password: '{{POSTGRES_PASSWORD}}'\nprocessing_elements:\n- id: process_filter_new\n  name: Filter New Records\n  operation: Filter\n  config:\n    condition: created_at > {{LAST_PROCESSED_TIMESTAMP}}\n    watermark_field: created_at\n    state_store: '{{WATERMARK_STATE_STORE}}'\n- id: process_to_json\n  name: Convert to JSON\n  operation: Serialize\n  config:\n    format: json\n    pretty_print: 'false'\nsinks:\n- id: sink_json_file\n  name: Write to JSON File\n  type: File\n  location: /data/output/orders_export.json\n  connection:\n    properties:\n      write_mode: append\n      encoding: UTF-8\nprocessed_data:\n- id: orders_raw\n  format: tabular\n- id: orders_json\n  format: json\nlinks:\n- from_id: source_postgres\n  to_id: process_filter_new\n  data_ref: orders_raw\n- from_id: process_filter_new\n  to_id: process_to_json\n  data_ref: orders_raw\n- from_id: process_to_json\n  to_id: sink_json_file\n  data_ref: orders_json",
+      "nifi_json": {
+        "id": "a1b2c3d4-0001-0000-0000-000000000000",
+        "name": "PostgreSQL Orders to JSON Export",
+        "comments": "Периодически выбирает новые записи из таблицы public.orders в PostgreSQL и сохраняет их в JSON-файл /data/output/orders_export.json",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "labels": [],
+        "funnels": [],
+        "controllerServices": [
+          {
+            "id": "cs-0001-dbcp-0000-000000000001",
+            "name": "DBCPConnectionPool - PostgreSQL Orders",
+            "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+            "comments": "JDBC connection pool for PostgreSQL public.orders",
+            "properties": {
+              "Database Connection URL": "jdbc:postgresql://{{POSTGRES_HOST}}:{{POSTGRES_PORT}}/{{POSTGRES_DATABASE}}",
+              "Database Driver Class Name": "org.postgresql.Driver",
+              "database-driver-locations": "{{POSTGRES_JDBC_DRIVER_PATH}}",
+              "Database User": "{{POSTGRES_USERNAME}}",
+              "Password": "{{POSTGRES_PASSWORD}}",
+              "Max Wait Time": "500 millis",
+              "Max Total Connections": "8",
+              "Validation query": "SELECT 1"
+            },
+            "state": "ENABLED"
+          },
+          {
+            "id": "cs-0002-jsonreader-0000-000000000002",
+            "name": "JsonTreeReader",
+            "type": "org.apache.nifi.json.JsonTreeReader",
+            "comments": "Reads JSON records",
+            "properties": {
+              "schema-access-strategy": "infer-schema",
+              "schema-name": "${schema.name}"
+            },
+            "state": "ENABLED"
+          },
+          {
+            "id": "cs-0003-jsonwriter-0000-000000000003",
+            "name": "JsonRecordSetWriter",
+            "type": "org.apache.nifi.json.JsonRecordSetWriter",
+            "comments": "Writes records as JSON (one record per line, no pretty print)",
+            "properties": {
+              "schema-access-strategy": "inherit-record-schema",
+              "schema-name": "${schema.name}",
+              "Pretty Print JSON": "false",
+              "suppress-nulls": "never-suppress",
+              "output-grouping": "output-oneline"
+            },
+            "state": "ENABLED"
+          }
+        ],
+        "processors": [
+          {
+            "id": "proc-0001-querydb-0000-000000000010",
+            "name": "Read New Orders from PostgreSQL",
+            "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+            "comments": "Queries public.orders table for new records using watermark on created_at. Runs every 5 minutes.",
+            "position": {
+              "x": 200,
+              "y": 100
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "5 min",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "properties": {
+                "dbcp-connection-pool": "cs-0001-dbcp-0000-000000000001",
+                "db-fetch-db-type": "PostgreSQL",
+                "db-fetch-table-name": "public.orders",
+                "db-fetch-column-names": "",
+                "db-fetch-where-clause": "",
+                "db-fetch-max-value-column-names": "created_at",
+                "db-fetch-initial-max-value": "{{LAST_PROCESSED_TIMESTAMP}}",
+                "db-fetch-fetch-size": "10000",
+                "db-fetch-max-rows": "0",
+                "db-fetch-normalize-table-name": "false",
+                "record-writer": "cs-0003-jsonwriter-0000-000000000003"
+              },
+              "autoTerminatedRelationships": []
+            }
+          },
+          {
+            "id": "proc-0002-queryrecord-0000-000000000020",
+            "name": "Filter New Records",
+            "type": "org.apache.nifi.processors.standard.QueryRecord",
+            "comments": "Filters records where created_at is greater than the last processed watermark timestamp.",
+            "position": {
+              "x": 200,
+              "y": 300
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "properties": {
+                "record-reader": "cs-0002-jsonreader-0000-000000000002",
+                "record-writer": "cs-0003-jsonwriter-0000-000000000003",
+                "include-zero-record-flowfiles": "false",
+                "cache-schema": "true",
+                "filtered": "SELECT * FROM FLOWFILE WHERE created_at > CAST('{{LAST_PROCESSED_TIMESTAMP}}' AS TIMESTAMP)"
+              },
+              "autoTerminatedRelationships": [
+                "failure",
+                "original"
+              ]
+            }
+          },
+          {
+            "id": "proc-0003-convertrecord-0000-000000000030",
+            "name": "Convert to JSON",
+            "type": "org.apache.nifi.processors.standard.ConvertRecord",
+            "comments": "Converts tabular records to JSON format (no pretty print, UTF-8).",
+            "position": {
+              "x": 200,
+              "y": 500
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "properties": {
+                "record-reader": "cs-0002-jsonreader-0000-000000000002",
+                "record-writer": "cs-0003-jsonwriter-0000-000000000003"
+              },
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            }
+          },
+          {
+            "id": "proc-0004-putfile-0000-000000000040",
+            "name": "Write to JSON File",
+            "type": "org.apache.nifi.processors.standard.PutFile",
+            "comments": "Appends JSON records to /data/output/orders_export.json with UTF-8 encoding.",
+            "position": {
+              "x": 200,
+              "y": 700
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "properties": {
+                "Directory": "/data/output",
+                "Filename": "orders_export.json",
+                "Conflict Resolution Strategy": "append",
+                "Create Missing Directories": "true",
+                "Maximum File Count": "-1",
+                "Last Modified Time": "",
+                "Permissions": "",
+                "Owner": "",
+                "Group": ""
+              },
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          }
+        ],
+        "connections": [
+          {
+            "id": "conn-0001-0000-0000-000000000100",
+            "name": "Read New Orders -> Filter New Records",
+            "source": {
+              "id": "proc-0001-querydb-0000-000000000010",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "proc-0002-queryrecord-0000-000000000020",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "flowFileExpiration": "0 sec",
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "labelIndex": 1,
+            "zIndex": 0,
+            "bends": []
+          },
+          {
+            "id": "conn-0002-0000-0000-000000000200",
+            "name": "Filter New Records -> Convert to JSON",
+            "source": {
+              "id": "proc-0002-queryrecord-0000-000000000020",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "proc-0003-convertrecord-0000-000000000030",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "filtered"
+            ],
+            "flowFileExpiration": "0 sec",
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "labelIndex": 1,
+            "zIndex": 0,
+            "bends": []
+          },
+          {
+            "id": "conn-0003-0000-0000-000000000300",
+            "name": "Convert to JSON -> Write to JSON File",
+            "source": {
+              "id": "proc-0003-convertrecord-0000-000000000030",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "proc-0004-putfile-0000-000000000040",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "flowFileExpiration": "0 sec",
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "labelIndex": 1,
+            "zIndex": 0,
+            "bends": []
+          }
+        ]
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details.",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 65.81,
+      "stage1_duration_sec": 9.8,
+      "stage2_duration_sec": 31.37,
+      "prompt_tokens": 2533,
+      "completion_tokens": 3483,
+      "total_tokens": 6016,
+      "cost_usd": 0.059844,
+      "nifi_processor_count": 4,
+      "nifi_connection_count": 3,
+      "pim_source_count": 1,
+      "pim_step_count": 2,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 217,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 1426,
+          "completion_tokens": 730,
+          "total_tokens": 2156,
+          "duration_ms": 9421,
+          "cost_usd": 0.015228
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 1004,
+          "completion_tokens": 2744,
+          "total_tokens": 3748,
+          "duration_ms": 31140,
+          "cost_usd": 0.044172
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1426,
+          "completion_tokens": 730,
+          "total_tokens": 2156,
+          "duration_ms": 9421,
+          "cost_usd": 0.015228
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 1004,
+          "completion_tokens": 2744,
+          "total_tokens": 3748,
+          "duration_ms": 31140,
+          "cost_usd": 0.044172
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

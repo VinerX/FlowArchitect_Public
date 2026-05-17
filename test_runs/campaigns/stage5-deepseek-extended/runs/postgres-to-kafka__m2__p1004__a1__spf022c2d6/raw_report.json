@@ -1,0 +1,38 @@
+{
+  "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T17:53:22.103415+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: transactions_overdue_pipeline\n  name: Publish Pending Transactions to Kafka\n  description: Read pending transactions from public.transactions, convert to JSON,\n    and publish to Kafka topic transactions.overdue\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: '{{SCHEDULE_CONDITION}}'\nsources:\n- id: source_db\n  name: Read Pending Transactions\n  type: PostgreSQL\n  location: public.transactions\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\n      query: SELECT * FROM public.transactions WHERE status = 'PENDING'\nprocessing_elements:\n- id: process_convert\n  name: Convert to JSON\n  operation: Convert\n  config:\n    format: json\nsinks:\n- id: sink_kafka\n  name: Publish to Kafka\n  type: Kafka\n  location: transactions.overdue\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      topic: transactions.overdue\nprocessed_data:\n- id: transactions_json\n  format: json\nlinks:\n- from_id: source_db\n  to_id: process_convert\n  data_ref: transactions_json\n- from_id: process_convert\n  to_id: sink_kafka\n  data_ref: transactions_json",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for NiFi JSON",
+      "duration_sec": 403.17,
+      "stage1_duration_sec": 102.92,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

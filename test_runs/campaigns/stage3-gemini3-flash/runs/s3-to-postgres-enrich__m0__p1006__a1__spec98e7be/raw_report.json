@@ -1,0 +1,138 @@
+{
+  "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:17:40.807961+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "encodingVersion": "2.0",
+        "snapshot": {
+          "processors": [
+            {
+              "identifier": "list-s3",
+              "name": "ListS3",
+              "type": "org.apache.nifi.processors.aws.s3.ListS3",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "1 hour",
+              "properties": {
+                "Bucket": "raw-logs",
+                "Region": "us-east-1"
+              }
+            },
+            {
+              "identifier": "fetch-s3",
+              "name": "FetchS3Object",
+              "type": "org.apache.nifi.processors.aws.s3.FetchS3Object",
+              "properties": {
+                "Bucket": "raw-logs",
+                "Object Key": "${filename}",
+                "Region": "us-east-1"
+              }
+            },
+            {
+              "identifier": "add-timestamp",
+              "name": "UpdateRecord",
+              "type": "org.apache.nifi.processors.standard.UpdateRecord",
+              "properties": {
+                "record-reader": "json-reader",
+                "record-writer": "json-writer",
+                "replacement-value-strategy": "literal_values",
+                "/processed_at": "${now()}"
+              }
+            },
+            {
+              "identifier": "put-db",
+              "name": "PutDatabaseRecord",
+              "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+              "properties": {
+                "record-reader": "json-reader",
+                "database-type": "PostgreSQL",
+                "db-connection-pool": "postgres-service",
+                "table-name": "public.event_log",
+                "statement-type": "INSERT"
+              }
+            }
+          ],
+          "connections": [
+            {
+              "source": "list-s3",
+              "destination": "fetch-s3",
+              "selectedRelationships": [
+                "success"
+              ]
+            },
+            {
+              "source": "fetch-s3",
+              "destination": "add-timestamp",
+              "selectedRelationships": [
+                "success"
+              ]
+            },
+            {
+              "source": "add-timestamp",
+              "destination": "put-db",
+              "selectedRelationships": [
+                "success"
+              ]
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "210ed857-019e-1000-fdcf-60d7e84f844d",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 39.08,
+      "stage1_duration_sec": 4.86,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 163,
+      "completion_tokens": 572,
+      "total_tokens": 735,
+      "cost_usd": 0.001798,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 131,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 94,
+          "completion_tokens": 6,
+          "total_tokens": 100,
+          "duration_ms": 4640,
+          "cost_usd": 6.5e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 94,
+          "completion_tokens": 6,
+          "total_tokens": 100,
+          "duration_ms": 4640,
+          "cost_usd": 6.5e-05
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

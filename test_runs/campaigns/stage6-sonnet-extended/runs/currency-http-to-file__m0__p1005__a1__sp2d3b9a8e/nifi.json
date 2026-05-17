@@ -1,0 +1,474 @@
+{
+  "flowContents": {
+    "componentType": "PROCESS_GROUP",
+    "identifier": "e1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "instanceIdentifier": "e1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Exchange Rates ETL",
+    "position": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "processors": [
+      {
+        "componentType": "PROCESSOR",
+        "identifier": "a1111111-1111-1111-1111-111111111111",
+        "instanceIdentifier": "a1111111-1111-1111-1111-111111111111",
+        "name": "InvokeHTTP - Get Exchange Rates",
+        "position": {
+          "x": 200.0,
+          "y": 200.0
+        },
+        "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "HTTP Method": "GET",
+          "Remote URL": "https://api.exchangerate.host/latest",
+          "Connection Timeout": "10 secs",
+          "Read Timeout": "15 secs",
+          "Include Date Header": "true",
+          "Follow Redirects": "true",
+          "Attributes to Send": null,
+          "SSL Context Service": null,
+          "Proxy Host": null,
+          "Proxy Port": null,
+          "Content-Type": "application/json",
+          "send-message-body": "false",
+          "Use Chunked Encoding": "false",
+          "Penalize on \"No Retry\"": "false",
+          "use-etag": "false",
+          "Ignore response's content": "false"
+        },
+        "autoTerminatedRelationships": [
+          "No Retry",
+          "Failure",
+          "Retry"
+        ],
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "1 hour",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "comments": "Fetches latest exchange rates from exchangerate.host API"
+      },
+      {
+        "componentType": "PROCESSOR",
+        "identifier": "b2222222-2222-2222-2222-222222222222",
+        "instanceIdentifier": "b2222222-2222-2222-2222-222222222222",
+        "name": "EvaluateJsonPath - Extract Status",
+        "position": {
+          "x": 500.0,
+          "y": 200.0
+        },
+        "type": "org.apache.nifi.processors.standard.EvaluateJsonPath",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "Destination": "flowfile-attribute",
+          "Return Type": "auto-detect",
+          "Path Not Found Behavior": "warn",
+          "Null Value Representation": "empty string",
+          "success": "$.success",
+          "base_currency": "$.base",
+          "rates_date": "$.date"
+        },
+        "autoTerminatedRelationships": [
+          "failure"
+        ],
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "comments": "Extracts key fields from the JSON response for routing and metadata"
+      },
+      {
+        "componentType": "PROCESSOR",
+        "identifier": "c3333333-3333-3333-3333-333333333333",
+        "instanceIdentifier": "c3333333-3333-3333-3333-333333333333",
+        "name": "RouteOnAttribute - Check Success",
+        "position": {
+          "x": 800.0,
+          "y": 200.0
+        },
+        "type": "org.apache.nifi.processors.standard.RouteOnAttribute",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "Routing Strategy": "Route to Property name",
+          "success_response": "${success:equals('true')}",
+          "http_success": "${invokehttp.status.code:equals('200')}"
+        },
+        "autoTerminatedRelationships": [
+          "unmatched"
+        ],
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "comments": "Routes flow based on HTTP status and API success flag"
+      },
+      {
+        "componentType": "PROCESSOR",
+        "identifier": "d4444444-4444-4444-4444-444444444444",
+        "instanceIdentifier": "d4444444-4444-4444-4444-444444444444",
+        "name": "UpdateAttribute - Set Filename and Metadata",
+        "position": {
+          "x": 1100.0,
+          "y": 150.0
+        },
+        "type": "org.apache.nifi.processors.standard.UpdateAttribute",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "filename": "rates.json",
+          "output.directory": "/data/output",
+          "mime.type": "application/json",
+          "fetch.timestamp": "${now():format('yyyy-MM-dd HH:mm:ss')}",
+          "base.currency": "${base_currency}",
+          "rates.date": "${rates_date}"
+        },
+        "autoTerminatedRelationships": [],
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "comments": "Sets filename and metadata attributes for downstream processors"
+      },
+      {
+        "componentType": "PROCESSOR",
+        "identifier": "e5555555-5555-5555-5555-555555555555",
+        "instanceIdentifier": "e5555555-5555-5555-5555-555555555555",
+        "name": "PutFile - Save rates.json",
+        "position": {
+          "x": 1400.0,
+          "y": 150.0
+        },
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "Directory": "/data/output",
+          "Conflict Resolution Strategy": "replace",
+          "Create Missing Directories": "true",
+          "Maximum File Count": null,
+          "Last Modified Time": null,
+          "Permissions": null,
+          "Owner": null,
+          "Group": null
+        },
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ],
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "comments": "Writes the exchange rates JSON to /data/output/rates.json"
+      },
+      {
+        "componentType": "PROCESSOR",
+        "identifier": "f6666666-6666-6666-6666-666666666666",
+        "instanceIdentifier": "f6666666-6666-6666-6666-666666666666",
+        "name": "LogMessage - Log API Error",
+        "position": {
+          "x": 1100.0,
+          "y": 350.0
+        },
+        "type": "org.apache.nifi.processors.standard.LogMessage",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "log-level": "error",
+          "log-prefix": "Exchange Rate API Error",
+          "log-message": "Failed to fetch exchange rates. HTTP Status: ${invokehttp.status.code}, API Success: ${success}"
+        },
+        "autoTerminatedRelationships": [
+          "success"
+        ],
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "comments": "Logs errors when API call fails or returns unsuccessful response"
+      }
+    ],
+    "connections": [
+      {
+        "componentType": "CONNECTION",
+        "identifier": "conn-1111-1111-1111-1111-111111111111",
+        "instanceIdentifier": "conn-1111-1111-1111-1111-111111111111",
+        "name": "InvokeHTTP -> EvaluateJsonPath (Response)",
+        "source": {
+          "id": "a1111111-1111-1111-1111-111111111111",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "b2222222-2222-2222-2222-222222222222",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "Response"
+        ],
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": 10000,
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "labelIndex": 1,
+        "zIndex": 0
+      },
+      {
+        "componentType": "CONNECTION",
+        "identifier": "conn-2222-2222-2222-2222-222222222222",
+        "instanceIdentifier": "conn-2222-2222-2222-2222-222222222222",
+        "name": "EvaluateJsonPath -> RouteOnAttribute (matched)",
+        "source": {
+          "id": "b2222222-2222-2222-2222-222222222222",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "c3333333-3333-3333-3333-333333333333",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "match"
+        ],
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": 10000,
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "labelIndex": 1,
+        "zIndex": 0
+      },
+      {
+        "componentType": "CONNECTION",
+        "identifier": "conn-3333-3333-3333-3333-333333333333",
+        "instanceIdentifier": "conn-3333-3333-3333-3333-333333333333",
+        "name": "RouteOnAttribute -> UpdateAttribute (success_response)",
+        "source": {
+          "id": "c3333333-3333-3333-3333-333333333333",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "d4444444-4444-4444-4444-444444444444",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success_response"
+        ],
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": 10000,
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "labelIndex": 1,
+        "zIndex": 0
+      },
+      {
+        "componentType": "CONNECTION",
+        "identifier": "conn-4444-4444-4444-4444-444444444444",
+        "instanceIdentifier": "conn-4444-4444-4444-4444-444444444444",
+        "name": "RouteOnAttribute -> UpdateAttribute (http_success)",
+        "source": {
+          "id": "c3333333-3333-3333-3333-333333333333",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "d4444444-4444-4444-4444-444444444444",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "http_success"
+        ],
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": 10000,
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "labelIndex": 1,
+        "zIndex": 0
+      },
+      {
+        "componentType": "CONNECTION",
+        "identifier": "conn-5555-5555-5555-5555-555555555555",
+        "instanceIdentifier": "conn-5555-5555-5555-5555-555555555555",
+        "name": "UpdateAttribute -> PutFile",
+        "source": {
+          "id": "d4444444-4444-4444-4444-444444444444",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "e5555555-5555-5555-5555-555555555555",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": 10000,
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "labelIndex": 1,
+        "zIndex": 0
+      },
+      {
+        "componentType": "CONNECTION",
+        "identifier": "conn-6666-6666-6666-6666-666666666666",
+        "instanceIdentifier": "conn-6666-6666-6666-6666-666666666666",
+        "name": "RouteOnAttribute -> LogMessage (unmatched error)",
+        "source": {
+          "id": "c3333333-3333-3333-3333-333333333333",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "f6666666-6666-6666-6666-666666666666",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "unmatched"
+        ],
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": 10000,
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "labelIndex": 1,
+        "zIndex": 0
+      }
+    ],
+    "labels": [
+      {
+        "componentType": "LABEL",
+        "identifier": "label-1111-1111-1111-1111-111111111111",
+        "instanceIdentifier": "label-1111-1111-1111-1111-111111111111",
+        "label": "STEP 1: Fetch exchange rates from API every 1 hour",
+        "position": {
+          "x": 150.0,
+          "y": 120.0
+        },
+        "width": 350.0,
+        "height": 50.0,
+        "style": {
+          "background-color": "#dce9f5"
+        },
+        "zIndex": 0
+      },
+      {
+        "componentType": "LABEL",
+        "identifier": "label-2222-2222-2222-2222-222222222222",
+        "instanceIdentifier": "label-2222-2222-2222-2222-222222222222",
+        "label": "STEP 2: Validate and extract JSON metadata",
+        "position": {
+          "x": 450.0,
+          "y": 120.0
+        },
+        "width": 350.0,
+        "height": 50.0,
+        "style": {
+          "background-color": "#dce9f5"
+        },
+        "zIndex": 0
+      },
+      {
+        "componentType": "LABEL",
+        "identifier": "label-3333-3333-3333-3333-333333333333",
+        "instanceIdentifier": "label-3333-3333-3333-3333-333333333333",
+        "label": "STEP 3: Route on success / failure",
+        "position": {
+          "x": 750.0,
+          "y": 120.0
+        },
+        "width": 300.0,
+        "height": 50.0,
+        "style": {
+          "background-color": "#dce9f5"
+        },
+        "zIndex": 0
+      },
+      {
+        "componentType": "LABEL",
+        "identifier": "label-4444-4444-4444-4444-444444444444",
+        "instanceIdentifier": "label-4444-4444-4444-4444-444444444444",
+        "label": "STEP 4: Set filename=rates.json and write to /data/output/",
+        "position": {
+          "x": 1050.0,
+          "y": 70.0
+        },
+        "width": 400.0,
+        "height": 50.0,
+        "style": {
+          "background-color": "#d5f5e3"
+        },
+        "zIndex": 0
+      },
+      {
+        "componentType": "LABEL",
+        "identifier": "label-5555-5555-5555-5555-555555555555",
+        "instanceIdentifier": "label-5555-5555-5555-5555-555555555555",
+        "label": "ERROR PATH: Log API failures",
+        "position": {
+          "x": 1050.0,
+          "y": 310.0
+        },
+        "width": 300.0,
+        "height": 50.0,
+        "style": {
+          "background-color": "#fde8e8"
+        },
+        "zIndex": 0
+      }
+    ],
+    "funnels": [],
+    "controllerServices": [],
+    "variables": {},
+    "parameterContextName": null,
+    "flowFileConcurrency": "UNBOUNDED",
+    "flowFileOutboundPolicy": "STREAM_WHEN_AVAILABLE",
+    "defaultFlowFileExpiration": "0 sec",
+    "defaultBackPressureObjectThreshold": 10000,
+    "defaultBackPressureDataSizeThreshold": "1 GB",
+    "comments": "ETL flow: Fetches latest currency exchange rates from https://api.exchangerate.host/latest every hour and saves the result to /data/output/rates.json. Includes error routing and metadata extraction."
+  },
+  "parameterContexts": [],
+  "flowEncodingVersion": "1.0"
+}

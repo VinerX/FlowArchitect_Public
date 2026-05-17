@@ -1,0 +1,199 @@
+{
+  "flowContents": {
+    "identifier": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+    "name": "Exchange Rates Fetcher",
+    "comments": "Fetches latest currency exchange rates from a public API and saves them to a local JSON file.",
+    "processors": [
+      {
+        "identifier": "32b8e110-9dd6-445a-a523-4f3090c3b70c",
+        "name": "Fetch Exchange Rates",
+        "comments": "Generated from PIM source 'source_exchangerate_api' (HTTP)",
+        "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "HTTP URL": "https://api.exchangerate.host/latest",
+          "HTTP Method": "GET"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "Original",
+          "Retry",
+          "No Retry",
+          "Failure"
+        ]
+      },
+      {
+        "identifier": "1c1786f3-cb62-4f75-9b38-4dc3bfcedd8a",
+        "name": "Parse API Response",
+        "comments": "Generated from PIM processing element 'process_parse_json' (Parse JSON)",
+        "type": "org.apache.nifi.processors.standard.ConvertRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 460.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Record Writer": "76019726-83ee-4976-a674-d1c296f82977",
+          "Record Reader": "fd4c7b52-e714-4edf-8f8d-2637a461b82b",
+          "target_field": "rates"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      },
+      {
+        "identifier": "e56c846e-ba2f-4e95-901f-8efd5108e029",
+        "name": "Save Rates to File",
+        "comments": "Generated from PIM sink 'sink_json_file' (File)",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Directory": "/data/output"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "5aa5165a-a6b5-4d15-b860-e8efa701d623",
+        "name": "Fetch Exchange Rates -> Parse API Response",
+        "comments": "rates_json",
+        "source": {
+          "id": "32b8e110-9dd6-445a-a523-4f3090c3b70c",
+          "groupId": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+          "type": "PROCESSOR",
+          "name": "Fetch Exchange Rates"
+        },
+        "destination": {
+          "id": "1c1786f3-cb62-4f75-9b38-4dc3bfcedd8a",
+          "groupId": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+          "type": "PROCESSOR",
+          "name": "Parse API Response"
+        },
+        "selectedRelationships": [
+          "Response"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      },
+      {
+        "identifier": "909134fb-29cc-4168-ba06-3f6d689d9d54",
+        "name": "Parse API Response -> Save Rates to File",
+        "comments": "rates_json",
+        "source": {
+          "id": "1c1786f3-cb62-4f75-9b38-4dc3bfcedd8a",
+          "groupId": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+          "type": "PROCESSOR",
+          "name": "Parse API Response"
+        },
+        "destination": {
+          "id": "e56c846e-ba2f-4e95-901f-8efd5108e029",
+          "groupId": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+          "type": "PROCESSOR",
+          "name": "Save Rates to File"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": [
+      {
+        "identifier": "fd4c7b52-e714-4edf-8f8d-2637a461b82b",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Access Strategy": "Infer Schema"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "76019726-83ee-4976-a674-d1c296f82977",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Write Strategy": "Do Not Write Schema"
+        },
+        "propertyDescriptors": {}
+      }
+    ]
+  }
+}

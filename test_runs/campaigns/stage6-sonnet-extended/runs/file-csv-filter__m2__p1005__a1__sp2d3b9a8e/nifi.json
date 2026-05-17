@@ -1,0 +1,326 @@
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "Completed Orders Filter Pipeline",
+  "comments": "Read CSV files from /data/input/orders/, filter rows where status=COMPLETED, write result to /data/output/completed_orders.csv",
+  "position": {
+    "x": 0,
+    "y": 0
+  },
+  "processGroupFlowContent": {
+    "processors": [
+      {
+        "id": "11111111-1111-1111-1111-111111111101",
+        "name": "Read Orders CSV Files",
+        "type": "org.apache.nifi.processors.standard.GetFile",
+        "position": {
+          "x": 200,
+          "y": 200
+        },
+        "config": {
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "60 sec",
+          "executionNode": "ALL",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "autoTerminatedRelationships": [],
+          "properties": {
+            "Input Directory": "/data/input/orders/",
+            "File Filter": "[^\\.].*\\.csv",
+            "Path Filter": null,
+            "Recurse Subdirectories": "true",
+            "Keep Source File": "true",
+            "Minimum File Age": "0 sec",
+            "Maximum File Age": null,
+            "Minimum File Size": "0 B",
+            "Maximum File Size": null,
+            "Ignore Hidden Files": "true"
+          }
+        },
+        "relationships": [
+          {
+            "name": "success",
+            "autoTerminate": false
+          }
+        ]
+      },
+      {
+        "id": "11111111-1111-1111-1111-111111111102",
+        "name": "Convert CSV to Records",
+        "type": "org.apache.nifi.processors.standard.ConvertRecord",
+        "position": {
+          "x": 500,
+          "y": 200
+        },
+        "config": {
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "0 sec",
+          "executionNode": "ALL",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "autoTerminatedRelationships": [],
+          "properties": {
+            "record-reader": "22222222-2222-2222-2222-222222222201",
+            "record-writer": "22222222-2222-2222-2222-222222222202"
+          }
+        },
+        "relationships": [
+          {
+            "name": "success",
+            "autoTerminate": false
+          },
+          {
+            "name": "failure",
+            "autoTerminate": true
+          }
+        ]
+      },
+      {
+        "id": "11111111-1111-1111-1111-111111111103",
+        "name": "Filter Completed Orders",
+        "type": "org.apache.nifi.processors.standard.QueryRecord",
+        "position": {
+          "x": 800,
+          "y": 200
+        },
+        "config": {
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "0 sec",
+          "executionNode": "ALL",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "autoTerminatedRelationships": [],
+          "properties": {
+            "record-reader": "22222222-2222-2222-2222-222222222201",
+            "record-writer": "22222222-2222-2222-2222-222222222202",
+            "include-zero-record-flowfiles": "false",
+            "completed": "SELECT * FROM FLOWFILE WHERE status = 'COMPLETED'"
+          }
+        },
+        "relationships": [
+          {
+            "name": "completed",
+            "autoTerminate": false
+          },
+          {
+            "name": "original",
+            "autoTerminate": true
+          },
+          {
+            "name": "failure",
+            "autoTerminate": true
+          }
+        ]
+      },
+      {
+        "id": "11111111-1111-1111-1111-111111111104",
+        "name": "Write Completed Orders CSV",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "position": {
+          "x": 1100,
+          "y": 200
+        },
+        "config": {
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "0 sec",
+          "executionNode": "ALL",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "autoTerminatedRelationships": [],
+          "properties": {
+            "Directory": "/data/output",
+            "Conflict Resolution Strategy": "replace",
+            "Create Missing Directories": "true",
+            "Maximum File Count": null,
+            "Last Modified Time": null,
+            "Permissions": null,
+            "Owner": null,
+            "Group": null
+          }
+        },
+        "relationships": [
+          {
+            "name": "success",
+            "autoTerminate": true
+          },
+          {
+            "name": "failure",
+            "autoTerminate": true
+          }
+        ]
+      },
+      {
+        "id": "11111111-1111-1111-1111-111111111105",
+        "name": "Set Output Filename",
+        "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+        "position": {
+          "x": 950,
+          "y": 350
+        },
+        "config": {
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "0 sec",
+          "executionNode": "ALL",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "autoTerminatedRelationships": [],
+          "properties": {
+            "filename": "completed_orders.csv"
+          }
+        },
+        "relationships": [
+          {
+            "name": "success",
+            "autoTerminate": false
+          }
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "id": "33333333-3333-3333-3333-333333333301",
+        "name": "GetFile -> ConvertRecord",
+        "source": {
+          "id": "11111111-1111-1111-1111-111111111101",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "11111111-1111-1111-1111-111111111102",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "prioritizers": []
+      },
+      {
+        "id": "33333333-3333-3333-3333-333333333302",
+        "name": "ConvertRecord -> QueryRecord",
+        "source": {
+          "id": "11111111-1111-1111-1111-111111111102",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "11111111-1111-1111-1111-111111111103",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "prioritizers": []
+      },
+      {
+        "id": "33333333-3333-3333-3333-333333333303",
+        "name": "QueryRecord (completed) -> UpdateAttribute",
+        "source": {
+          "id": "11111111-1111-1111-1111-111111111103",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "11111111-1111-1111-1111-111111111105",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "completed"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "prioritizers": []
+      },
+      {
+        "id": "33333333-3333-3333-3333-333333333304",
+        "name": "UpdateAttribute -> PutFile",
+        "source": {
+          "id": "11111111-1111-1111-1111-111111111105",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "11111111-1111-1111-1111-111111111104",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "prioritizers": []
+      }
+    ],
+    "controllerServices": [
+      {
+        "id": "22222222-2222-2222-2222-222222222201",
+        "name": "CSVReader",
+        "type": "org.apache.nifi.csv.CSVReader",
+        "comments": "Reads CSV input with header row, comma delimiter, UTF-8 encoding",
+        "properties": {
+          "schema-access-strategy": "infer-schema",
+          "schema-registry": null,
+          "schema-name": null,
+          "schema-text": null,
+          "date-format": null,
+          "time-format": null,
+          "timestamp-format": null,
+          "csv-format": "Default Excel",
+          "value-separator": ",",
+          "quote-char": "\"",
+          "escape-char": "\\",
+          "comment-marker": null,
+          "first-line-is-header": "true",
+          "ignore-csv-header": "false",
+          "null-string": null,
+          "trim-fields": "true",
+          "charset": "UTF-8"
+        },
+        "state": "ENABLED"
+      },
+      {
+        "id": "22222222-2222-2222-2222-222222222202",
+        "name": "CSVRecordSetWriter",
+        "type": "org.apache.nifi.csv.CSVRecordSetWriter",
+        "comments": "Writes CSV output with header row, comma delimiter, UTF-8 encoding",
+        "properties": {
+          "schema-write-strategy": "no-schema",
+          "schema-access-strategy": "inherit-record-schema",
+          "schema-registry": null,
+          "schema-name": null,
+          "schema-text": null,
+          "date-format": null,
+          "time-format": null,
+          "timestamp-format": null,
+          "csv-format": "Default Excel",
+          "value-separator": ",",
+          "quote-char": "\"",
+          "escape-char": "\\",
+          "comment-marker": null,
+          "include-header-line": "true",
+          "null-string": null,
+          "trim-fields": "true",
+          "charset": "UTF-8"
+        },
+        "state": "ENABLED"
+      }
+    ]
+  }
+}

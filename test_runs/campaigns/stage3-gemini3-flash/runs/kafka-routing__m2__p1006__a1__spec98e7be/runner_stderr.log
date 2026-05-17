@@ -1,0 +1,22 @@
+[37mINFO     [settings_manager.py:36]       | Settings loaded successfully.[0m
+[37mINFO     [api_preset_manager.py:270]    | [ApiPresetsManager] initialized[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'session.list_updated'[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'chat_user_message_saved'[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'chat_new_message'[0m
+[37mINFO     [provider_manager.py:26]       | Registered 3 providers: ['openai', 'gemini', 'common'][0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 1/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'etl_pim_generated'[0m
+[37mINFO     [provider_manager.py:26]       | Registered 3 providers: ['openai', 'gemini', 'common'][0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 1/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[37mINFO     [placeholder_manager.py:211]   | PlaceholderManager: loaded 2 global entries[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'chat_new_message'[0m
+[37mINFO     [provider_manager.py:26]       | Registered 3 providers: ['openai', 'gemini', 'common'][0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 1/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'session.name_updated'[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'session.list_updated'[0m

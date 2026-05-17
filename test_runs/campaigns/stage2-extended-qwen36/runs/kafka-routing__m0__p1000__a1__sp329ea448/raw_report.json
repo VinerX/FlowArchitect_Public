@@ -1,0 +1,301 @@
+{
+  "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-12T18:02:23.937319+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flow": {
+          "processGroups": [
+            {
+              "id": "pg-event-router",
+              "name": "Kafka to PG/Unknown Router",
+              "processGroups": [],
+              "processors": [
+                {
+                  "id": "proc-consume-kafka",
+                  "name": "ConsumeKafka",
+                  "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafka_2_6",
+                  "position": {
+                    "x": 100,
+                    "y": 100
+                  },
+                  "config": {
+                    "properties": {
+                      "bootstrap.servers": "localhost:9092",
+                      "topic.names": "events.all",
+                      "auto.offset.reset": "latest"
+                    },
+                    "schedulingPeriod": "0 sec",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "autoTerminatedRelationships": []
+                  }
+                },
+                {
+                  "id": "proc-eval-json",
+                  "name": "Extract Type Field",
+                  "type": "org.apache.nifi.processors.standard.EvaluateJsonPath",
+                  "position": {
+                    "x": 100,
+                    "y": 300
+                  },
+                  "config": {
+                    "properties": {
+                      "Destination": "flowfile-attribute",
+                      "type": "$.type"
+                    },
+                    "schedulingPeriod": "0 sec",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "autoTerminatedRelationships": [
+                      "failure",
+                      "original"
+                    ]
+                  }
+                },
+                {
+                  "id": "proc-route-attr",
+                  "name": "Route by Type",
+                  "type": "org.apache.nifi.processors.standard.RouteOnAttribute",
+                  "position": {
+                    "x": 100,
+                    "y": 500
+                  },
+                  "config": {
+                    "properties": {
+                      "Routing Strategy": "Route to Property name",
+                      "purchase": "${type:equals('purchase')}",
+                      "refund": "${type:equals('refund')}"
+                    },
+                    "schedulingPeriod": "0 sec",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "autoTerminatedRelationships": []
+                  }
+                },
+                {
+                  "id": "proc-put-db-purchases",
+                  "name": "Write Purchases to PG",
+                  "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+                  "position": {
+                    "x": 400,
+                    "y": 700
+                  },
+                  "config": {
+                    "properties": {
+                      "Database Connection Pooling Service": "cs-dbcp-pg",
+                      "Table Name": "purchases",
+                      "Record Reader": "cs-json-reader"
+                    },
+                    "schedulingPeriod": "0 sec",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "autoTerminatedRelationships": [
+                      "failure",
+                      "success"
+                    ]
+                  }
+                },
+                {
+                  "id": "proc-put-db-refunds",
+                  "name": "Write Refunds to PG",
+                  "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+                  "position": {
+                    "x": 700,
+                    "y": 700
+                  },
+                  "config": {
+                    "properties": {
+                      "Database Connection Pooling Service": "cs-dbcp-pg",
+                      "Table Name": "refunds",
+                      "Record Reader": "cs-json-reader"
+                    },
+                    "schedulingPeriod": "0 sec",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "autoTerminatedRelationships": [
+                      "failure",
+                      "success"
+                    ]
+                  }
+                },
+                {
+                  "id": "proc-publish-kafka",
+                  "name": "Publish Unknown Events",
+                  "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+                  "position": {
+                    "x": 1000,
+                    "y": 700
+                  },
+                  "config": {
+                    "properties": {
+                      "bootstrap.servers": "localhost:9092",
+                      "topic.name": "events.unknown"
+                    },
+                    "schedulingPeriod": "0 sec",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "autoTerminatedRelationships": [
+                      "failure",
+                      "success"
+                    ]
+                  }
+                }
+              ],
+              "connections": [
+                {
+                  "id": "conn-1",
+                  "source": {
+                    "id": "proc-consume-kafka",
+                    "groupId": "pg-event-router"
+                  },
+                  "destination": {
+                    "id": "proc-eval-json",
+                    "groupId": "pg-event-router"
+                  },
+                  "selectedRelationships": [
+                    "success"
+                  ]
+                },
+                {
+                  "id": "conn-2",
+                  "source": {
+                    "id": "proc-eval-json",
+                    "groupId": "pg-event-router"
+                  },
+                  "destination": {
+                    "id": "proc-route-attr",
+                    "groupId": "pg-event-router"
+                  },
+                  "selectedRelationships": [
+                    "matched"
+                  ]
+                },
+                {
+                  "id": "conn-3",
+                  "source": {
+                    "id": "proc-route-attr",
+                    "groupId": "pg-event-router"
+                  },
+                  "destination": {
+                    "id": "proc-put-db-purchases",
+                    "groupId": "pg-event-router"
+                  },
+                  "selectedRelationships": [
+                    "purchase"
+                  ]
+                },
+                {
+                  "id": "conn-4",
+                  "source": {
+                    "id": "proc-route-attr",
+                    "groupId": "pg-event-router"
+                  },
+                  "destination": {
+                    "id": "proc-put-db-refunds",
+                    "groupId": "pg-event-router"
+                  },
+                  "selectedRelationships": [
+                    "refund"
+                  ]
+                },
+                {
+                  "id": "conn-5",
+                  "source": {
+                    "id": "proc-route-attr",
+                    "groupId": "pg-event-router"
+                  },
+                  "destination": {
+                    "id": "proc-publish-kafka",
+                    "groupId": "pg-event-router"
+                  },
+                  "selectedRelationships": [
+                    "unmatched"
+                  ]
+                }
+              ],
+              "controllerServices": [
+                {
+                  "id": "cs-dbcp-pg",
+                  "name": "PostgreSQL Connection Pool",
+                  "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+                  "properties": {
+                    "Database Driver Location(s)": "/path/to/postgresql-driver.jar",
+                    "Database Driver Class Name": "org.postgresql.Driver",
+                    "Database Connection URL": "jdbc:postgresql://localhost:5432/events_db",
+                    "Database User": "nifi_user",
+                    "Password": "change_me"
+                  },
+                  "state": "ENABLED"
+                },
+                {
+                  "id": "cs-json-reader",
+                  "name": "JSON Tree Reader",
+                  "type": "org.apache.nifi.json.JsonTreeReader",
+                  "properties": {
+                    "Schema Access Strategy": "infer-schema"
+                  },
+                  "state": "ENABLED"
+                }
+              ],
+              "ports": [],
+              "funnels": [],
+              "labels": [],
+              "remoteProcessGroups": []
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "1d5cbfce-019e-1000-916f-d02f5f2ac916",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 152.59,
+      "stage1_duration_sec": 118.29,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 207,
+      "completion_tokens": 8241,
+      "total_tokens": 8448,
+      "cost_usd": 0.010781,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 97,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 117,
+          "completion_tokens": 1772,
+          "total_tokens": 1889,
+          "duration_ms": 117983,
+          "cost_usd": 0.002342
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 117,
+          "completion_tokens": 1772,
+          "total_tokens": 1889,
+          "duration_ms": 117983,
+          "cost_usd": 0.002342
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

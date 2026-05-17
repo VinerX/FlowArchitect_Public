@@ -1,0 +1,63 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 56.96,
+  "stage1_duration_sec": 5.0,
+  "stage2_duration_sec": 8.84,
+  "prompt_tokens": 2325,
+  "completion_tokens": 2195,
+  "total_tokens": 4520,
+  "cost_usd": 0.007748,
+  "nifi_processor_count": 0,
+  "nifi_connection_count": 0,
+  "pim_source_count": 1,
+  "pim_step_count": 1,
+  "pim_sink_count": 1,
+  "session_id": 121,
+  "preset_id": 1006,
+  "preset_name": "openrouter gemini 3 flash",
+  "preset_model": "google/gemini-3-flash-preview",
+  "llm_calls": [
+    {
+      "purpose": "pim_generation",
+      "provider": "common",
+      "model": "google/gemini-3-flash-preview",
+      "prompt_tokens": 1383,
+      "completion_tokens": 608,
+      "total_tokens": 1991,
+      "duration_ms": 4687,
+      "cost_usd": 0.002515
+    },
+    {
+      "purpose": "psm_conversion",
+      "provider": "common",
+      "model": "google/gemini-3-flash-preview",
+      "prompt_tokens": 849,
+      "completion_tokens": 1581,
+      "total_tokens": 2430,
+      "duration_ms": 8657,
+      "cost_usd": 0.005168
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "pim_generation": {
+      "calls": 1,
+      "prompt_tokens": 1383,
+      "completion_tokens": 608,
+      "total_tokens": 1991,
+      "duration_ms": 4687,
+      "cost_usd": 0.002515
+    },
+    "psm_conversion": {
+      "calls": 1,
+      "prompt_tokens": 849,
+      "completion_tokens": 1581,
+      "total_tokens": 2430,
+      "duration_ms": 8657,
+      "cost_usd": 0.005168
+    }
+  },
+  "nifi_import_success": true,
+  "nifi_error_count": 0,
+  "nifi_import_error": null
+}

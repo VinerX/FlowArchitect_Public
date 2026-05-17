@@ -1,0 +1,41 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 3,
+  "mode_name": "Adapter+LLM (NL->YAML->Adapter->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T19:29:32.265803+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: exchange_rates_flow\n  name: Exchange Rates Fetch and Save\n  description: Fetch latest exchange rates from exchangerate.host API and save to\n    JSON file\ntriggers:\n- id: trigger_main\n  type: manual\n  condition: ''\nsources:\n- id: source_exchange_api\n  name: Exchange Rate API\n  type: HTTP\n  location: https://api.exchangerate.host/latest\nprocessing_elements: []\nsinks:\n- id: sink_file\n  name: Save to JSON File\n  type: File\n  location: /data/output/rates.json\nprocessed_data:\n- id: rates_json\n  format: json\nlinks:\n- from_id: source_exchange_api\n  to_id: sink_file\n  data_ref: rates_json",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": {
+        "error": "manual_trigger_warning",
+        "details": "Trigger(s) ['trigger_main'] have type 'manual'.\nThe flow will NOT start automatically in NiFi — someone must press Run in the NiFi UI.\nChange trigger type to 'schedule' or 'event' for production use."
+      },
+      "duration_sec": 14.7,
+      "stage1_duration_sec": 14.67,
+      "stage2_duration_sec": 0.03,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 0,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

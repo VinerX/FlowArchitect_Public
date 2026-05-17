@@ -1,0 +1,757 @@
+{
+  "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T20:16:28.784406+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: s3_json_to_postgres\n  name: S3 JSON to PostgreSQL ETL\n  description: Read JSON files from S3 raw-logs bucket hourly, enrich with processed_at\n    timestamp, and load into PostgreSQL event_log table\ntriggers:\n- id: trigger_hourly\n  type: schedule\n  condition: every 1 hour\nsources:\n- id: source_s3\n  name: Read JSON from S3\n  type: S3\n  location: raw-logs\n  connection:\n    properties:\n      bucket: raw-logs\n      region: '{{AWS_REGION}}'\n      access_key_id: '{{AWS_ACCESS_KEY_ID}}'\n      secret_access_key: '{{AWS_SECRET_ACCESS_KEY}}'\nprocessing_elements:\n- id: process_enrich\n  name: Add processed_at timestamp\n  operation: AddField\n  config:\n    field_name: processed_at\n    value: '{{CURRENT_TIMESTAMP}}'\nsinks:\n- id: sink_postgres\n  name: Write to PostgreSQL\n  type: PostgreSQL\n  location: public.event_log\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\nprocessed_data:\n- id: event_json\n  format: json\nlinks:\n- from_id: source_s3\n  to_id: process_enrich\n  data_ref: event_json\n- from_id: process_enrich\n  to_id: sink_postgres\n  data_ref: event_json",
+      "nifi_json": {
+        "content": {
+          "version": "1.0.0",
+          "offset": {
+            "x": 0,
+            "y": 0
+          },
+          "processGroup": {
+            "id": "s3_json_to_postgres-pg",
+            "name": "S3 JSON to PostgreSQL ETL",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "comment": "Read JSON files from S3 raw-logs bucket hourly, enrich with processed_at timestamp, and load into PostgreSQL event_log table",
+            "parameterContextName": null,
+            "variables": {}
+          },
+          "controllerServices": [
+            {
+              "id": "aws-creds-service",
+              "name": "AWS Credentials Service",
+              "comment": "AWS credentials for S3 access",
+              "type": "org.apache.nifi.aws.controllerservice.impl.AWSCredentialsProviderControllerService",
+              "properties": {
+                "Access Key": "{{AWS_ACCESS_KEY_ID}}",
+                "Secret Key": "{{AWS_SECRET_ACCESS_KEY}}"
+              },
+              "propertyDescriptors": {
+                "Access Key": {
+                  "name": "Access Key",
+                  "displayName": "Access Key"
+                },
+                "Secret Key": {
+                  "name": "Secret Key",
+                  "displayName": "Secret Key"
+                }
+              },
+              "controllerServiceAnnotations": [],
+              "componentType": "CONTROLLER_SERVICE",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 100,
+                "y": 400
+              }
+            },
+            {
+              "id": "s3-connection-service",
+              "name": "S3 Connection Service",
+              "comment": "S3 connection configuration",
+              "type": "org.apache.nifi.aws.controllerservice.impl.AWSS3ConnectionService",
+              "properties": {
+                "Region": "{{AWS_REGION}}",
+                "Bucket": "raw-logs",
+                "AWSCredentialsProviderService": "aws-creds-service"
+              },
+              "propertyDescriptors": {
+                "Region": {
+                  "name": "Region",
+                  "displayName": "Region"
+                },
+                "Bucket": {
+                  "name": "Bucket",
+                  "displayName": "Bucket"
+                },
+                "AWSCredentialsProviderService": {
+                  "name": "AWSCredentialsProviderService",
+                  "displayName": "AWS Credentials Provider Service"
+                }
+              },
+              "controllerServiceAnnotations": [],
+              "componentType": "CONTROLLER_SERVICE",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 300,
+                "y": 400
+              }
+            },
+            {
+              "id": "json-reader",
+              "name": "JSON Tree Reader",
+              "comment": "Reader for JSON records from S3",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "properties": {
+                "schema-name": "",
+                "schema-registry": "",
+                "Schema Access Strategy": "Inherit Record Schema",
+                "Date Format": "",
+                "Time Format": "",
+                "Timestamp Format": "",
+                "Boolean Format": "",
+                "Byte Array Format": "",
+                "Character Set": "UTF-8",
+                "Trim Hash Columns": "false"
+              },
+              "propertyDescriptors": {
+                "schema-name": {
+                  "name": "schema-name",
+                  "displayName": "Schema Name"
+                },
+                "schema-registry": {
+                  "name": "schema-registry",
+                  "displayName": "Schema Registry"
+                },
+                "Schema Access Strategy": {
+                  "name": "Schema Access Strategy",
+                  "displayName": "Schema Access Strategy"
+                },
+                "Date Format": {
+                  "name": "Date Format",
+                  "displayName": "Date Format"
+                },
+                "Time Format": {
+                  "name": "Time Format",
+                  "displayName": "Time Format"
+                },
+                "Timestamp Format": {
+                  "name": "Timestamp Format",
+                  "displayName": "Timestamp Format"
+                },
+                "Boolean Format": {
+                  "name": "Boolean Format",
+                  "displayName": "Boolean Format"
+                },
+                "Byte Array Format": {
+                  "name": "Byte Array Format",
+                  "displayName": "Byte Array Format"
+                },
+                "Character Set": {
+                  "name": "Character Set",
+                  "displayName": "Character Set"
+                },
+                "Trim Hash Columns": {
+                  "name": "Trim Hash Columns",
+                  "displayName": "Trim Hash Columns"
+                }
+              },
+              "controllerServiceAnnotations": [],
+              "componentType": "CONTROLLER_SERVICE",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 500,
+                "y": 400
+              }
+            },
+            {
+              "id": "json-writer",
+              "name": "JSON Record Set Writer",
+              "comment": "Writer for JSON records",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "properties": {
+                "schema-name": "",
+                "schema-registry": "",
+                "Schema Access Strategy": "Inherit Record Schema",
+                "Date Format": "",
+                "Time Format": "",
+                "Timestamp Format": "",
+                "Boolean Format": "",
+                "Byte Array Format": "",
+                "Character Set": "UTF-8",
+                "Output Format": "JSON",
+                "Pretty Print JSON": "true",
+                "Array Separator": "",
+                "Trim Hash Columns": "false",
+                "Compression": "NONE"
+              },
+              "propertyDescriptors": {
+                "schema-name": {
+                  "name": "schema-name",
+                  "displayName": "Schema Name"
+                },
+                "schema-registry": {
+                  "name": "schema-registry",
+                  "displayName": "Schema Registry"
+                },
+                "Schema Access Strategy": {
+                  "name": "Schema Access Strategy",
+                  "displayName": "Schema Access Strategy"
+                },
+                "Date Format": {
+                  "name": "Date Format",
+                  "displayName": "Date Format"
+                },
+                "Time Format": {
+                  "name": "Time Format",
+                  "displayName": "Time Format"
+                },
+                "Timestamp Format": {
+                  "name": "Timestamp Format",
+                  "displayName": "Timestamp Format"
+                },
+                "Boolean Format": {
+                  "name": "Boolean Format",
+                  "displayName": "Boolean Format"
+                },
+                "Byte Array Format": {
+                  "name": "Byte Array Format",
+                  "displayName": "Byte Array Format"
+                },
+                "Character Set": {
+                  "name": "Character Set",
+                  "displayName": "Character Set"
+                },
+                "Output Format": {
+                  "name": "Output Format",
+                  "displayName": "Output Format"
+                },
+                "Pretty Print JSON": {
+                  "name": "Pretty Print JSON",
+                  "displayName": "Pretty Print JSON"
+                },
+                "Array Separator": {
+                  "name": "Array Separator",
+                  "displayName": "Array Separator"
+                },
+                "Trim Hash Columns": {
+                  "name": "Trim Hash Columns",
+                  "displayName": "Trim Hash Columns"
+                },
+                "Compression": {
+                  "name": "Compression",
+                  "displayName": "Compression"
+                }
+              },
+              "controllerServiceAnnotations": [],
+              "componentType": "CONTROLLER_SERVICE",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 700,
+                "y": 400
+              }
+            },
+            {
+              "id": "dbcp-connection-pool",
+              "name": "PostgreSQL Connection Pool",
+              "comment": "PostgreSQL database connection",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database User": "{{DB_USERNAME}}",
+                "Password": "{{DB_PASSWORD}}",
+                "Max Wait Time": "500 millis",
+                "Max Total Connections": "8",
+                "Validation Query": "select 1"
+              },
+              "propertyDescriptors": {
+                "Database Connection URL": {
+                  "name": "Database Connection URL",
+                  "displayName": "Database Connection URL"
+                },
+                "Database Driver Class Name": {
+                  "name": "Database Driver Class Name",
+                  "displayName": "Database Driver Class Name"
+                },
+                "Database User": {
+                  "name": "Database User",
+                  "displayName": "Database User"
+                },
+                "Password": {
+                  "name": "Password",
+                  "displayName": "Password"
+                },
+                "Max Wait Time": {
+                  "name": "Max Wait Time",
+                  "displayName": "Max Wait Time"
+                },
+                "Max Total Connections": {
+                  "name": "Max Total Connections",
+                  "displayName": "Max Total Connections"
+                },
+                "Validation Query": {
+                  "name": "Validation Query",
+                  "displayName": "Validation Query"
+                }
+              },
+              "controllerServiceAnnotations": [],
+              "componentType": "CONTROLLER_SERVICE",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 900,
+                "y": 400
+              }
+            }
+          ],
+          "processors": [
+            {
+              "id": "list-s3-object",
+              "name": "ListS3Object - List JSON files from S3",
+              "comment": "List objects in raw-logs S3 bucket",
+              "type": "org.apache.nifi.aws.processors.s3.ListS3Object",
+              "properties": {
+                "s3-connection-service": "s3-connection-service",
+                "Bucket": "raw-logs",
+                "Prefix": "",
+                "Delimiter": "",
+                "Filter": "",
+                "Minimum Object Age": "0 sec",
+                "Maximum Object Age": "",
+                "Write Files": "false",
+                "File Output Path": "",
+                "List Strategy": "Tracking Entities",
+                "Entity Tracking State Tracking": "false",
+                "Entity Tracking Initial Listing Target": "All Available",
+                "Update Strategy": "Tracking Modified Time",
+                "Release Signature": "false",
+                "State Cache": {
+                  "id": "state-cache",
+                  "name": "Local State Cache",
+                  "type": "org.apache.nifi.controller.state.providers.local.LocalStateProvider"
+                }
+              },
+              "propertyDescriptors": {
+                "s3-connection-service": {
+                  "name": "s3-connection-service",
+                  "displayName": "S3 Connection Service"
+                },
+                "Bucket": {
+                  "name": "Bucket",
+                  "displayName": "Bucket"
+                },
+                "Prefix": {
+                  "name": "Prefix",
+                  "displayName": "Prefix"
+                },
+                "Delimiter": {
+                  "name": "Delimiter",
+                  "displayName": "Delimiter"
+                },
+                "Filter": {
+                  "name": "Filter",
+                  "displayName": "Filter"
+                },
+                "Minimum Object Age": {
+                  "name": "Minimum Object Age",
+                  "displayName": "Minimum Object Age"
+                },
+                "Maximum Object Age": {
+                  "name": "Maximum Object Age",
+                  "displayName": "Maximum Object Age"
+                },
+                "Write Files": {
+                  "name": "Write Files",
+                  "displayName": "Write Files"
+                },
+                "File Output Path": {
+                  "name": "File Output Path",
+                  "displayName": "File Output Path"
+                },
+                "List Strategy": {
+                  "name": "List Strategy",
+                  "displayName": "List Strategy"
+                },
+                "Entity Tracking State Tracking": {
+                  "name": "Entity Tracking State Tracking",
+                  "displayName": "Entity Tracking State Tracking"
+                },
+                "Entity Tracking Initial Listing Target": {
+                  "name": "Entity Tracking Initial Listing Target",
+                  "displayName": "Entity Tracking Initial Listing Target"
+                },
+                "Update Strategy": {
+                  "name": "Update Strategy",
+                  "displayName": "Update Strategy"
+                },
+                "Release Signature": {
+                  "name": "Release Signature",
+                  "displayName": "Release Signature"
+                },
+                "State Cache": {
+                  "name": "State Cache",
+                  "displayName": "State Cache"
+                }
+              },
+              "schedulingPeriod": "0 0 * * * *",
+              "schedulingStrategy": "CRON_DRIVEN",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "componentType": "PROCESSOR",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 100,
+                "y": 100
+              }
+            },
+            {
+              "id": "fetch-s3-object",
+              "name": "FetchS3Object - Get JSON content",
+              "comment": "Fetch actual JSON content from S3 objects",
+              "type": "org.apache.nifi.aws.processors.s3.FetchS3Object",
+              "properties": {
+                "s3-connection-service": "s3-connection-service",
+                "Bucket": "raw-logs",
+                "Object Key": "${s3.object.key}",
+                "Version": "",
+                "Write Files": "false",
+                "File Output Path": "",
+                "Encryption Service": ""
+              },
+              "propertyDescriptors": {
+                "s3-connection-service": {
+                  "name": "s3-connection-service",
+                  "displayName": "S3 Connection Service"
+                },
+                "Bucket": {
+                  "name": "Bucket",
+                  "displayName": "Bucket"
+                },
+                "Object Key": {
+                  "name": "Object Key",
+                  "displayName": "Object Key"
+                },
+                "Version": {
+                  "name": "Version",
+                  "displayName": "Version"
+                },
+                "Write Files": {
+                  "name": "Write Files",
+                  "displayName": "Write Files"
+                },
+                "File Output Path": {
+                  "name": "File Output Path",
+                  "displayName": "File Output Path"
+                },
+                "Encryption Service": {
+                  "name": "Encryption Service",
+                  "displayName": "Encryption Service"
+                }
+              },
+              "schedulingPeriod": "0 sec",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "componentType": "PROCESSOR",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 400,
+                "y": 100
+              }
+            },
+            {
+              "id": "update-record",
+              "name": "UpdateRecord - Add processed_at timestamp",
+              "comment": "Enrich JSON records with processed_at timestamp",
+              "type": "org.apache.nifi.record.put.operation.UpdateRecord",
+              "properties": {
+                "record-reader": "json-reader",
+                "record-writer": "json-writer",
+                "Replacement Value Strategy": "Record Path Value",
+                "/processed_at": "${now():format('yyyy-MM-dd\\'T\\'HH:mm:ss.SSS\\'Z\\'')}"
+              },
+              "propertyDescriptors": {
+                "record-reader": {
+                  "name": "record-reader",
+                  "displayName": "Record Reader"
+                },
+                "record-writer": {
+                  "name": "record-writer",
+                  "displayName": "Record Writer"
+                },
+                "Replacement Value Strategy": {
+                  "name": "Replacement Value Strategy",
+                  "displayName": "Replacement Value Strategy"
+                },
+                "/processed_at": {
+                  "name": "/processed_at",
+                  "displayName": "/processed_at"
+                }
+              },
+              "schedulingPeriod": "0 sec",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "componentType": "PROCESSOR",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 700,
+                "y": 100
+              }
+            },
+            {
+              "id": "put-database-record",
+              "name": "PutDatabaseRecord - Write to PostgreSQL",
+              "comment": "Write enriched JSON records to PostgreSQL event_log table",
+              "type": "org.apache.nifi.dbcp.processors.PutDatabaseRecord",
+              "properties": {
+                "database-session-pool": "dbcp-connection-pool",
+                "record-reader": "json-reader",
+                "table-name": "event_log",
+                "schema-name": "public",
+                "Catalog Name": "",
+                "Quote Identifiers": "true",
+                "Quote Schema Name": "true",
+                "Unmatched Field Behavior": "Fail",
+                "Unmatched Column Behavior": "Fail",
+                "Update Keys": "",
+                "Generated Key Handling": "None",
+                "Maximum Batch Size": "100",
+                "Batch Size": "100"
+              },
+              "propertyDescriptors": {
+                "database-session-pool": {
+                  "name": "database-session-pool",
+                  "displayName": "Database Session Pool"
+                },
+                "record-reader": {
+                  "name": "record-reader",
+                  "displayName": "Record Reader"
+                },
+                "table-name": {
+                  "name": "table-name",
+                  "displayName": "Table Name"
+                },
+                "schema-name": {
+                  "name": "schema-name",
+                  "displayName": "Schema Name"
+                },
+                "Catalog Name": {
+                  "name": "Catalog Name",
+                  "displayName": "Catalog Name"
+                },
+                "Quote Identifiers": {
+                  "name": "Quote Identifiers",
+                  "displayName": "Quote Identifiers"
+                },
+                "Quote Schema Name": {
+                  "name": "Quote Schema Name",
+                  "displayName": "Quote Schema Name"
+                },
+                "Unmatched Field Behavior": {
+                  "name": "Unmatched Field Behavior",
+                  "displayName": "Unmatched Field Behavior"
+                },
+                "Unmatched Column Behavior": {
+                  "name": "Unmatched Column Behavior",
+                  "displayName": "Unmatched Column Behavior"
+                },
+                "Update Keys": {
+                  "name": "Update Keys",
+                  "displayName": "Update Keys"
+                },
+                "Generated Key Handling": {
+                  "name": "Generated Key Handling",
+                  "displayName": "Generated Key Handling"
+                },
+                "Maximum Batch Size": {
+                  "name": "Maximum Batch Size",
+                  "displayName": "Maximum Batch Size"
+                },
+                "Batch Size": {
+                  "name": "Batch Size",
+                  "displayName": "Batch Size"
+                }
+              },
+              "schedulingPeriod": "0 sec",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "componentType": "PROCESSOR",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 1000,
+                "y": 100
+              }
+            }
+          ],
+          "funnels": [],
+          "connections": [
+            {
+              "id": "conn-list-to-fetch",
+              "name": "ListS3Object to FetchS3Object",
+              "sourceId": "list-s3-object",
+              "targetId": "fetch-s3-object",
+              "sourceGroupId": "s3_json_to_postgres-pg",
+              "targetGroupId": "s3_json_to_postgres-pg",
+              "relationship": {
+                "class": "org.apache.nifi.connectable.Relationship",
+                "name": "success"
+              },
+              "labelIndex": 0,
+              "zIndex": 0,
+              "selectedRelationships": [
+                "success"
+              ],
+              "flowFileExpiration": "0 sec",
+              "backPressureDataSizeThreshold": "1 GB",
+              "backPressureObjectThreshold": 10000,
+              "prioritizationStrategy": "org.apache.nifi.prioritize.PrioritizeBySize",
+              "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
+              "partitioningStrategy": "org.apache.nifi.controller.flow.FlowFilePartitioning",
+              "componentType": "CONNECTION",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 300,
+                "y": 100
+              }
+            },
+            {
+              "id": "conn-fetch-to-update",
+              "name": "FetchS3Object to UpdateRecord",
+              "sourceId": "fetch-s3-object",
+              "targetId": "update-record",
+              "sourceGroupId": "s3_json_to_postgres-pg",
+              "targetGroupId": "s3_json_to_postgres-pg",
+              "relationship": {
+                "class": "org.apache.nifi.connectable.Relationship",
+                "name": "success"
+              },
+              "labelIndex": 0,
+              "zIndex": 0,
+              "selectedRelationships": [
+                "success"
+              ],
+              "flowFileExpiration": "0 sec",
+              "backPressureDataSizeThreshold": "1 GB",
+              "backPressureObjectThreshold": 10000,
+              "prioritizationStrategy": "org.apache.nifi.prioritize.PrioritizeBySize",
+              "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
+              "partitioningStrategy": "org.apache.nifi.controller.flow.FlowFilePartitioning",
+              "componentType": "CONNECTION",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 600,
+                "y": 100
+              }
+            },
+            {
+              "id": "conn-update-to-put",
+              "name": "UpdateRecord to PutDatabaseRecord",
+              "sourceId": "update-record",
+              "targetId": "put-database-record",
+              "sourceGroupId": "s3_json_to_postgres-pg",
+              "targetGroupId": "s3_json_to_postgres-pg",
+              "relationship": {
+                "class": "org.apache.nifi.connectable.Relationship",
+                "name": "success"
+              },
+              "labelIndex": 0,
+              "zIndex": 0,
+              "selectedRelationships": [
+                "success"
+              ],
+              "flowFileExpiration": "0 sec",
+              "backPressureDataSizeThreshold": "1 GB",
+              "backPressureObjectThreshold": 10000,
+              "prioritizationStrategy": "org.apache.nifi.prioritize.PrioritizeBySize",
+              "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
+              "partitioningStrategy": "org.apache.nifi.controller.flow.FlowFilePartitioning",
+              "componentType": "CONNECTION",
+              "groupIdentifier": "s3_json_to_postgres-pg",
+              "position": {
+                "x": 900,
+                "y": 100
+              }
+            }
+          ],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": []
+        },
+        "flowEncodingVersion": "1.3"
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22fdd400-019e-1000-fd6e-026752a32e42",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 150.25,
+      "stage1_duration_sec": 13.43,
+      "stage2_duration_sec": 102.41,
+      "prompt_tokens": 2162,
+      "completion_tokens": 5509,
+      "total_tokens": 7671,
+      "cost_usd": 0.007259,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 205,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 1266,
+          "completion_tokens": 542,
+          "total_tokens": 1808,
+          "duration_ms": 13016,
+          "cost_usd": 0.00103
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 775,
+          "completion_tokens": 4959,
+          "total_tokens": 5734,
+          "duration_ms": 102202,
+          "cost_usd": 0.006183
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1266,
+          "completion_tokens": 542,
+          "total_tokens": 1808,
+          "duration_ms": 13016,
+          "cost_usd": 0.00103
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 775,
+          "completion_tokens": 4959,
+          "total_tokens": 5734,
+          "duration_ms": 102202,
+          "cost_usd": 0.006183
+        }
+      },
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

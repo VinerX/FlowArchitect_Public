@@ -1,0 +1,27 @@
+
+================================================================
+Query  : ����� CSV-����� �� ���������� /data/input/orders/, �������� ������ �����...
+Mode   : 2 � LLMx2 (NL->YAML->LLM->JSON)
+Presets: [1006]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1006, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1006: openrouter gemini 3 flash  [google/gemini-3-flash-preview] ---
+  [1/2] USER_QUERY  mode=2  preset=1006
+  [1/2] PIM ready  (981 chars, 5.34s)
+  [2/2] REQUEST_CONVERSION  mode=2  preset=1006
+  [2/2] NiFi JSON ready  (0 proc, 0 conn, 9.03s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 2222 in / 2036 out / 4258 total  |  cost: $0.007219
+  Result : [OK]  (48.99s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage3-gemini3-flash\runs\file-csv-filter__m2__p1006__a1__spec98e7be\raw_report.json

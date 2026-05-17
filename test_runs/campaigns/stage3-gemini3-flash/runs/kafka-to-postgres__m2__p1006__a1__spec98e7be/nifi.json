@@ -1,0 +1,162 @@
+{
+  "identifier": "88a74e54-0001-1000-0000-000000000000",
+  "name": "Kafka Orders to PostgreSQL Pipeline",
+  "componentType": "PROCESS_GROUP",
+  "contents": {
+    "processors": [
+      {
+        "identifier": "src_kafka_orders",
+        "name": "Kafka Orders Topic",
+        "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafkaRecord_2_6",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-2-6-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 300.0,
+          "y": 100.0
+        },
+        "properties": {
+          "bootstrap.servers": "{{KAFKA_BROKERS}}",
+          "topic": "orders.created",
+          "group.id": "{{KAFKA_GROUP_ID}}",
+          "auto.offset.reset": "earliest",
+          "record-reader": "json-reader",
+          "record-writer": "json-writer"
+        },
+        "relationships": [
+          {
+            "name": "success",
+            "autoTerminate": false
+          }
+        ]
+      },
+      {
+        "identifier": "proc_parse_json",
+        "name": "Parse JSON and Extract Fields",
+        "type": "org.apache.nifi.processors.standard.QueryRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 300.0,
+          "y": 350.0
+        },
+        "properties": {
+          "record-reader": "json-reader",
+          "record-writer": "json-writer",
+          "include-zero-record-flowfiles": "false",
+          "sql": "SELECT order_id, user_id, amount, created_at FROM FLOWFILE"
+        },
+        "relationships": [
+          {
+            "name": "success",
+            "autoTerminate": false
+          }
+        ]
+      },
+      {
+        "identifier": "sink_pg_orders",
+        "name": "PostgreSQL Orders Table",
+        "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 300.0,
+          "y": 600.0
+        },
+        "properties": {
+          "record-reader": "json-reader",
+          "db-type": "PostgreSQL",
+          "statement-type": "INSERT",
+          "table-name": "public.orders",
+          "dbcp-service": "db-connection-pool"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "link-1",
+        "name": "data_order_record",
+        "source": {
+          "id": "src_kafka_orders",
+          "type": "PROCESSOR",
+          "groupId": "88a74e54-0001-1000-0000-000000000000"
+        },
+        "destination": {
+          "id": "proc_parse_json",
+          "type": "PROCESSOR",
+          "groupId": "88a74e54-0001-1000-0000-000000000000"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      },
+      {
+        "identifier": "link-2",
+        "name": "data_order_record",
+        "source": {
+          "id": "proc_parse_json",
+          "type": "PROCESSOR",
+          "groupId": "88a74e54-0001-1000-0000-000000000000"
+        },
+        "destination": {
+          "id": "sink_pg_orders",
+          "type": "PROCESSOR",
+          "groupId": "88a74e54-0001-1000-0000-000000000000"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      }
+    ],
+    "controllerServices": [
+      {
+        "identifier": "json-reader",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "1.23.2"
+        },
+        "properties": {}
+      },
+      {
+        "identifier": "json-writer",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "output-grouping": "output-array"
+        }
+      },
+      {
+        "identifier": "db-connection-pool",
+        "name": "DBCPConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-dbcp-service-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database User": "{{DB_USER}}",
+          "Password": "{{DB_PASSWORD}}"
+        }
+      }
+    ]
+  }
+}

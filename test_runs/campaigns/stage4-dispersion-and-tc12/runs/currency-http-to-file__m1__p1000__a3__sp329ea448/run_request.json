@@ -1,0 +1,130 @@
+{
+  "run_id": "currency-http-to-file__m1__p1000__a3__sp329ea448",
+  "case_id": "currency-http-to-file",
+  "title": "Currency HTTP to File (replicate)",
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "query_file": null,
+  "attempt": 3,
+  "mode": 1,
+  "preset_id": 1000,
+  "stage_presets": {
+    "pim": 1000,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": false,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "replicate",
+      "dispersion",
+      "level-1"
+    ],
+    "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.\n"
+  },
+  "status": "running",
+  "comment_count": 1,
+  "history": [
+    {
+      "timestamp": "2026-05-13T15:22:47.530289+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-13T15:25:39.013761+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    },
+    {
+      "timestamp": "2026-05-13T15:26:50.354424+00:00",
+      "status": "failed_import",
+      "reason": "runner_finished"
+    },
+    {
+      "timestamp": "2026-05-13T15:56:14.722858+00:00",
+      "status": "queued",
+      "reason": "manual_status_change"
+    },
+    {
+      "timestamp": "2026-05-13T15:59:04.751245+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-13T15:59:04.751245+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\query.txt",
+    "--preset",
+    "1000",
+    "--mode",
+    "1",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\raw_report.json",
+    "--pim-preset",
+    "1000",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960,
+  "finished_at": "2026-05-13T15:26:50.348423+00:00",
+  "exit_code": 0,
+  "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\raw_report.json",
+  "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\runner_stdout.log",
+  "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\runner_stderr.log",
+  "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\query.txt",
+  "result_summary": {
+    "success": true,
+    "error": null,
+    "duration_sec": 55.36,
+    "stage1_duration_sec": 50.82,
+    "stage2_duration_sec": 0.16,
+    "prompt_tokens": 1336,
+    "completion_tokens": 2692,
+    "total_tokens": 4028,
+    "cost_usd": 0.003934,
+    "nifi_processor_count": 2,
+    "nifi_connection_count": 1,
+    "pim_source_count": 1,
+    "pim_step_count": 0,
+    "pim_sink_count": 1,
+    "session_id": 137,
+    "preset_id": 1000,
+    "preset_name": "openrouter qwen/qwen3.6-plus",
+    "preset_model": "qwen/qwen3.6-plus",
+    "llm_calls": [
+      {
+        "purpose": "pim_generation",
+        "provider": "common",
+        "model": "qwen/qwen3.6-plus",
+        "prompt_tokens": 1336,
+        "completion_tokens": 2692,
+        "total_tokens": 4028,
+        "duration_ms": 50140,
+        "cost_usd": 0.003934
+      }
+    ],
+    "llm_usage_by_purpose": {
+      "pim_generation": {
+        "calls": 1,
+        "prompt_tokens": 1336,
+        "completion_tokens": 2692,
+        "total_tokens": 4028,
+        "duration_ms": 50140,
+        "cost_usd": 0.003934
+      }
+    },
+    "nifi_import_success": false,
+    "nifi_error_count": 0,
+    "nifi_import_error": "NiFi unreachable: Cannot connect to https://localhost:8443"
+  },
+  "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\run_summary.json",
+  "last_comment_at": "2026-05-13T15:56:14.722858+00:00"
+}

@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 276.07,
+  "stage1_duration_sec": 260.06,
+  "stage2_duration_sec": null,
+  "prompt_tokens": 210,
+  "completion_tokens": 8742,
+  "total_tokens": 8952,
+  "cost_usd": 0.007697,
+  "nifi_processor_count": 3,
+  "nifi_connection_count": 2,
+  "pim_source_count": null,
+  "pim_step_count": null,
+  "pim_sink_count": null,
+  "session_id": 159,
+  "preset_id": 1004,
+  "preset_name": "openrouter deepseek",
+  "preset_model": "deepseek/deepseek-v4-pro",
+  "llm_calls": [
+    {
+      "purpose": "direct",
+      "provider": "common",
+      "model": "deepseek/deepseek-v4-pro",
+      "prompt_tokens": 88,
+      "completion_tokens": 284,
+      "total_tokens": 372,
+      "duration_ms": 259719,
+      "cost_usd": 0.000285
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "direct": {
+      "calls": 1,
+      "prompt_tokens": 88,
+      "completion_tokens": 284,
+      "total_tokens": 372,
+      "duration_ms": 259719,
+      "cost_usd": 0.000285
+    }
+  },
+  "nifi_import_success": false,
+  "nifi_error_count": 0,
+  "nifi_import_error": "HTTP 400: Message body is malformed. Unable to map into expected format."
+}

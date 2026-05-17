@@ -1,0 +1,332 @@
+{
+  "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+  "mode": 3,
+  "mode_name": "Adapter+LLM (NL->YAML->Adapter->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T19:44:31.120706+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: orders_filter_pipeline\n  name: Filter Completed Orders Pipeline\n  description: Read CSV files from /data/input/orders/, filter rows where status=COMPLETED,\n    write to /data/output/completed_orders.csv\ntriggers:\n- id: trigger_main\n  type: schedule\n  condition: every 5 minutes\nsources:\n- id: source_csv\n  name: Read Orders CSV\n  type: CSV\n  location: /data/input/orders/\n  connection:\n    properties:\n      file_pattern: '*.csv'\n- id: source_csv_single\n  name: Read Single Output CSV\n  type: CSV\n  location: /data/output/completed_orders.csv\nprocessing_elements:\n- id: filter_completed\n  name: Filter Completed Orders\n  operation: Filter\n  config:\n    condition: status = 'COMPLETED'\nsinks:\n- id: sink_csv\n  name: Write Completed Orders\n  type: CSV\n  location: /data/output/completed_orders.csv\nprocessed_data:\n- id: orders_data\n  format: csv\nlinks:\n- from_id: source_csv\n  to_id: filter_completed\n  data_ref: orders_data\n- from_id: filter_completed\n  to_id: sink_csv\n  data_ref: orders_data",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "b027f905-dcd1-42aa-97fb-a69459fb1705",
+          "name": "Filter Completed Orders Pipeline",
+          "comments": "Read CSV files from /data/input/orders/, filter rows where status=COMPLETED, write to /data/output/completed_orders.csv",
+          "processors": [
+            {
+              "identifier": "a8b28130-09ec-4a20-b3c1-17f22d0f7cf7",
+              "name": "Read Orders CSV",
+              "comments": "Generated from PIM source 'source_csv' (CSV)",
+              "type": "org.apache.nifi.processors.standard.GetFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Input Directory": "/data/input/orders/",
+                "File Filter": "*.csv"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "5 min",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "59428e77-3bfa-4aed-8060-ca0796f07a61",
+              "name": "Read Single Output CSV",
+              "comments": "Generated from PIM source 'source_csv_single' (CSV)",
+              "type": "org.apache.nifi.processors.standard.GetFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 260.0
+              },
+              "style": {},
+              "properties": {
+                "Input Directory": "/data/output/",
+                "File Filter": "completed_orders.csv"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "5 min",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success"
+              ]
+            },
+            {
+              "identifier": "db0ea816-19fd-44d7-8264-b5b7eba0b2c2",
+              "name": "Filter Completed Orders",
+              "comments": "Generated from PIM processing element 'filter_completed' (Filter)",
+              "type": "org.apache.nifi.processors.standard.QueryRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "filtered": "status = 'COMPLETED'",
+                "Record Writer": "76c92d94-2c71-4824-934a-758e46f3ccc6",
+                "Record Reader": "77e5f504-3485-4c47-a738-88a067c9f540"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure",
+                "original"
+              ]
+            },
+            {
+              "identifier": "762ed6ab-0648-4504-abdd-03591582a441",
+              "name": "Write Completed Orders",
+              "comments": "Generated from PIM sink 'sink_csv' (CSV)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/output/completed_orders.csv"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "3f6ced14-37d3-4856-b628-5a7f0a9b3bdb",
+              "name": "Read Orders CSV -> Filter Completed Orders",
+              "comments": "orders_data",
+              "source": {
+                "id": "a8b28130-09ec-4a20-b3c1-17f22d0f7cf7",
+                "groupId": "b027f905-dcd1-42aa-97fb-a69459fb1705",
+                "type": "PROCESSOR",
+                "name": "Read Orders CSV"
+              },
+              "destination": {
+                "id": "db0ea816-19fd-44d7-8264-b5b7eba0b2c2",
+                "groupId": "b027f905-dcd1-42aa-97fb-a69459fb1705",
+                "type": "PROCESSOR",
+                "name": "Filter Completed Orders"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "a73b438b-a354-4385-a518-0cd74a493498",
+              "name": "Filter Completed Orders -> Write Completed Orders",
+              "comments": "orders_data",
+              "source": {
+                "id": "db0ea816-19fd-44d7-8264-b5b7eba0b2c2",
+                "groupId": "b027f905-dcd1-42aa-97fb-a69459fb1705",
+                "type": "PROCESSOR",
+                "name": "Filter Completed Orders"
+              },
+              "destination": {
+                "id": "762ed6ab-0648-4504-abdd-03591582a441",
+                "groupId": "b027f905-dcd1-42aa-97fb-a69459fb1705",
+                "type": "PROCESSOR",
+                "name": "Write Completed Orders"
+              },
+              "selectedRelationships": [
+                "filtered"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "77e5f504-3485-4c47-a738-88a067c9f540",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "76c92d94-2c71-4824-934a-758e46f3ccc6",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22df230e-019e-1000-446d-3f6f2d069366",
+        "validation_errors": [
+          {
+            "name": "Read Orders CSV",
+            "type": "org.apache.nifi.processors.standard.GetFile",
+            "errors": [
+              "'Input Directory' validated against '/data/input/orders/' is invalid because Directory does not exist",
+              "'File Filter' validated against '*.csv' is invalid because Not a valid Java Regular Expression"
+            ]
+          },
+          {
+            "name": "Filter Completed Orders",
+            "type": "org.apache.nifi.processors.standard.QueryRecord",
+            "errors": [
+              "'filtered' validated against 'status = 'COMPLETED'' is invalid because Not a valid SQL Statement: Non-query expression encountered in illegal context"
+            ]
+          },
+          {
+            "name": "Read Single Output CSV",
+            "type": "org.apache.nifi.processors.standard.GetFile",
+            "errors": [
+              "'Input Directory' validated against '/data/output/' is invalid because Directory does not exist"
+            ]
+          }
+        ],
+        "error_count": 4,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 64.07,
+      "stage1_duration_sec": 17.21,
+      "stage2_duration_sec": 5.4,
+      "prompt_tokens": 4597,
+      "completion_tokens": 3446,
+      "total_tokens": 8043,
+      "cost_usd": 0.005514,
+      "nifi_processor_count": 4,
+      "nifi_connection_count": 2,
+      "pim_source_count": 2,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 186,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 1257,
+          "completion_tokens": 873,
+          "total_tokens": 2130,
+          "duration_ms": 16625,
+          "cost_usd": 0.001425
+        },
+        {
+          "purpose": "nifi_correction",
+          "provider": "common",
+          "model": "google/gemini-2.5-flash-lite",
+          "prompt_tokens": 111,
+          "completion_tokens": 5,
+          "total_tokens": 116,
+          "duration_ms": 5235,
+          "cost_usd": 1.3e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1257,
+          "completion_tokens": 873,
+          "total_tokens": 2130,
+          "duration_ms": 16625,
+          "cost_usd": 0.001425
+        },
+        "nifi_correction": {
+          "calls": 1,
+          "prompt_tokens": 111,
+          "completion_tokens": 5,
+          "total_tokens": 116,
+          "duration_ms": 5235,
+          "cost_usd": 1.3e-05
+        }
+      },
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

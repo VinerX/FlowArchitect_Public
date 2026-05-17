@@ -1,0 +1,2 @@
+{"timestamp": "2026-05-12T18:58:12.565046+00:00", "author": "Codex", "kind": "manual_nifi_materialized", "text": "Run materialized into NiFi for manual inspection. pg_id=1d8d899f-019e-1000-62c7-139bee2a9df6, validation_errors=2.", "run_id": "file-csv-filter__m1__p1000__a1__sp329ea448"}
+{"timestamp": "2026-05-12T19:00:35.247546+00:00", "author": "Codex", "kind": "manual_nifi_cleanup", "text": "Deleted materialized NiFi process group 1d8d899f-019e-1000-62c7-139bee2a9df6.", "run_id": "file-csv-filter__m1__p1000__a1__sp329ea448"}

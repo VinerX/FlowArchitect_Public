@@ -1,0 +1,74 @@
+{
+  "encodingVersion": "2.0",
+  "snapshot": {
+    "processors": [
+      {
+        "identifier": "list-s3",
+        "name": "ListS3",
+        "type": "org.apache.nifi.processors.aws.s3.ListS3",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "1 hour",
+        "properties": {
+          "Bucket": "raw-logs",
+          "Region": "us-east-1"
+        }
+      },
+      {
+        "identifier": "fetch-s3",
+        "name": "FetchS3Object",
+        "type": "org.apache.nifi.processors.aws.s3.FetchS3Object",
+        "properties": {
+          "Bucket": "raw-logs",
+          "Object Key": "${filename}",
+          "Region": "us-east-1"
+        }
+      },
+      {
+        "identifier": "add-timestamp",
+        "name": "UpdateRecord",
+        "type": "org.apache.nifi.processors.standard.UpdateRecord",
+        "properties": {
+          "record-reader": "json-reader",
+          "record-writer": "json-writer",
+          "replacement-value-strategy": "literal_values",
+          "/processed_at": "${now()}"
+        }
+      },
+      {
+        "identifier": "put-db",
+        "name": "PutDatabaseRecord",
+        "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+        "properties": {
+          "record-reader": "json-reader",
+          "database-type": "PostgreSQL",
+          "db-connection-pool": "postgres-service",
+          "table-name": "public.event_log",
+          "statement-type": "INSERT"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "source": "list-s3",
+        "destination": "fetch-s3",
+        "selectedRelationships": [
+          "success"
+        ]
+      },
+      {
+        "source": "fetch-s3",
+        "destination": "add-timestamp",
+        "selectedRelationships": [
+          "success"
+        ]
+      },
+      {
+        "source": "add-timestamp",
+        "destination": "put-db",
+        "selectedRelationships": [
+          "success"
+        ]
+      }
+    ]
+  }
+}

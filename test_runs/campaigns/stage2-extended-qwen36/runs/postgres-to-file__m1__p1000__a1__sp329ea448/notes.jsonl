@@ -1,0 +1,2 @@
+{"timestamp": "2026-05-13T15:57:37.501267+00:00", "author": "Codex", "kind": "manual_nifi_materialized", "text": "Run materialized into NiFi for manual inspection. pg_id=220e08f6-019e-1000-5343-454148465141, validation_errors=2.", "run_id": "postgres-to-file__m1__p1000__a1__sp329ea448"}
+{"timestamp": "2026-05-13T16:01:47.968690+00:00", "author": "Codex", "kind": "manual_nifi_cleanup", "text": "Deleted materialized NiFi process group 220e08f6-019e-1000-5343-454148465141.", "run_id": "postgres-to-file__m1__p1000__a1__sp329ea448"}

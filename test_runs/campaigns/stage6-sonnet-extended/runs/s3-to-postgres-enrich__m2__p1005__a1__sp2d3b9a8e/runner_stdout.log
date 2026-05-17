@@ -1,0 +1,31 @@
+
+================================================================
+Query  : ������ ��� ������� JSON-����� �� S3-������ raw-logs, ��� ������ ������ �...
+Mode   : 2 � LLMx2 (NL->YAML->LLM->JSON)
+Presets: [1005]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1005, 'error_corrector': 1005, 'nifi_corrector': 1005}
+Backend ready.
+
+--- Preset 1005: openrouter sonnet 4.6  [anthropic/claude-sonnet-4.6] ---
+  [1/2] USER_QUERY  mode=2  preset=1005
+  [1/2] PIM ready  (1461 chars, 8.39s)
+  [2/2] REQUEST_CONVERSION  mode=2  preset=1005
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (40s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (5 proc, 6 conn, 44.55s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: FAILED: NiFi unreachable: Cannot connect to https://localhost:8443
+  tokens: 2574 in / 5329 out / 7903 total  |  cost: $0.087657
+  Result : [OK]  (57.33s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage6-sonnet-extended\runs\s3-to-postgres-enrich__m2__p1005__a1__sp2d3b9a8e\raw_report.json

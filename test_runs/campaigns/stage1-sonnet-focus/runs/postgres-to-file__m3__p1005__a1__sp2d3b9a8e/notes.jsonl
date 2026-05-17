@@ -1,0 +1,1 @@
+{"timestamp": "2026-05-11T17:21:27.774530+00:00", "author": "codex", "kind": "comparison_note", "text": "Sonnet mode 3 did not beat mode 1 on postgres-to-file. The correction stage produced a richer and more plausible flow, but still left three validation errors and cost more than five times as much as mode 1.", "run_id": "postgres-to-file__m3__p1005__a1__sp2d3b9a8e"}

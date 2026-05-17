@@ -1,0 +1,48 @@
+flow:
+  id: kafka_to_postgres_orders
+  name: Kafka Orders to PostgreSQL Pipeline
+  description: Ingests order creation events from Kafka, extracts specific fields
+    from JSON, and persists them into a PostgreSQL table.
+triggers:
+- id: trigger_event_stream
+  type: event
+  condition: on_message_received
+sources:
+- id: src_kafka_orders
+  name: Kafka Orders Topic
+  type: Kafka
+  location: orders.created
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_GROUP_ID}}'
+      offset_reset: earliest
+processing_elements:
+- id: proc_parse_json
+  name: Parse JSON and Extract Fields
+  operation: Transform
+  config:
+    fields: order_id, user_id, amount, created_at
+    format: json
+sinks:
+- id: sink_pg_orders
+  name: PostgreSQL Orders Table
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USER}}'
+      password: '{{DB_PASSWORD}}'
+processed_data:
+- id: data_order_record
+  format: structured_row
+links:
+- from_id: src_kafka_orders
+  to_id: proc_parse_json
+  data_ref: data_order_record
+- from_id: proc_parse_json
+  to_id: sink_pg_orders
+  data_ref: data_order_record

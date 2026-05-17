@@ -1,0 +1,63 @@
+flow:
+  id: kafka_orders_to_postgres
+  name: Kafka Orders to PostgreSQL Pipeline
+  description: Считывание сообщений из Kafka topic 'orders', преобразование JSON в
+    строки таблицы и запись в PostgreSQL
+triggers:
+- id: trigger_main
+  type: event
+  condition: New message in Kafka topic 'orders'
+sources:
+- id: source_kafka_orders
+  name: Read Orders from Kafka
+  type: Kafka
+  location: orders
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_CONSUMER_GROUP_ID}}'
+      auto_offset_reset: earliest
+      security_protocol: '{{KAFKA_SECURITY_PROTOCOL}}'
+processing_elements:
+- id: process_parse_json
+  name: Parse JSON Messages
+  operation: Deserialize
+  config:
+    input_format: json
+    output_format: structured_record
+- id: process_map_to_rows
+  name: Map JSON Fields to Table Rows
+  operation: Map
+  config:
+    mapping_strategy: json_fields_to_columns
+    target_table: '{{POSTGRES_TARGET_TABLE}}'
+sinks:
+- id: sink_postgres
+  name: Write to PostgreSQL
+  type: PostgreSQL
+  location: '{{POSTGRES_SCHEMA}}.{{POSTGRES_TARGET_TABLE}}'
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+      ssl_mode: '{{DB_SSL_MODE}}'
+processed_data:
+- id: raw_orders_json
+  format: json
+- id: parsed_orders_records
+  format: structured_record
+- id: mapped_table_rows
+  format: tabular
+links:
+- from_id: source_kafka_orders
+  to_id: process_parse_json
+  data_ref: raw_orders_json
+- from_id: process_parse_json
+  to_id: process_map_to_rows
+  data_ref: parsed_orders_records
+- from_id: process_map_to_rows
+  to_id: sink_postgres
+  data_ref: mapped_table_rows

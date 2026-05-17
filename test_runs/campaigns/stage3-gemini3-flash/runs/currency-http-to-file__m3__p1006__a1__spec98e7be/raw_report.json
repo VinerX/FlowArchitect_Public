@@ -1,0 +1,213 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 3,
+  "mode_name": "Adapter+LLM (NL->YAML->Adapter->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:00:41.772733+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: currency_exchange_fetcher\n  name: Currency Exchange Rates Pipeline\n  description: Fetches latest exchange rates from an API and saves them to a local\n    JSON file.\ntriggers:\n- id: daily_trigger\n  type: schedule\n  condition: 0 0 * * *\nsources:\n- id: source_api\n  name: Exchange Rate API\n  type: HTTP_REST\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\n      auth_type: none\nprocessing_elements: []\nsinks:\n- id: sink_file\n  name: Local JSON Storage\n  type: File\n  location: /data/output/rates.json\n  connection:\n    properties:\n      format: json\n      write_mode: overwrite\nprocessed_data:\n- id: exchange_rates_data\n  format: json\nlinks:\n- from_id: source_api\n  to_id: sink_file\n  data_ref: exchange_rates_data",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "416cb646-afe7-46a6-8046-8482e68b75c5",
+          "name": "Currency Exchange Rates Pipeline",
+          "comments": "Fetches latest exchange rates from an API and saves them to a local JSON file.",
+          "processors": [
+            {
+              "identifier": "cab1a9d9-553f-4228-9c76-2eff9da49590",
+              "name": "Exchange Rate API",
+              "comments": "Generated from PIM source 'source_api' (HTTP_REST)",
+              "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "HTTP URL": "https://api.exchangerate.host/latest",
+                "HTTP Method": "GET"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "Original",
+                "Retry",
+                "No Retry",
+                "Failure"
+              ]
+            },
+            {
+              "identifier": "d72a7d71-e21a-43ac-9d83-093320b68376",
+              "name": "Local JSON Storage",
+              "comments": "Generated from PIM sink 'sink_file' (File)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/output",
+                "Conflict Resolution Strategy": "replace",
+                "Create Parent Directories": "false",
+                "File Size": "0 B",
+                "Last Modified Time": "0 sec",
+                "Permissions": "rw-r--r--",
+                "Directory as Filename": "false",
+                "Target System Timezone": "UTC",
+                "Atomic Operation Safety": "true"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "51732d5e-fbfb-4901-92c9-2eb1d8beb761",
+              "name": "Exchange Rate API -> Local JSON Storage",
+              "comments": "exchange_rates_data",
+              "source": {
+                "id": "cab1a9d9-553f-4228-9c76-2eff9da49590",
+                "groupId": "416cb646-afe7-46a6-8046-8482e68b75c5",
+                "type": "PROCESSOR",
+                "name": "Exchange Rate API"
+              },
+              "destination": {
+                "id": "d72a7d71-e21a-43ac-9d83-093320b68376",
+                "groupId": "416cb646-afe7-46a6-8046-8482e68b75c5",
+                "type": "PROCESSOR",
+                "name": "Local JSON Storage"
+              },
+              "selectedRelationships": [
+                "Response"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": []
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "20ff55e3-019e-1000-a358-dc05218ae497",
+        "validation_errors": [
+          {
+            "name": "Local JSON Storage",
+            "type": "org.apache.nifi.processors.standard.PutFile",
+            "errors": [
+              "'Target System Timezone' validated against 'UTC' is invalid because 'Target System Timezone' is not a supported property or has no Validator associated with it",
+              "'File Size' validated against '0 B' is invalid because 'File Size' is not a supported property or has no Validator associated with it",
+              "'Create Parent Directories' validated against 'false' is invalid because 'Create Parent Directories' is not a supported property or has no Validator associated with it",
+              "'Directory as Filename' validated against 'false' is invalid because 'Directory as Filename' is not a supported property or has no Validator associated with it",
+              "'Atomic Operation Safety' validated against 'true' is invalid because 'Atomic Operation Safety' is not a supported property or has no Validator associated with it"
+            ]
+          }
+        ],
+        "error_count": 5,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 41.96,
+      "stage1_duration_sec": 3.85,
+      "stage2_duration_sec": 3.48,
+      "prompt_tokens": 3270,
+      "completion_tokens": 1687,
+      "total_tokens": 4957,
+      "cost_usd": 0.006696,
+      "nifi_processor_count": 2,
+      "nifi_connection_count": 1,
+      "pim_source_count": 1,
+      "pim_step_count": 0,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 110,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 1372,
+          "completion_tokens": 414,
+          "total_tokens": 1786,
+          "duration_ms": 3578,
+          "cost_usd": 0.001928
+        },
+        {
+          "purpose": "nifi_correction",
+          "provider": "common",
+          "model": "google/gemini-2.5-flash-lite",
+          "prompt_tokens": 1816,
+          "completion_tokens": 1267,
+          "total_tokens": 3083,
+          "duration_ms": 3250,
+          "cost_usd": 0.000688
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1372,
+          "completion_tokens": 414,
+          "total_tokens": 1786,
+          "duration_ms": 3578,
+          "cost_usd": 0.001928
+        },
+        "nifi_correction": {
+          "calls": 1,
+          "prompt_tokens": 1816,
+          "completion_tokens": 1267,
+          "total_tokens": 3083,
+          "duration_ms": 3250,
+          "cost_usd": 0.000688
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

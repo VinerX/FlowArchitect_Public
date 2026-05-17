@@ -1,0 +1,38 @@
+{
+  "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-12T17:22:12.168834+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: kafka_pg_orders_etl\n  name: Kafka to PostgreSQL Orders ETL\n  description: Reads messages from Kafka topic orders.created, parses JSON, extracts\n    key fields, and inserts them into PostgreSQL table public.orders\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 1 minute\nsources:\n- id: source_kafka\n  name: Read Kafka Topic\n  type: Kafka\n  location: orders.created\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      group_id: '{{KAFKA_GROUP_ID}}'\nprocessing_elements:\n- id: process_extract_fields\n  name: Parse JSON and Extract Fields\n  operation: Extract\n  config:\n    fields:\n    - order_id\n    - user_id\n    - amount\n    - created_at\n    input_format: json\nsinks:\n- id: sink_postgres\n  name: Insert into PostgreSQL\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\nprocessed_data:\n- id: parsed_orders\n  format: json\nlinks:\n- from_id: source_kafka\n  to_id: process_extract_fields\n  data_ref: parsed_orders\n- from_id: process_extract_fields\n  to_id: sink_postgres\n  data_ref: parsed_orders",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for NiFi JSON",
+      "duration_sec": 353.28,
+      "stage1_duration_sec": 53.05,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

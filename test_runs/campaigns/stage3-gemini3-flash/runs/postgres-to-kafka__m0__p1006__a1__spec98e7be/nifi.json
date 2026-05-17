@@ -1,0 +1,59 @@
+{
+  "encodingVersion": "2.0",
+  "snapshot": {
+    "processors": [
+      {
+        "identifier": "query-db",
+        "name": "QueryDatabaseTable",
+        "type": "org.apache.nifi.processors.standard.QueryDatabaseTable",
+        "properties": {
+          "db-fetch-dbcp-service": "PostgreSQL_Pool",
+          "table-name": "public.transactions",
+          "db-fetch-where-clause": "status = 'PENDING'"
+        },
+        "componentType": "PROCESSOR"
+      },
+      {
+        "identifier": "convert-avro-json",
+        "name": "ConvertAvroToJSON",
+        "type": "org.apache.nifi.processors.avro.ConvertAvroToJSON",
+        "componentType": "PROCESSOR"
+      },
+      {
+        "identifier": "publish-kafka",
+        "name": "PublishKafka_2_6",
+        "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+        "properties": {
+          "bootstrap.servers": "localhost:9092",
+          "topic": "transactions.overdue",
+          "acks": "all"
+        },
+        "componentType": "PROCESSOR"
+      }
+    ],
+    "connections": [
+      {
+        "source": {
+          "id": "query-db"
+        },
+        "destination": {
+          "id": "convert-avro-json"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      },
+      {
+        "source": {
+          "id": "convert-avro-json"
+        },
+        "destination": {
+          "id": "publish-kafka"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      }
+    ]
+  }
+}

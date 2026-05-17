@@ -1,0 +1,264 @@
+{
+  "id": "a1b2c3d4-0001-0001-0001-000000000001",
+  "name": "Pending Transactions to Kafka",
+  "comments": "Reads records with status PENDING from table public.transactions, converts to JSON and publishes to Kafka topic transactions.overdue",
+  "position": {
+    "x": 0,
+    "y": 0
+  },
+  "processGroups": [],
+  "remoteProcessGroups": [],
+  "processors": [
+    {
+      "id": "a1b2c3d4-0002-0002-0002-000000000002",
+      "name": "Read Pending Transactions",
+      "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+      "position": {
+        "x": 200,
+        "y": 200
+      },
+      "config": {
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "1 min",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "properties": {
+          "Database Connection Pooling Service": "a1b2c3d4-0010-0010-0010-000000000010",
+          "Database Type": "PostgreSQL",
+          "Table Name": "public.transactions",
+          "Additional WHERE clause": "status = 'PENDING'",
+          "Custom Query": "SELECT * FROM public.transactions WHERE status = 'PENDING'",
+          "Maximum-value Columns": "",
+          "Columns to Return": "",
+          "Record Writer": "a1b2c3d4-0011-0011-0011-000000000011",
+          "Fetch Size": "0",
+          "Max Rows Per Flow File": "0",
+          "Output Batch Size": "0",
+          "Maximum Number of Fragments": "0",
+          "Normalize Table/Column Names": "false",
+          "Use Avro Logical Types": "false",
+          "Default Decimal Precision": "10",
+          "Default Decimal Scale": "0",
+          "Transaction Isolation Level": "TRANSACTION_READ_COMMITTED"
+        },
+        "autoTerminatedRelationships": []
+      }
+    },
+    {
+      "id": "a1b2c3d4-0003-0003-0003-000000000003",
+      "name": "Convert to JSON",
+      "type": "org.apache.nifi.processors.standard.ConvertRecord",
+      "position": {
+        "x": 600,
+        "y": 200
+      },
+      "config": {
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "properties": {
+          "Record Reader": "a1b2c3d4-0012-0012-0012-000000000012",
+          "Record Writer": "a1b2c3d4-0011-0011-0011-000000000011"
+        },
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "a1b2c3d4-0004-0004-0004-000000000004",
+      "name": "Publish to Kafka transactions.overdue",
+      "type": "org.apache.nifi.kafka.processors.PublishKafka",
+      "position": {
+        "x": 1000,
+        "y": 200
+      },
+      "config": {
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "properties": {
+          "Kafka Connection Service": "a1b2c3d4-0013-0013-0013-000000000013",
+          "Topic Name": "transactions.overdue",
+          "Record Reader": "a1b2c3d4-0012-0012-0012-000000000012",
+          "Record Writer": "a1b2c3d4-0011-0011-0011-000000000011",
+          "Message Key Field": "{{KAFKA_MESSAGE_KEY_FIELD}}",
+          "Acknowledgment Wait Time": "5 secs",
+          "Max Request Size": "1 MB",
+          "Compression Type": "none",
+          "Delivery Guarantee": "GUARANTEE_REPLICATED_DELIVERY",
+          "Attributes to Send as Headers (Regex)": "",
+          "Message Timeout": "30 sec",
+          "Transactions Enabled": "false",
+          "Transactional Id Prefix": ""
+        },
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "a1b2c3d4-0005-0005-0005-000000000005",
+      "name": "Read Pending Transactions -> Convert to JSON",
+      "source": {
+        "id": "a1b2c3d4-0002-0002-0002-000000000002",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "a1b2c3d4-0003-0003-0003-000000000003",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": 10000,
+      "labelIndex": 1,
+      "zIndex": 0,
+      "bends": []
+    },
+    {
+      "id": "a1b2c3d4-0006-0006-0006-000000000006",
+      "name": "Convert to JSON -> Publish to Kafka transactions.overdue",
+      "source": {
+        "id": "a1b2c3d4-0003-0003-0003-000000000003",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "a1b2c3d4-0004-0004-0004-000000000004",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": 10000,
+      "labelIndex": 1,
+      "zIndex": 0,
+      "bends": []
+    }
+  ],
+  "controllerServices": [
+    {
+      "id": "a1b2c3d4-0010-0010-0010-000000000010",
+      "name": "DBCPConnectionPool - PostgreSQL Transactions",
+      "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+      "comments": "PostgreSQL connection pool for public.transactions",
+      "properties": {
+        "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+        "Database Driver Class Name": "org.postgresql.Driver",
+        "database-driver-locations": "{{POSTGRESQL_DRIVER_JAR_PATH}}",
+        "Database User": "{{DB_USERNAME}}",
+        "Password": "{{DB_PASSWORD}}",
+        "Max Wait Time": "500 millis",
+        "Max Total Connections": "8",
+        "Min Idle Connections": "0",
+        "Max Idle Connections": "8",
+        "Max Connection Lifetime": "-1",
+        "Eviction Run Period": "-1",
+        "Min Evictable Idle Time": "30 mins",
+        "Soft Min Evictable Idle Time": "-1",
+        "Validation Query": "SELECT 1"
+      }
+    },
+    {
+      "id": "a1b2c3d4-0011-0011-0011-000000000011",
+      "name": "JsonRecordSetWriter",
+      "type": "org.apache.nifi.json.JsonRecordSetWriter",
+      "comments": "Writes records as JSON, including null values",
+      "properties": {
+        "Schema Write Strategy": "no-schema",
+        "Schema Access Strategy": "inherit-record-schema",
+        "Schema Registry": "",
+        "Schema Name": "",
+        "Schema Text": "",
+        "Date Format": "",
+        "Time Format": "",
+        "Timestamp Format": "",
+        "Pretty Print JSON": "false",
+        "Suppress Null Values": "NEVER_SUPPRESS",
+        "Output Grouping": "output-oneline"
+      }
+    },
+    {
+      "id": "a1b2c3d4-0012-0012-0012-000000000012",
+      "name": "JsonTreeReader",
+      "type": "org.apache.nifi.json.JsonTreeReader",
+      "comments": "Reads JSON records",
+      "properties": {
+        "Schema Access Strategy": "infer-schema",
+        "Schema Registry": "",
+        "Schema Name": "",
+        "Schema Text": "",
+        "Date Format": "",
+        "Time Format": "",
+        "Timestamp Format": "",
+        "Allow Comments": "false"
+      }
+    },
+    {
+      "id": "a1b2c3d4-0013-0013-0013-000000000013",
+      "name": "Kafka3ConnectionService - transactions.overdue",
+      "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+      "comments": "Kafka connection service for publishing to transactions.overdue",
+      "properties": {
+        "bootstrap.servers": "{{KAFKA_BROKERS}}",
+        "Security Protocol": "PLAINTEXT",
+        "SASL Mechanism": "",
+        "SASL Username": "",
+        "SASL Password": "",
+        "SSL Context Service": "",
+        "acks": "all",
+        "retries": "3",
+        "max.block.ms": "5000",
+        "request.timeout.ms": "30000"
+      }
+    }
+  ],
+  "labels": [
+    {
+      "id": "a1b2c3d4-0020-0020-0020-000000000020",
+      "label": "Pending Transactions to Kafka\nReads PENDING records from public.transactions and publishes to transactions.overdue",
+      "position": {
+        "x": 150,
+        "y": 80
+      },
+      "width": 950,
+      "height": 60,
+      "style": {
+        "font-size": "14px",
+        "background-color": "#e8f4f8"
+      }
+    }
+  ],
+  "funnels": [],
+  "variables": {
+    "DB_HOST": "{{DB_HOST}}",
+    "DB_PORT": "{{DB_PORT}}",
+    "DATABASE_NAME": "{{DATABASE_NAME}}",
+    "DB_USERNAME": "{{DB_USERNAME}}",
+    "DB_PASSWORD": "{{DB_PASSWORD}}",
+    "KAFKA_BROKERS": "{{KAFKA_BROKERS}}",
+    "KAFKA_MESSAGE_KEY_FIELD": "{{KAFKA_MESSAGE_KEY_FIELD}}",
+    "POSTGRESQL_DRIVER_JAR_PATH": "{{POSTGRESQL_DRIVER_JAR_PATH}}"
+  }
+}

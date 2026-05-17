@@ -1,0 +1,43 @@
+flow:
+  id: csv_order_processing
+  name: Process Completed Orders
+  description: Reads CSV files, filters by COMPLETED status, and writes results to
+    a new CSV.
+triggers:
+- id: trigger_manual
+  type: manual
+  condition: on demand
+sources:
+- id: source_csv
+  name: Read Orders CSV
+  type: File
+  location: /data/input/orders/
+  connection:
+    properties:
+      format: csv
+      recursive: 'false'
+processing_elements:
+- id: filter_completed
+  name: Filter Completed Status
+  operation: Filter
+  config:
+    condition: status == 'COMPLETED'
+sinks:
+- id: sink_csv
+  name: Write Completed Orders
+  type: File
+  location: /data/output/completed_orders.csv
+  connection:
+    properties:
+      format: csv
+      write_mode: overwrite
+processed_data:
+- id: order_data
+  format: csv
+links:
+- from_id: source_csv
+  to_id: filter_completed
+  data_ref: order_data
+- from_id: filter_completed
+  to_id: sink_csv
+  data_ref: order_data

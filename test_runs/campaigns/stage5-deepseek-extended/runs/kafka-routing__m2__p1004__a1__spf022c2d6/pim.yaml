@@ -1,0 +1,74 @@
+flow:
+  id: event_router_pipeline
+  name: Event Router Pipeline
+  description: Read events from Kafka, route to PostgreSQL or Kafka based on type
+    field
+triggers:
+- id: trigger_stream
+  type: schedule
+  condition: every 1 minute
+sources:
+- id: source_kafka
+  name: Kafka Source
+  type: Kafka
+  location: events.all
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: event_router_group
+processing_elements:
+- id: process_router
+  name: Type Router
+  operation: Router
+  config:
+    field: type
+    routes:
+      purchase: sink_pg_purchases
+      refund: sink_pg_refunds
+      default: sink_kafka_unknown
+sinks:
+- id: sink_pg_purchases
+  name: PostgreSQL Purchases
+  type: PostgreSQL
+  location: public.purchases
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_pg_refunds
+  name: PostgreSQL Refunds
+  type: PostgreSQL
+  location: public.refunds
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_kafka_unknown
+  name: Kafka Unknown Sink
+  type: Kafka
+  location: events.unknown
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: events_json
+  format: json
+links:
+- from_id: source_kafka
+  to_id: process_router
+  data_ref: events_json
+- from_id: process_router
+  to_id: sink_pg_purchases
+  data_ref: events_json
+- from_id: process_router
+  to_id: sink_pg_refunds
+  data_ref: events_json
+- from_id: process_router
+  to_id: sink_kafka_unknown
+  data_ref: events_json

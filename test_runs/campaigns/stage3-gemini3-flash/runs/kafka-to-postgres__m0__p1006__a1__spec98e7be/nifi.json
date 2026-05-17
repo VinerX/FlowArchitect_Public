@@ -1,0 +1,104 @@
+{
+  "identifier": "7c8b9a1d-0001-1000-0000-000000000000",
+  "instanceIdentifier": "01861000-1000-1111-8888-999999999999",
+  "name": "Kafka to PostgreSQL Orders Flow",
+  "componentType": "PROCESS_GROUP",
+  "contents": {
+    "processors": [
+      {
+        "identifier": "consume-kafka",
+        "name": "ConsumeKafka_2_6",
+        "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafka_2_6",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-2-6-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "bootstrap.servers": "localhost:9092",
+          "topic": "orders.created",
+          "group.id": "nifi-consumer-group",
+          "honor-transactions": "true"
+        }
+      },
+      {
+        "identifier": "convert-json-to-sql",
+        "name": "ConvertJSONToSQL",
+        "type": "org.apache.nifi.processors.standard.ConvertJSONToSQL",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "JDBC Connection Pool": "PostgreSQL-Connection-Pool",
+          "Statement Type": "INSERT",
+          "Table Name": "orders",
+          "Schema Name": "public",
+          "Unmatched Column Behavior": "Ignore Unmatched Columns"
+        }
+      },
+      {
+        "identifier": "put-sql",
+        "name": "PutSQL",
+        "type": "org.apache.nifi.processors.standard.PutSQL",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "JDBC Connection Pool": "PostgreSQL-Connection-Pool"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "conn-1",
+        "source": {
+          "id": "consume-kafka",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "convert-json-to-sql",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      },
+      {
+        "identifier": "conn-2",
+        "source": {
+          "id": "convert-json-to-sql",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "put-sql",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      }
+    ],
+    "controllerServices": [
+      {
+        "identifier": "PostgreSQL-Connection-Pool",
+        "name": "DBCPConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-dbcp-service-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://localhost:5432/your_db",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database User": "postgres",
+          "Password": "password"
+        }
+      }
+    ]
+  }
+}

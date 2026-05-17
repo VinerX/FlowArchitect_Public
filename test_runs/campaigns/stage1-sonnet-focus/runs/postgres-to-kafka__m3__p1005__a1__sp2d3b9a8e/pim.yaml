@@ -1,0 +1,61 @@
+flow:
+  id: postgres_to_kafka_pipeline
+  name: PostgreSQL to Kafka Analytics Pipeline
+  description: Периодически выбирает новые записи из PostgreSQL и публикует их в Kafka
+    topic analytics.events в формате JSON
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 1 minute
+sources:
+- id: source_postgres
+  name: Read New Records from PostgreSQL
+  type: PostgreSQL
+  location: '{{DB_SCHEMA}}.{{DB_TABLE}}'
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processing_elements:
+- id: process_filter_new
+  name: Filter New Records
+  operation: Filter
+  config:
+    condition: created_at > {{LAST_PROCESSED_TIMESTAMP}}
+    watermark_field: created_at
+    state_store: '{{WATERMARK_STATE_STORE}}'
+- id: process_to_json
+  name: Convert to JSON
+  operation: Serialize
+  config:
+    format: json
+    include_schema: 'false'
+sinks:
+- id: sink_kafka
+  name: Publish to Kafka analytics.events
+  type: Kafka
+  location: analytics.events
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      acks: all
+      key_serializer: org.apache.kafka.common.serialization.StringSerializer
+      value_serializer: org.apache.kafka.common.serialization.StringSerializer
+processed_data:
+- id: new_records_raw
+  format: tabular
+- id: new_records_json
+  format: json
+links:
+- from_id: source_postgres
+  to_id: process_filter_new
+  data_ref: new_records_raw
+- from_id: process_filter_new
+  to_id: process_to_json
+  data_ref: new_records_raw
+- from_id: process_to_json
+  to_id: sink_kafka
+  data_ref: new_records_json

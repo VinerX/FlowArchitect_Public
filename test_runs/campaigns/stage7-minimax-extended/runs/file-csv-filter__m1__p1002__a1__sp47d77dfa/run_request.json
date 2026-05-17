@@ -1,0 +1,61 @@
+{
+  "run_id": "file-csv-filter__m1__p1002__a1__sp47d77dfa",
+  "case_id": "file-csv-filter",
+  "title": "File CSV Filter",
+  "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 1,
+  "preset_id": 1002,
+  "stage_presets": {
+    "pim": 1002,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": false,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "file",
+      "filter",
+      "level-1"
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-13T16:06:44.504130+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-13T19:33:54.585099+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-13T19:33:54.585099+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage7-minimax-extended\\runs\\file-csv-filter__m1__p1002__a1__sp47d77dfa\\query.txt",
+    "--preset",
+    "1002",
+    "--mode",
+    "1",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage7-minimax-extended\\runs\\file-csv-filter__m1__p1002__a1__sp47d77dfa\\raw_report.json",
+    "--pim-preset",
+    "1002",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

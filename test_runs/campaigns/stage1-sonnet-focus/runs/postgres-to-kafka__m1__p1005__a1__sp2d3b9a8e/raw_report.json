@@ -1,0 +1,392 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-11T17:05:11.264409+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: postgres_to_kafka_pipeline\n  name: PostgreSQL to Kafka Analytics Pipeline\n  description: Периодически выбирает новые записи из PostgreSQL и публикует их в Kafka\n    topic analytics.events в формате JSON\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 1 minute\nsources:\n- id: source_postgres\n  name: Read New Records from PostgreSQL\n  type: PostgreSQL\n  location: '{{DB_SCHEMA}}.{{DB_TABLE}}'\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DB_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\nprocessing_elements:\n- id: process_filter_new\n  name: Filter New Records\n  operation: Filter\n  config:\n    condition: created_at > {{LAST_PROCESSED_TIMESTAMP}}\n    watermark_field: created_at\n    state_store: '{{WATERMARK_STATE_STORE}}'\n- id: process_serialize_json\n  name: Serialize to JSON\n  operation: Serialize\n  config:\n    format: json\n    include_schema: 'false'\nsinks:\n- id: sink_kafka\n  name: Publish to Kafka analytics.events\n  type: Kafka\n  location: analytics.events\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      acks: all\n      key_serializer: org.apache.kafka.common.serialization.StringSerializer\n      value_serializer: org.apache.kafka.common.serialization.StringSerializer\nprocessed_data:\n- id: raw_records\n  format: tabular\n- id: filtered_records\n  format: tabular\n- id: json_records\n  format: json\nlinks:\n- from_id: source_postgres\n  to_id: process_filter_new\n  data_ref: raw_records\n- from_id: process_filter_new\n  to_id: process_serialize_json\n  data_ref: filtered_records\n- from_id: process_serialize_json\n  to_id: sink_kafka\n  data_ref: json_records",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "18ab6f6a-43b1-4ea4-ab34-28baaf250d8d",
+          "name": "PostgreSQL to Kafka Analytics Pipeline",
+          "comments": "Периодически выбирает новые записи из PostgreSQL и публикует их в Kafka topic analytics.events в формате JSON",
+          "processors": [
+            {
+              "identifier": "867fc8dd-fa5d-4178-9976-c5041076f496",
+              "name": "Read New Records from PostgreSQL",
+              "comments": "Generated from PIM source 'source_postgres' (PostgreSQL)",
+              "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Table Name": "{{DB_SCHEMA}}.{{DB_TABLE}}",
+                "Database Type": "PostgreSQL",
+                "Database Connection Pooling Service": "62e3bcd8-bae5-47e7-b8b0-b163c4317d7e",
+                "Record Writer": "cc4c3d50-2135-4431-9671-33f3e65d629d"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "60 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "25bba310-013d-4a79-b5e2-0ab722c7f218",
+              "name": "Filter New Records",
+              "comments": "Generated from PIM processing element 'process_filter_new' (Filter)",
+              "type": "org.apache.nifi.processors.standard.QueryRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "filtered": "SELECT * FROM FLOWFILE WHERE created_at > {{LAST_PROCESSED_TIMESTAMP}}",
+                "Record Writer": "cc4c3d50-2135-4431-9671-33f3e65d629d",
+                "Record Reader": "27a5a02b-f928-4623-b31d-ca9576f648d2",
+                "watermark_field": "created_at",
+                "state_store": "{{WATERMARK_STATE_STORE}}"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure",
+                "original"
+              ]
+            },
+            {
+              "identifier": "87968e2c-8d53-4564-b88b-bdd7dec74b37",
+              "name": "Serialize to JSON",
+              "comments": "Generated from PIM processing element 'process_serialize_json' (Serialize)",
+              "type": "org.apache.nifi.processors.standard.ConvertRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Record Writer": "cc4c3d50-2135-4431-9671-33f3e65d629d",
+                "Record Reader": "27a5a02b-f928-4623-b31d-ca9576f648d2",
+                "include_schema": "false"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            },
+            {
+              "identifier": "ec3e7b6f-08f6-41b3-a84d-104d5d8329b0",
+              "name": "Publish to Kafka analytics.events",
+              "comments": "Generated from PIM sink 'sink_kafka' (Kafka)",
+              "type": "org.apache.nifi.kafka.processors.PublishKafka",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 1220.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Topic Name": "analytics.events",
+                "Kafka Connection Service": "8b594507-6135-4b27-a220-09344b9a334e",
+                "acks": "all",
+                "key_serializer": "org.apache.kafka.common.serialization.StringSerializer",
+                "value_serializer": "org.apache.kafka.common.serialization.StringSerializer"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "72d88d5e-43ab-426a-bae3-9c784e8a79b8",
+              "name": "Read New Records from PostgreSQL -> Filter New Records",
+              "comments": "raw_records",
+              "source": {
+                "id": "867fc8dd-fa5d-4178-9976-c5041076f496",
+                "groupId": "18ab6f6a-43b1-4ea4-ab34-28baaf250d8d",
+                "type": "PROCESSOR",
+                "name": "Read New Records from PostgreSQL"
+              },
+              "destination": {
+                "id": "25bba310-013d-4a79-b5e2-0ab722c7f218",
+                "groupId": "18ab6f6a-43b1-4ea4-ab34-28baaf250d8d",
+                "type": "PROCESSOR",
+                "name": "Filter New Records"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "eec6f0b2-daf6-4bbe-9585-22ab6d9ec2d5",
+              "name": "Filter New Records -> Serialize to JSON",
+              "comments": "filtered_records",
+              "source": {
+                "id": "25bba310-013d-4a79-b5e2-0ab722c7f218",
+                "groupId": "18ab6f6a-43b1-4ea4-ab34-28baaf250d8d",
+                "type": "PROCESSOR",
+                "name": "Filter New Records"
+              },
+              "destination": {
+                "id": "87968e2c-8d53-4564-b88b-bdd7dec74b37",
+                "groupId": "18ab6f6a-43b1-4ea4-ab34-28baaf250d8d",
+                "type": "PROCESSOR",
+                "name": "Serialize to JSON"
+              },
+              "selectedRelationships": [
+                "filtered"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "bf42bc6c-59be-4970-a0ce-032293d5bc87",
+              "name": "Serialize to JSON -> Publish to Kafka analytics.events",
+              "comments": "json_records",
+              "source": {
+                "id": "87968e2c-8d53-4564-b88b-bdd7dec74b37",
+                "groupId": "18ab6f6a-43b1-4ea4-ab34-28baaf250d8d",
+                "type": "PROCESSOR",
+                "name": "Serialize to JSON"
+              },
+              "destination": {
+                "id": "ec3e7b6f-08f6-41b3-a84d-104d5d8329b0",
+                "groupId": "18ab6f6a-43b1-4ea4-ab34-28baaf250d8d",
+                "type": "PROCESSOR",
+                "name": "Publish to Kafka analytics.events"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "62e3bcd8-bae5-47e7-b8b0-b163c4317d7e",
+              "name": "DatabaseConnectionPool",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-dbcp-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database User": "{{DB_USERNAME}}",
+                "Password": "{{DB_PASSWORD}}"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "8b594507-6135-4b27-a220-09344b9a334e",
+              "name": "KafkaConnectionService",
+              "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-3-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "bootstrap.servers": "{{KAFKA_BROKERS}}",
+                "security.protocol": "PLAINTEXT"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "27a5a02b-f928-4623-b31d-ca9576f648d2",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "cc4c3d50-2135-4431-9671-33f3e65d629d",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "18005b89-019e-1000-1810-af97d6c8be83",
+        "validation_errors": [
+          {
+            "name": "Serialize to JSON",
+            "type": "org.apache.nifi.processors.standard.ConvertRecord",
+            "errors": [
+              "'include_schema' validated against 'false' is invalid because 'include_schema' is not a supported property or has no Validator associated with it"
+            ]
+          },
+          {
+            "name": "Read New Records from PostgreSQL",
+            "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+            "errors": [
+              "'Database Connection Pooling Service' validated against '78e425bc-0d1f-366d-be1c-a3ca9053645c' is invalid because Controller Service [Database Connection Pooling Service] Identifier [78e425bc-0d1f-366d-be1c-a3ca9053645c] state is Enabling"
+            ]
+          },
+          {
+            "name": "Filter New Records",
+            "type": "org.apache.nifi.processors.standard.QueryRecord",
+            "errors": [
+              "'state_store' validated against '{{WATERMARK_STATE_STORE}}' is invalid because Not a valid SQL Statement: Encountered \"{\" at line 1, column 1.\r\nWas expecting one of:\r\n    \"ABS\" ...\r\n    \"ALTER\" ...\r\n    \"ARRAY\" ...\r\n    \"AVG\" ...\r\n    \"CALL\" ...\r\n    \"CARDINALITY\" ...\r\n    \"CASE\" ...\r\n    \"CAST\" ...\r\n    \"CEIL\" ...\r\n    \"CEILING\" ...\r\n    \"CHAR\" ...\r\n    \"CHAR_LENGTH\" ...\r\n    \"CHARACTER_LENGTH\" ...\r\n    \"CLASSIFIER\" ...\r\n    \"COALESCE\" ...\r\n    \"COLLECT\" ...\r\n    \"CONVERT\" ...\r\n    \"COUNT\" ...\r\n    \"COVAR_POP\" ...\r\n    \"COVAR_SAMP\" ...\r\n    \"CUME_DIST\" ...\r\n    \"CURRENT\" ...\r\n    \"CURRENT_CATALOG\" ...\r\n    \"CURRENT_DATE\" ...\r\n    \"CURRENT_DEFAULT_TRANSFORM_GROUP\" ...\r\n    \"CURRENT_PATH\" ...\r\n    \"CURRENT_ROLE\" ...\r\n    \"CURRENT_SCHEMA\" ...\r\n    \"CURRENT_TIME\" ...\r\n    \"CURRENT_TIMESTAMP\" ...\r\n    \"CURRENT_USER\" ...\r\n    \"CURSOR\" ...\r\n    \"DATE\" ...\r\n    \"DATETIME\" ...\r\n    \"DECIMAL\" ...\r\n    \"DELETE\" ...\r\n    \"DENSE_RANK\" ...\r\n    \"DESCRIBE\" ...\r\n    \"ELEMENT\" ...\r\n    \"EVERY\" ...\r\n    \"EXISTS\" ...\r\n    \"EXP\" ...\r\n    \"EXPLAIN\" ...\r\n    \"EXTRACT\" ...\r\n    \"FALSE\" ...\r\n    \"FIRST_VALUE\" ...\r\n    \"FLOOR\" ...\r\n    \"FUSION\" ...\r\n    \"GROUPING\" ...\r\n    \"HOUR\" ...\r\n    \"INSERT\" ...\r\n    \"INTERSECTION\" ...\r\n    \"INTERVAL\" ...\r\n    \"JSON_ARRAY\" ...\r\n    \"JSON_ARRAYAGG\" ...\r\n    \"JSON_EXISTS\" ...\r\n    \"JSON_OBJECT\" ...\r\n    \"JSON_OBJECTAGG\" ...\r\n    \"JSON_QUERY\" ...\r\n    \"JSON_VALUE\" ...\r\n    \"LAG\" ...\r\n    \"LAST_VALUE\" ...\r\n    \"LEAD\" ...\r\n    \"LEFT\" ...\r\n    \"LN\" ...\r\n    \"LOCALTIME\" ...\r\n    \"LOCALTIMESTAMP\" ...\r\n    \"LOWER\" ...\r\n    \"MATCH_NUMBER\" ...\r\n    \"MAX\" ...\r\n    \"MERGE\" ...\r\n    \"MIN\" ...\r\n    \"MINUTE\" ...\r\n    \"MOD\" ...\r\n    \"MONTH\" ...\r\n    \"MULTISET\" ...\r\n    \"NEW\" ...\r\n    \"NEXT\" ...\r\n    \"NOT\" ...\r\n    \"NTH_VALUE\" ...\r\n    \"NTILE\" ...\r\n    \"NULL\" ...\r\n    \"NULLIF\" ...\r\n    \"OCTET_LENGTH\" ...\r\n    \"OVERLAY\" ...\r\n    \"PERCENTILE_CONT\" ...\r\n    \"PERCENTILE_DISC\" ...\r\n    \"PERCENT_RANK\" ...\r\n    \"PERIOD\" ...\r\n    \"POSITION\" ...\r\n    \"POWER\" ...\r\n    \"PREV\" ...\r\n    \"RANK\" ...\r\n    \"REGR_COUNT\" ...\r\n    \"REGR_SXX\" ...\r\n    \"REGR_SYY\" ...\r\n    \"RESET\" ...\r\n    \"RIGHT\" ...\r\n    \"ROW\" ...\r\n    \"ROW_NUMBER\" ...\r\n    \"RUNNING\" ...\r\n    \"SAFE_CAST\" ...\r\n    \"SECOND\" ...\r\n    \"SELECT\" ...\r\n    \"SESSION_USER\" ...\r\n    \"SET\" ...\r\n    \"SOME\" ...\r\n    \"SPECIFIC\" ...\r\n    \"SQRT\" ...\r\n    \"STDDEV_POP\" ...\r\n    \"STDDEV_SAMP\" ...\r\n    \"SUBSTRING\" ...\r\n    \"SUM\" ...\r\n    \"SYSTEM_USER\" ...\r\n    \"TABLE\" ...\r\n    \"TIME\" ...\r\n    \"TIMESTAMP\" ...\r\n    \"TRANSLATE\" ...\r\n    \"TRIM\" ...\r\n    \"TRUE\" ...\r\n    \"TRUNCATE\" ...\r\n    \"TRY_CAST\" ...\r\n    \"UNIQUE\" ...\r\n    \"UNKNOWN\" ...\r\n    \"UPDATE\" ...\r\n    \"UPPER\" ...\r\n    \"UPSERT\" ...\r\n    \"USER\" ...\r\n    \"UUID\" ...\r\n    \"VALUE\" ...\r\n    \"VALUES\" ...\r\n    \"VAR_POP\" ...\r\n    \"VAR_SAMP\" ...\r\n    \"WITH\" ...\r\n    \"YEAR\" ...\r\n    <UNSIGNED_INTEGER_LITERAL> ...\r\n    <APPROX_NUMERIC_LITERAL> ...\r\n    <DECIMAL_NUMERIC_LITERAL> ...\r\n    <BINARY_STRING_LITERAL> ...\r\n    <QUOTED_STRING> ...\r\n    <PREFIXED_STRING_LITERAL> ...\r\n    <UNICODE_STRING_LITERAL> ...\r\n    <C_STYLE_ESCAPED_STRING_LITERAL> ...\r\n    <BIG_QUERY_DOUBLE_QUOTED_STRING> ...\r\n    <BIG_QUERY_QUOTED_STRING> ...\r\n    \"(\" ...\r\n    <LBRACE_D> ...\r\n    <LBRACE_T> ...\r\n    <LBRACE_TS> ...\r\n    <LBRACE_FN> ...\r\n    \"?\" ...\r\n    \"+\" ...\r\n    \"-\" ...\r\n    <BRACKET_QUOTED_IDENTIFIER> ...\r\n    <QUOTED_IDENTIFIER> ...\r\n    <BACK_QUOTED_IDENTIFIER> ...\r\n    <BIG_QUERY_BACK_QUOTED_IDENTIFIER> ...\r\n    <HYPHENATED_IDENTIFIER> ...\r\n    <IDENTIFIER> ...\r\n    <UNICODE_QUOTED_IDENTIFIER> ...\r\n    ",
+              "'watermark_field' validated against 'created_at' is invalid because Not a valid SQL Statement: Non-query expression encountered in illegal context",
+              "'filtered' validated against 'SELECT * FROM FLOWFILE WHERE created_at > {{LAST_PROCESSED_TIMESTAMP}}' is invalid because Not a valid SQL Statement: Encountered \"> {\" at line 1, column 41.\r\nWas expecting one of:\r\n    <EOF> \r\n    \"EXCEPT\" ...\r\n    \"FETCH\" ...\r\n    \"GROUP\" ...\r\n    \"HAVING\" ...\r\n    \"INTERSECT\" ...\r\n    \"LIMIT\" ...\r\n    \"OFFSET\" ...\r\n    \"ORDER\" ...\r\n    \"QUALIFY\" ...\r\n    \"MINUS\" ...\r\n    \"UNION\" ...\r\n    \"WINDOW\" ...\r\n    \".\" ...\r\n    \"NOT\" ...\r\n    \"IN\" ...\r\n    \"<\" ...\r\n    \"<=\" ...\r\n    \">\" \"SOME\" ...\r\n    \">\" \"ANY\" ...\r\n    \">\" \"ALL\" ...\r\n    \"BETWEEN\" ...\r\n    \"LIKE\" ...\r\n    \"ILIKE\" ...\r\n    \"RLIKE\" ...\r\n    \"SIMILAR\" ...\r\n    \"=\" ...\r\n    \"<<\" ...\r\n    \">\" \"+\" ...\r\n    \">\" \"-\" ...\r\n    \">\" \"NOT\" ...\r\n    \">\" \"EXISTS\" ...\r\n    \">\" \"UNIQUE\" ...\r\n    \">\" \"INTERVAL\" ...\r\n    \">\" <UNSIGNED_INTEGER_LITERAL> ...\r\n    \">\" <DECIMAL_NUMERIC_LITERAL> ...\r\n    \">\" \"DECIMAL\" ...\r\n    \">\" <APPROX_NUMERIC_LITERAL> ...\r\n    \">\" <BINARY_STRING_LITERAL> ...\r\n    \">\" <PREFIXED_STRING_LITERAL> ...\r\n    \">\" <QUOTED_STRING> ...\r\n    \">\" <UNICODE_STRING_LITERAL> ...\r\n    \">\" <C_STYLE_ESCAPED_STRING_LITERAL> ...\r\n    \">\" <BIG_QUERY_DOUBLE_QUOTED_STRING> ...\r\n    \">\" <BIG_QUERY_QUOTED_STRING> ...\r\n    \">\" \"TRUE\" ...\r\n    \">\" \"FALSE\" ...\r\n    \">\" \"UNKNOWN\" ...\r\n    \">\" \"NULL\" ...\r\n    \">\" <LBRACE_D> ...\r\n    \">\" <LBRACE_T> ...\r\n    \">\" <LBRACE_TS> ...\r\n    \">\" \"DATE\" ...\r\n    \">\" \"DATETIME\" ...\r\n    \">\" \"TIME\" ...\r\n    \">\" \"UUID\" ...\r\n    \">\" \"TIMESTAMP\" ...\r\n    \">\" \"?\" ...\r\n    \">\" \"CAST\" ...\r\n    \">\" \"SAFE_CAST\" ...\r\n    \">\" \"TRY_CAST\" ...\r\n    \">\" \"EXTRACT\" ...\r\n    \">\" \"POSITION\" ...\r\n    \">\" \"CONVERT\" ...\r\n    \">\" \"TRANSLATE\" ...\r\n    \">\" \"OVERLAY\" ...\r\n    \">\" \"FLOOR\" ...\r\n    \">\" \"CEIL\" ...\r\n    \">\" \"CEILING\" ...\r\n    \">\" \"SUBSTRING\" ...\r\n    \">\" \"TRIM\" ...\r\n    \">\" \"CLASSIFIER\" ...\r\n    \">\" \"MATCH_NUMBER\" ...\r\n    \">\" \"RUNNING\" ...\r\n    \">\" \"PREV\" ...\r\n    \">\" \"NEXT\" ...\r\n    \">\" \"JSON_EXISTS\" ...\r\n    \">\" \"JSON_VALUE\" ...\r\n    \">\" \"JSON_QUERY\" ...\r\n    \">\" \"JSON_OBJECT\" ...\r\n    \">\" \"JSON_OBJECTAGG\" ...\r\n    \">\" \"JSON_ARRAY\" ...\r\n    \">\" \"JSON_ARRAYAGG\" ...\r\n    \">\" <LBRACE_FN> ...\r\n    \">\" \"MULTISET\" ...\r\n    \">\" \"ARRAY\" ...\r\n    \">\" \"PERIOD\" ...\r\n    \">\" \"PERCENTILE_CONT\" ...\r\n    \">\" \"PERCENTILE_DISC\" ...\r\n    \">\" \"SPECIFIC\" ...\r\n    \">\" <IDENTIFIER> ...\r\n    \">\" <HYPHENATED_IDENTIFIER> ...\r\n    \">\" <QUOTED_IDENTIFIER> ...\r\n    \">\" <BACK_QUOTED_IDENTIFIER> ...\r\n    \">\" <BIG_QUERY_BACK_QUOTED_IDENTIFIER> ...\r\n    \">\" <BRACKET_QUOTED_IDENTIFIER> ...\r\n    \">\" <UNICODE_QUOTED_IDENTIFIER> ...\r\n    \">\" \"ABS\" ...\r\n    \">\" \"AVG\" ...\r\n    \">\" \"CARDINALITY\" ...\r\n    \">\" \"CHAR\" ...\r\n    \">\" \"CHAR_LENGTH\" ...\r\n    \">\" \"CHARACTER_LENGTH\" ...\r\n    \">\" \"COALESCE\" ...\r\n    \">\" \"COLLECT\" ...\r\n    \">\" \"COVAR_POP\" ...\r\n    \">\" \"COVAR_SAMP\" ...\r\n    \">\" \"CUME_DIST\" ...\r\n    \">\" \"COUNT\" ...\r\n    \">\" \"CURRENT_DATE\" ...\r\n    \">\" \"CURRENT_TIME\" ...\r\n    \">\" \"CURRENT_TIMESTAMP\" ...\r\n    \">\" \"DENSE_RANK\" ...\r\n    \">\" \"ELEMENT\" ...\r\n    \">\" \"EVERY\" ...\r\n    \">\" \"EXP\" ...\r\n    \">\" \"FIRST_VALUE\" ...\r\n    \">\" \"FUSION\" ...\r\n    \">\" \"INTERSECTION\" ...\r\n    \">\" \"GROUPING\" ...\r\n    \">\" \"HOUR\" ...\r\n    \">\" \"LAG\" ...\r\n    \">\" \"LEAD\" ...\r\n    \">\" \"LEFT\" ...\r\n    \">\" \"LAST_VALUE\" ...\r\n    \">\" \"LN\" ...\r\n    \">\" \"LOCALTIME\" ...\r\n    \">\" \"LOCALTIMESTAMP\" ...\r\n    \">\" \"LOWER\" ...\r\n    \">\" \"MAX\" ...\r\n    \">\" \"MIN\" ...\r\n    \">\" \"MINUTE\" ...\r\n    \">\" \"MOD\" ...\r\n    \">\" \"MONTH\" ...\r\n    \">\" \"NTH_VALUE\" ...\r\n    \">\" \"NTILE\" ...\r\n    \">\" \"NULLIF\" ...\r\n    \">\" \"OCTET_LENGTH\" ...\r\n    \">\" \"PERCENT_RANK\" ...\r\n    \">\" \"POWER\" ...\r\n    \">\" \"RANK\" ...\r\n    \">\" \"REGR_COUNT\" ...\r\n    \">\" \"REGR_SXX\" ...\r\n    \">\" \"REGR_SYY\" ...\r\n    \">\" \"RIGHT\" ...\r\n    \">\" \"ROW_NUMBER\" ...\r\n    \">\" \"SECOND\" ...\r\n    \">\" \"SQRT\" ...\r\n    \">\" \"STDDEV_POP\" ...\r\n    \">\" \"STDDEV_SAMP\" ...\r\n    \">\" \"SUM\" ...\r\n    \">\" \"UPPER\" ...\r\n    \">\" \"TRUNCATE\" ...\r\n    \">\" \"USER\" ...\r\n    \">\" \"VAR_POP\" ...\r\n    \">\" \"VAR_SAMP\" ...\r\n    \">\" \"YEAR\" ...\r\n    \">\" \"CURRENT_CATALOG\" ...\r\n    \">\" \"CURRENT_DEFAULT_TRANSFORM_GROUP\" ...\r\n    \">\" \"CURRENT_PATH\" ...\r\n    \">\" \"CURRENT_ROLE\" ...\r\n    \">\" \"CURRENT_SCHEMA\" ...\r\n    \">\" \"CURRENT_USER\" ...\r\n    \">\" \"SESSION_USER\" ...\r\n    \">\" \"SYSTEM_USER\" ...\r\n    \">\" \"NEW\" ...\r\n    \">\" \"CASE\" ...\r\n    \">\" \"CURRENT\" ...\r\n    \">\" \"CURSOR\" ...\r\n    \">\" \"ROW\" ...\r\n    \">\" \"(\" ...\r\n    \"[\" ...\r\n    \"IS\" ...\r\n    \"FORMAT\" ...\r\n    \"(\" ...\r\n    ",
+              "'Relationship state_store' is invalid because Relationship 'state_store' is not connected to any component and is not auto-terminated",
+              "'Relationship watermark_field' is invalid because Relationship 'watermark_field' is not connected to any component and is not auto-terminated"
+            ]
+          },
+          {
+            "name": "Publish to Kafka analytics.events",
+            "type": "org.apache.nifi.kafka.processors.PublishKafka",
+            "errors": [
+              "'value_serializer' validated against 'org.apache.kafka.common.serialization.StringSerializer' is invalid because 'value_serializer' is not a supported property or has no Validator associated with it",
+              "'key_serializer' validated against 'org.apache.kafka.common.serialization.StringSerializer' is invalid because 'key_serializer' is not a supported property or has no Validator associated with it"
+            ]
+          }
+        ],
+        "error_count": 9,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 47.23,
+      "stage1_duration_sec": 9.9,
+      "stage2_duration_sec": 0.1,
+      "prompt_tokens": 1513,
+      "completion_tokens": 796,
+      "total_tokens": 2309,
+      "cost_usd": 0.016479,
+      "nifi_processor_count": 4,
+      "nifi_connection_count": 3,
+      "pim_source_count": 1,
+      "pim_step_count": 2,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 60,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 95,
+          "completion_tokens": 10,
+          "total_tokens": 105,
+          "duration_ms": 9594,
+          "cost_usd": 0.000435
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 95,
+          "completion_tokens": 10,
+          "total_tokens": 105,
+          "duration_ms": 9594,
+          "cost_usd": 0.000435
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

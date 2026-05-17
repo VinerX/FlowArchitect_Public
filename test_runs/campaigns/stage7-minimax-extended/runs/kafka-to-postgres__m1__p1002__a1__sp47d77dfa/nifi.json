@@ -1,0 +1,239 @@
+{
+  "flowContents": {
+    "identifier": "210fd207-024c-4e24-8da0-dc3759af124e",
+    "name": "Orders Kafka to PostgreSQL",
+    "comments": "Read orders.created messages from Kafka, parse JSON, extract fields and insert into PostgreSQL",
+    "processors": [
+      {
+        "identifier": "039d53d4-d73c-4c0b-8710-31de28797b91",
+        "name": "Read Orders from Kafka",
+        "comments": "Generated from PIM source 'source_kafka' (Kafka)",
+        "type": "org.apache.nifi.kafka.processors.ConsumeKafka",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Topics": "orders.created",
+          "Topic Format": "names",
+          "Group ID": "orders_ingestion_group",
+          "Processing Strategy": "RECORD",
+          "Output Strategy": "USE_VALUE",
+          "Kafka Connection Service": "eed5493e-a2ce-4e85-bc76-a1accd56dffe",
+          "Record Writer": "1027d281-5661-4cd2-8d1e-263c2a7a0548",
+          "Record Reader": "4df2a83f-3bb2-496e-8f50-0bd79c74ffef",
+          "auto_offset_reset": "earliest"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "parse failure"
+        ]
+      },
+      {
+        "identifier": "f621355d-db20-43d8-8290-e3e905ace949",
+        "name": "Parse JSON and Extract Fields",
+        "comments": "Generated from PIM processing element 'process_parse' (ParseJSON)",
+        "type": "org.apache.nifi.processors.standard.ConvertRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 460.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Record Writer": "1027d281-5661-4cd2-8d1e-263c2a7a0548",
+          "Record Reader": "4df2a83f-3bb2-496e-8f50-0bd79c74ffef",
+          "fields": "order_id,user_id,amount,created_at"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      },
+      {
+        "identifier": "de931eaa-2be5-4f2a-8f8b-661e5719f4df",
+        "name": "Write to PostgreSQL",
+        "comments": "Generated from PIM sink 'sink_postgres' (PostgreSQL)",
+        "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Table Name": "public.orders",
+          "Statement Type": "INSERT",
+          "Database Connection Pooling Service": "f33f1e61-b879-46c8-8a7c-a089be4a6fd8",
+          "Record Reader": "4df2a83f-3bb2-496e-8f50-0bd79c74ffef"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure",
+          "retry"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "7e18aeb0-72f7-4eb5-b874-92c3d91fbd9c",
+        "name": "Read Orders from Kafka -> Parse JSON and Extract Fields",
+        "comments": "orders_data",
+        "source": {
+          "id": "039d53d4-d73c-4c0b-8710-31de28797b91",
+          "groupId": "210fd207-024c-4e24-8da0-dc3759af124e",
+          "type": "PROCESSOR",
+          "name": "Read Orders from Kafka"
+        },
+        "destination": {
+          "id": "f621355d-db20-43d8-8290-e3e905ace949",
+          "groupId": "210fd207-024c-4e24-8da0-dc3759af124e",
+          "type": "PROCESSOR",
+          "name": "Parse JSON and Extract Fields"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      },
+      {
+        "identifier": "8519bfa5-232e-43a4-a74b-c752cb395ff0",
+        "name": "Parse JSON and Extract Fields -> Write to PostgreSQL",
+        "comments": "orders_data",
+        "source": {
+          "id": "f621355d-db20-43d8-8290-e3e905ace949",
+          "groupId": "210fd207-024c-4e24-8da0-dc3759af124e",
+          "type": "PROCESSOR",
+          "name": "Parse JSON and Extract Fields"
+        },
+        "destination": {
+          "id": "de931eaa-2be5-4f2a-8f8b-661e5719f4df",
+          "groupId": "210fd207-024c-4e24-8da0-dc3759af124e",
+          "type": "PROCESSOR",
+          "name": "Write to PostgreSQL"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": [
+      {
+        "identifier": "f33f1e61-b879-46c8-8a7c-a089be4a6fd8",
+        "name": "DatabaseConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-dbcp-service-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database User": "{{DB_USERNAME}}",
+          "Password": "{{DB_PASSWORD}}"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "eed5493e-a2ce-4e85-bc76-a1accd56dffe",
+        "name": "KafkaConnectionService",
+        "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-3-service-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "bootstrap.servers": "{{KAFKA_BROKERS}}",
+          "security.protocol": "PLAINTEXT"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "4df2a83f-3bb2-496e-8f50-0bd79c74ffef",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Access Strategy": "Infer Schema"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "1027d281-5661-4cd2-8d1e-263c2a7a0548",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Write Strategy": "Do Not Write Schema"
+        },
+        "propertyDescriptors": {}
+      }
+    ]
+  }
+}

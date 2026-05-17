@@ -1,0 +1,146 @@
+{
+  "flowContents": {
+    "identifier": "filter-completed-orders-flow",
+    "name": "Filter Completed Orders",
+    "processors": [
+      {
+        "identifier": "getfile-proc",
+        "name": "GetFile",
+        "type": "org.apache.nifi.processors.standard.GetFile",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "config": {
+          "properties": {
+            "Input Directory": "/data/input/orders/"
+          },
+          "schedulingPeriod": "1 sec",
+          "autoTerminatedRelationships": []
+        }
+      },
+      {
+        "identifier": "queryrecord-proc",
+        "name": "QueryRecord",
+        "type": "org.apache.nifi.processors.standard.QueryRecord",
+        "position": {
+          "x": 300,
+          "y": 0
+        },
+        "config": {
+          "properties": {
+            "Record Reader": "csv-reader-cs",
+            "Record Writer": "csv-writer-cs",
+            "sql-query": "SELECT * FROM FLOWFILE WHERE status = 'COMPLETED'"
+          },
+          "schedulingPeriod": "0 sec",
+          "autoTerminatedRelationships": [
+            "failure",
+            "original"
+          ]
+        }
+      },
+      {
+        "identifier": "updateattr-proc",
+        "name": "UpdateAttribute",
+        "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+        "position": {
+          "x": 600,
+          "y": 0
+        },
+        "config": {
+          "properties": {
+            "filename": "completed_orders.csv"
+          },
+          "schedulingPeriod": "0 sec",
+          "autoTerminatedRelationships": []
+        }
+      },
+      {
+        "identifier": "putfile-proc",
+        "name": "PutFile",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "position": {
+          "x": 900,
+          "y": 0
+        },
+        "config": {
+          "properties": {
+            "Directory": "/data/output/",
+            "Conflict Resolution Strategy": "replace",
+            "Create Missing Directories": "true"
+          },
+          "schedulingPeriod": "0 sec",
+          "autoTerminatedRelationships": [
+            "success",
+            "failure"
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "conn-1",
+        "source": {
+          "id": "getfile-proc",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "queryrecord-proc",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      },
+      {
+        "identifier": "conn-2",
+        "source": {
+          "id": "queryrecord-proc",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "updateattr-proc",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      },
+      {
+        "identifier": "conn-3",
+        "source": {
+          "id": "updateattr-proc",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "putfile-proc",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      }
+    ],
+    "controllerServices": [
+      {
+        "identifier": "csv-reader-cs",
+        "name": "CSVReader",
+        "type": "org.apache.nifi.csv.CSVReader",
+        "properties": {
+          "Schema Access Strategy": "Use String Fields From Header"
+        },
+        "state": "ENABLED"
+      },
+      {
+        "identifier": "csv-writer-cs",
+        "name": "CSVRecordSetWriter",
+        "type": "org.apache.nifi.csv.CSVRecordSetWriter",
+        "properties": {
+          "Schema Write Strategy": "Use String Fields From Header"
+        },
+        "state": "ENABLED"
+      }
+    ]
+  }
+}

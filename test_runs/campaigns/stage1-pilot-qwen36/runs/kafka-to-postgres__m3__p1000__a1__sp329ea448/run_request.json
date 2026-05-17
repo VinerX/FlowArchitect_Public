@@ -1,0 +1,153 @@
+{
+  "run_id": "kafka-to-postgres__m3__p1000__a1__sp329ea448",
+  "case_id": "kafka-to-postgres",
+  "title": "Kafka to PostgreSQL",
+  "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 3,
+  "preset_id": 1000,
+  "stage_presets": {
+    "pim": 1000,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "kafka",
+      "postgres",
+      "streaming"
+    ],
+    "expected_behavior": "Сообщения из Kafka появляются в таблице PostgreSQL после преобразования.",
+    "manual_test_checklist": [
+      "Импортировать полученный nifi.json в тестовый NiFi.",
+      "Проверить наличие всех обязательных процессоров и соединений.",
+      "Проверить, что схема потока соответствует задаче Kafka -> PostgreSQL."
+    ]
+  },
+  "status": "running",
+  "comment_count": 1,
+  "history": [
+    {
+      "timestamp": "2026-05-03T13:33:08.013873+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-03T14:49:31.433004+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    },
+    {
+      "timestamp": "2026-05-03T14:50:56.906073+00:00",
+      "status": "failed_import",
+      "reason": "runner_finished"
+    },
+    {
+      "timestamp": "2026-05-03T15:45:19.524917+00:00",
+      "status": "queued",
+      "reason": "manual_status_change"
+    },
+    {
+      "timestamp": "2026-05-03T15:45:27.223502+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-03T15:45:27.223502+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\query.txt",
+    "--preset",
+    "1000",
+    "--mode",
+    "3",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\raw_report.json",
+    "--pim-preset",
+    "1000",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960,
+  "finished_at": "2026-05-03T14:50:56.900072+00:00",
+  "exit_code": 0,
+  "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\raw_report.json",
+  "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\runner_stdout.log",
+  "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\runner_stderr.log",
+  "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\query.txt",
+  "result_summary": {
+    "success": true,
+    "error": null,
+    "duration_sec": 83.78,
+    "stage1_duration_sec": 47.6,
+    "stage2_duration_sec": 6.57,
+    "prompt_tokens": 4566,
+    "completion_tokens": 6533,
+    "total_tokens": 11099,
+    "cost_usd": 0.009977,
+    "nifi_processor_count": 3,
+    "nifi_connection_count": 2,
+    "pim_source_count": 1,
+    "pim_step_count": 1,
+    "pim_sink_count": 1,
+    "session_id": 32,
+    "preset_id": 1000,
+    "preset_name": "openrouter qwen/qwen3.6-plus",
+    "preset_model": "qwen/qwen3.6-plus",
+    "llm_calls": [
+      {
+        "purpose": "pim_generation",
+        "provider": "common",
+        "model": "qwen/qwen3.6-plus",
+        "prompt_tokens": 1335,
+        "completion_tokens": 2541,
+        "total_tokens": 3876,
+        "duration_ms": 47281,
+        "cost_usd": 0.003737
+      },
+      {
+        "purpose": "nifi_correction",
+        "provider": "common",
+        "model": "google/gemini-2.5-flash-lite",
+        "prompt_tokens": 92,
+        "completion_tokens": 1612,
+        "total_tokens": 1704,
+        "duration_ms": 6343,
+        "cost_usd": 0.000654
+      }
+    ],
+    "llm_usage_by_purpose": {
+      "pim_generation": {
+        "calls": 1,
+        "prompt_tokens": 1335,
+        "completion_tokens": 2541,
+        "total_tokens": 3876,
+        "duration_ms": 47281,
+        "cost_usd": 0.003737
+      },
+      "nifi_correction": {
+        "calls": 1,
+        "prompt_tokens": 92,
+        "completion_tokens": 1612,
+        "total_tokens": 1704,
+        "duration_ms": 6343,
+        "cost_usd": 0.000654
+      }
+    },
+    "nifi_import_success": true,
+    "nifi_error_count": 7,
+    "nifi_import_error": null
+  },
+  "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\run_summary.json",
+  "last_comment_at": "2026-05-03T15:45:19.524917+00:00"
+}

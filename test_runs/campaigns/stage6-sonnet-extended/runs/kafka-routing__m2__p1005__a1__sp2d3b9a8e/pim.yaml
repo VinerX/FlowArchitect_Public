@@ -1,0 +1,82 @@
+flow:
+  id: events_routing_pipeline
+  name: Events Routing Pipeline
+  description: Read messages from Kafka topic events.all, route to PostgreSQL purchases
+    table, PostgreSQL refunds table, or Kafka events.unknown topic based on the 'type'
+    field
+triggers:
+- id: trigger_main
+  type: event
+  condition: new message in Kafka topic events.all
+sources:
+- id: source_events_all
+  name: Read from Kafka events.all
+  type: Kafka
+  location: events.all
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_CONSUMER_GROUP_ID}}'
+      auto_offset_reset: earliest
+processing_elements:
+- id: process_router
+  name: Route by Event Type
+  operation: ContentBasedRouter
+  config:
+    field: type
+    routes:
+      purchase: sink_postgres_purchases
+      refund: sink_postgres_refunds
+      default: sink_kafka_unknown
+sinks:
+- id: sink_postgres_purchases
+  name: Write to PostgreSQL purchases
+  type: PostgreSQL
+  location: public.purchases
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_postgres_refunds
+  name: Write to PostgreSQL refunds
+  type: PostgreSQL
+  location: public.refunds
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_kafka_unknown
+  name: Write to Kafka events.unknown
+  type: Kafka
+  location: events.unknown
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: event_message
+  format: json
+- id: event_purchase
+  format: json
+- id: event_refund
+  format: json
+- id: event_unknown
+  format: json
+links:
+- from_id: source_events_all
+  to_id: process_router
+  data_ref: event_message
+- from_id: process_router
+  to_id: sink_postgres_purchases
+  data_ref: event_purchase
+- from_id: process_router
+  to_id: sink_postgres_refunds
+  data_ref: event_refund
+- from_id: process_router
+  to_id: sink_kafka_unknown
+  data_ref: event_unknown

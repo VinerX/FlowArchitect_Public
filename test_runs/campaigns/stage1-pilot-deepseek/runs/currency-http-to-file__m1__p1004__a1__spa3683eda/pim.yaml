@@ -1,0 +1,30 @@
+flow:
+  id: currency_rates_to_file
+  name: Fetch Currency Rates and Save to File
+  description: Retrieve latest currency exchange rates from exchangerate.host API
+    and save to rates.json
+triggers:
+- id: trigger_daily
+  type: schedule
+  condition: every day at 06:00
+sources:
+- id: source_api
+  name: Exchange Rate API
+  type: HTTP
+  location: https://api.exchangerate.host/latest
+processing_elements: []
+sinks:
+- id: sink_file
+  name: Save to JSON file
+  type: File
+  location: rates.json
+  connection:
+    properties:
+      output_directory: '{{OUTPUT_DIR}}'
+processed_data:
+- id: currency_data
+  format: json
+links:
+- from_id: source_api
+  to_id: sink_file
+  data_ref: currency_data

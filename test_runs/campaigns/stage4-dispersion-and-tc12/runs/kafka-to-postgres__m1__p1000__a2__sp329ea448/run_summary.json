@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 84.09,
+  "stage1_duration_sec": 47.2,
+  "stage2_duration_sec": 0.09,
+  "prompt_tokens": 1459,
+  "completion_tokens": 3859,
+  "total_tokens": 5318,
+  "cost_usd": 0.005491,
+  "nifi_processor_count": 3,
+  "nifi_connection_count": 2,
+  "pim_source_count": 1,
+  "pim_step_count": 1,
+  "pim_sink_count": 1,
+  "session_id": 142,
+  "preset_id": 1000,
+  "preset_name": "openrouter qwen/qwen3.6-plus",
+  "preset_model": "qwen/qwen3.6-plus",
+  "llm_calls": [
+    {
+      "purpose": "pim_generation",
+      "provider": "common",
+      "model": "qwen/qwen3.6-plus",
+      "prompt_tokens": 108,
+      "completion_tokens": 1357,
+      "total_tokens": 1465,
+      "duration_ms": 46875,
+      "cost_usd": 0.001799
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "pim_generation": {
+      "calls": 1,
+      "prompt_tokens": 108,
+      "completion_tokens": 1357,
+      "total_tokens": 1465,
+      "duration_ms": 46875,
+      "cost_usd": 0.001799
+    }
+  },
+  "nifi_import_success": true,
+  "nifi_error_count": 1,
+  "nifi_import_error": null
+}

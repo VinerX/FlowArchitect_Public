@@ -1,0 +1,49 @@
+flow:
+  id: s3_json_to_postgres
+  name: S3 JSON to PostgreSQL ETL
+  description: Read JSON files from S3 raw-logs bucket hourly, enrich with processed_at
+    timestamp, and load into PostgreSQL event_log table
+triggers:
+- id: trigger_hourly
+  type: schedule
+  condition: every 1 hour
+sources:
+- id: source_s3
+  name: Read JSON from S3
+  type: S3
+  location: raw-logs
+  connection:
+    properties:
+      bucket: raw-logs
+      region: '{{AWS_REGION}}'
+      access_key_id: '{{AWS_ACCESS_KEY_ID}}'
+      secret_access_key: '{{AWS_SECRET_ACCESS_KEY}}'
+processing_elements:
+- id: process_enrich
+  name: Add processed_at timestamp
+  operation: AddField
+  config:
+    field_name: processed_at
+    value: '{{CURRENT_TIMESTAMP}}'
+sinks:
+- id: sink_postgres
+  name: Write to PostgreSQL
+  type: PostgreSQL
+  location: public.event_log
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processed_data:
+- id: event_json
+  format: json
+links:
+- from_id: source_s3
+  to_id: process_enrich
+  data_ref: event_json
+- from_id: process_enrich
+  to_id: sink_postgres
+  data_ref: event_json

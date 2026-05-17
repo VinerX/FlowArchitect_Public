@@ -1,0 +1,38 @@
+{
+  "query": "Забирай данные о транзакциях из REST API банка https://api.bank.example.com/transactions каждые 30 секунд, фильтруй транзакции на сумму более 100000 рублей, обогащай данные информацией о клиенте из PostgreSQL-таблицы public.clients по полю client_id, результат публикуй в Kafka-топик high_value_transactions и параллельно сохраняй в S3 бакет compliance-archive с партиционированием по дате.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T15:38:23.303181+00:00",
+      "success": false,
+      "yaml_pim": null,
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for YAML PIM",
+      "duration_sec": 300.24,
+      "stage1_duration_sec": null,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

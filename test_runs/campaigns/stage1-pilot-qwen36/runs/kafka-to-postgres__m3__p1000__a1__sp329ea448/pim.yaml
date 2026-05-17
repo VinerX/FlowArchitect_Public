@@ -1,0 +1,48 @@
+flow:
+  id: kafka_orders_to_pg
+  name: Kafka Orders to PostgreSQL Pipeline
+  description: Reads JSON messages from Kafka topic 'orders', transforms them into
+    relational table rows, and writes them to PostgreSQL.
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 1 minute
+sources:
+- id: source_kafka
+  name: Read Kafka Orders
+  type: Kafka
+  location: orders
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_GROUP_ID}}'
+processing_elements:
+- id: process_json_to_table
+  name: JSON to Table Rows
+  operation: Transform
+  config:
+    input_format: json
+    output_format: relational
+    flatten_nested: true
+sinks:
+- id: sink_postgres
+  name: Write to PostgreSQL
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processed_data:
+- id: orders_relational
+  format: relational
+links:
+- from_id: source_kafka
+  to_id: process_json_to_table
+  data_ref: orders_relational
+- from_id: process_json_to_table
+  to_id: sink_postgres
+  data_ref: orders_relational

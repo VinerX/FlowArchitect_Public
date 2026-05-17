@@ -1,0 +1,183 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл orders_export.json.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-11T18:33:59.231289+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: orders_export_flow\n  name: Orders Export to JSON\n  description: Periodically select new records from PostgreSQL public.orders and save\n    to JSON file\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: '{{SCHEDULE_INTERVAL}}'\nsources:\n- id: source_pg_orders\n  name: Read from PostgreSQL\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DB_NAME}}'\n      username: '{{DB_USER}}'\n      password: '{{DB_PASSWORD}}'\nprocessing_elements:\n- id: process_new_records\n  name: Filter New Records\n  operation: Filter\n  config:\n    condition: '{{NEW_RECORDS_CONDITION}}'\nsinks:\n- id: sink_json_file\n  name: Write to JSON File\n  type: File\n  location: '{{OUTPUT_DIRECTORY}}/orders_export.json'\nprocessed_data:\n- id: orders_data\n  format: json\nlinks:\n- from_id: source_pg_orders\n  to_id: process_new_records\n  data_ref: orders_data\n- from_id: process_new_records\n  to_id: sink_json_file\n  data_ref: orders_data",
+      "nifi_json": {
+        "id": "c7a1e2b9-4f8e-4a2b-a9d3-123456789abc",
+        "name": "Orders Export to JSON",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "version": 1,
+        "processors": [
+          {
+            "id": "d4f5a678-90ab-cdef-1234-567890abcdef",
+            "name": "Read from PostgreSQL",
+            "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+            "position": {
+              "x": 0,
+              "y": 0
+            },
+            "properties": {
+              "Database Connection Pooling Service": "3b2e5a7d-9f8c-4e6a-b1c3-7890123456de",
+              "Table Name": "public.orders",
+              "Maximum-value Columns": "",
+              "Output Batch Size": "10000",
+              "Record Writer": "5c8e1a2b-9d0f-4a7c-8e3f-6543210987ab"
+            },
+            "schedulingPeriod": "{{SCHEDULE_INTERVAL}}",
+            "schedulingStrategy": "TIMER_DRIVEN"
+          },
+          {
+            "id": "e8f7a6b5-4c3d-2e1f-0987-6ab5c4d3e2f1",
+            "name": "Filter New Records",
+            "type": "org.apache.nifi.processors.standard.QueryRecord",
+            "position": {
+              "x": 400,
+              "y": 0
+            },
+            "properties": {
+              "Record Reader": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+              "Record Writer": "5c8e1a2b-9d0f-4a7c-8e3f-6543210987ab",
+              "Record SQL": "SELECT * FROM FLOWFILE WHERE {{NEW_RECORDS_CONDITION}}"
+            }
+          },
+          {
+            "id": "f0e9d8c7-b6a5-4e3d-2c1b-0a98b7c6d5e4",
+            "name": "Write to JSON File",
+            "type": "org.apache.nifi.processors.standard.PutFile",
+            "position": {
+              "x": 800,
+              "y": 0
+            },
+            "properties": {
+              "Directory": "{{OUTPUT_DIRECTORY}}",
+              "Conflict Resolution Strategy": "fail",
+              "Create Missing Directories": "true"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+            "name": "success",
+            "sourceId": "d4f5a678-90ab-cdef-1234-567890abcdef",
+            "sourceRelationship": "success",
+            "destinationId": "e8f7a6b5-4c3d-2e1f-0987-6ab5c4d3e2f1"
+          },
+          {
+            "id": "b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e",
+            "name": "success",
+            "sourceId": "e8f7a6b5-4c3d-2e1f-0987-6ab5c4d3e2f1",
+            "sourceRelationship": "success",
+            "destinationId": "f0e9d8c7-b6a5-4e3d-2c1b-0a98b7c6d5e4"
+          }
+        ],
+        "controllerServices": [
+          {
+            "id": "3b2e5a7d-9f8c-4e6a-b1c3-7890123456de",
+            "name": "DBCPConnectionPool",
+            "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+            "properties": {
+              "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+              "Database Driver Class Name": "org.postgresql.Driver",
+              "Database User": "{{DB_USER}}",
+              "Password": "{{DB_PASSWORD}}"
+            }
+          },
+          {
+            "id": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+            "name": "JsonTreeReader",
+            "type": "org.apache.nifi.json.JsonTreeReader",
+            "properties": {
+              "Schema Access Strategy": "infer-schema"
+            }
+          },
+          {
+            "id": "5c8e1a2b-9d0f-4a7c-8e3f-6543210987ab",
+            "name": "JsonRecordSetWriter",
+            "type": "org.apache.nifi.json.JsonRecordSetWriter",
+            "properties": {
+              "Schema Write Strategy": "no-schema"
+            }
+          }
+        ]
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details.",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 173.64,
+      "stage1_duration_sec": 55.84,
+      "stage2_duration_sec": 92.91,
+      "prompt_tokens": 2137,
+      "completion_tokens": 4771,
+      "total_tokens": 6908,
+      "cost_usd": 0.00508,
+      "nifi_processor_count": 3,
+      "nifi_connection_count": 2,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1004,
+        "nifi_corrector": 1004
+      },
+      "session_id": 75,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "deepseek/deepseek-v4-pro",
+          "prompt_tokens": 1299,
+          "completion_tokens": 1664,
+          "total_tokens": 2963,
+          "duration_ms": 55578,
+          "cost_usd": 0.002013
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "deepseek/deepseek-v4-pro",
+          "prompt_tokens": 754,
+          "completion_tokens": 2929,
+          "total_tokens": 3683,
+          "duration_ms": 92750,
+          "cost_usd": 0.002876
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1299,
+          "completion_tokens": 1664,
+          "total_tokens": 2963,
+          "duration_ms": 55578,
+          "cost_usd": 0.002013
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 754,
+          "completion_tokens": 2929,
+          "total_tokens": 3683,
+          "duration_ms": 92750,
+          "cost_usd": 0.002876
+        }
+      },
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

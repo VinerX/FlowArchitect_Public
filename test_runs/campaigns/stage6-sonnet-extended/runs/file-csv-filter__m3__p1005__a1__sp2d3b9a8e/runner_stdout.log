@@ -1,0 +1,23 @@
+
+================================================================
+Query  : ����� CSV-����� �� ���������� /data/input/orders/, �������� ������ �����...
+Mode   : 3 � Adapter+LLM (NL->YAML->Adapter->LLM->JSON)
+Presets: [1005]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1005, 'error_corrector': 1005, 'nifi_corrector': 1005}
+Backend ready.
+
+--- Preset 1005: openrouter sonnet 4.6  [anthropic/claude-sonnet-4.6] ---
+  [1/2] USER_QUERY  mode=3  preset=1005
+  [1/2] PIM ready  (1281 chars, 7.32s)
+  [2/2] REQUEST_CONVERSION  mode=3  preset=1005
+  Result : [FAIL] {'error': 'manual_trigger_warning', 'details': "Trigger(s) ['trigger_main'] have type 'manual'.\nThe flow will NOT start automatically in NiFi � someone must press Run in the NiFi UI.\nChange trigger type to 'schedule' or 'event' for production use."}  (7.36s)
+
+================================================================
+Results: 0/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage6-sonnet-extended\runs\file-csv-filter__m3__p1005__a1__sp2d3b9a8e\raw_report.json

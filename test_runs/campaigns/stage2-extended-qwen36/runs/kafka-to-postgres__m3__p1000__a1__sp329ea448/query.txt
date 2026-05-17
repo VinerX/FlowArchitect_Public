@@ -1,0 +1,1 @@
+Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.

@@ -1,0 +1,43 @@
+
+================================================================
+Query  : �������� ��������� �� Kafka topic orders.created, ����� JSON, �������� �...
+Mode   : 0 � Direct (NL->JSON)
+Presets: [1005]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1005, 'error_corrector': 1005, 'nifi_corrector': 1005}
+Backend ready.
+
+--- Preset 1005: openrouter sonnet 4.6  [anthropic/claude-sonnet-4.6] ---
+  [1/2] USER_QUERY  mode=0  preset=1005
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (40s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (50s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (60s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (70s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (80s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (90s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (100s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (110s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (120s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (130s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (140s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (150s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (160s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (170s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (180s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (0 proc, 0 conn, Nones)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: FAILED: HTTP 500: An unexpected error has occurred. Please check the logs for additional details.
+  tokens: 300 in / 6643 out / 6943 total  |  cost: $0.100545
+  Result : [OK]  (205.85s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage6-sonnet-extended\runs\kafka-to-postgres__m0__p1005__a1__sp2d3b9a8e\raw_report.json

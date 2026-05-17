@@ -1,0 +1,48 @@
+flow:
+  id: s3_to_postgres_logs
+  name: S3 Logs Processing
+  description: Hourly ingestion of JSON logs from S3 to PostgreSQL with timestamp
+    enrichment
+triggers:
+- id: hourly_trigger
+  type: schedule
+  condition: 0 * * * *
+sources:
+- id: s3_raw_logs
+  name: S3 Raw Logs
+  type: S3
+  location: raw-logs
+  connection:
+    properties:
+      bucket: raw-logs
+      region: '{{S3_REGION}}'
+      access_key: '{{S3_ACCESS_KEY}}'
+      secret_key: '{{S3_SECRET_KEY}}'
+processing_elements:
+- id: add_timestamp
+  name: Add Processed At
+  operation: Transformation
+  config:
+    expression: processed_at = current_timestamp()
+sinks:
+- id: postgres_event_log
+  name: PostgreSQL Event Log
+  type: PostgreSQL
+  location: public.event_log
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USER}}'
+      password: '{{DB_PASSWORD}}'
+processed_data:
+- id: json_log_data
+  format: json
+links:
+- from_id: s3_raw_logs
+  to_id: add_timestamp
+  data_ref: json_log_data
+- from_id: add_timestamp
+  to_id: postgres_event_log
+  data_ref: json_log_data

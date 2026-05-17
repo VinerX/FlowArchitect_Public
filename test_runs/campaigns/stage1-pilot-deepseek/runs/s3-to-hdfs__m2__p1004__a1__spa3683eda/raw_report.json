@@ -1,0 +1,38 @@
+{
+  "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-11T17:55:20.687864+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: s3_to_hdfs_ingestion\n  name: S3 to HDFS Ingestion\n  description: Ingest files from S3 bucket raw-data, decompress if necessary, and\n    store in HDFS /data/raw\ntriggers:\n- id: trigger_s3_poll\n  type: schedule\n  condition: every 5 minutes\nsources:\n- id: source_s3\n  name: Read from S3 bucket raw-data\n  type: S3\n  location: raw-data\n  connection:\n    properties:\n      aws_access_key_id: '{{AWS_ACCESS_KEY_ID}}'\n      aws_secret_access_key: '{{AWS_SECRET_ACCESS_KEY}}'\n      region: '{{AWS_REGION}}'\n      endpoint_url: '{{S3_ENDPOINT_URL}}'\nprocessing_elements:\n- id: process_unpack\n  name: Unpack if compressed\n  operation: Decompress\n  config:\n    auto_detect: true\nsinks:\n- id: sink_hdfs\n  name: Write to HDFS\n  type: HDFS\n  location: /data/raw\n  connection:\n    properties:\n      namenode: '{{HDFS_NAMENODE}}'\n      user: '{{HDFS_USER}}'\n      fs.defaultFS: '{{HDFS_DEFAULT_FS}}'\nprocessed_data:\n- id: raw_files\n  format: binary\nlinks:\n- from_id: source_s3\n  to_id: process_unpack\n  data_ref: raw_files\n- from_id: process_unpack\n  to_id: sink_hdfs\n  data_ref: raw_files",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for NiFi JSON",
+      "duration_sec": 355.07,
+      "stage1_duration_sec": 54.78,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1004,
+        "nifi_corrector": 1004
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

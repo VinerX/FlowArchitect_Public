@@ -1,0 +1,74 @@
+flow:
+  id: events_router
+  name: Events Router Pipeline
+  description: Read events from Kafka, route by type field to PostgreSQL tables or
+    Kafka topic
+triggers:
+- id: trigger_stream
+  type: schedule
+  condition: continuous streaming
+sources:
+- id: source_kafka
+  name: Read Events
+  type: Kafka
+  location: events.all
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: events_router_group
+      topic: events.all
+processing_elements:
+- id: router_type
+  name: Route by Type
+  operation: Conditional Router
+  config:
+    conditions:
+      purchase: type == 'purchase'
+      refund: type == 'refund'
+      unknown: type NOT IN ('purchase', 'refund')
+sinks:
+- id: sink_purchases
+  name: Write Purchases
+  type: PostgreSQL
+  location: public.purchases
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_refunds
+  name: Write Refunds
+  type: PostgreSQL
+  location: public.refunds
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_unknown
+  name: Write Unknown Events
+  type: Kafka
+  location: events.unknown
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: event_data
+  format: json
+links:
+- from_id: source_kafka
+  to_id: router_type
+  data_ref: event_data
+- from_id: router_type
+  to_id: sink_purchases
+  data_ref: event_data
+- from_id: router_type
+  to_id: sink_refunds
+  data_ref: event_data
+- from_id: router_type
+  to_id: sink_unknown
+  data_ref: event_data

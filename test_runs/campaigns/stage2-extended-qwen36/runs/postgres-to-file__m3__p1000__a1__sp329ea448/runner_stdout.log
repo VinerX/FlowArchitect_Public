@@ -1,0 +1,31 @@
+
+================================================================
+Query  : ������������ ������� ����� ������ �� PostgreSQL public.orders � ��������...
+Mode   : 3 � Adapter+LLM (NL->YAML->Adapter->LLM->JSON)
+Presets: [1000]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1000, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1000: openrouter qwen/qwen3.6-plus  [qwen/qwen3.6-plus] ---
+  [1/2] USER_QUERY  mode=3  preset=1000
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  ... waiting for YAML PIM (20s elapsed, timeout=300s)
+  ... waiting for YAML PIM (30s elapsed, timeout=300s)
+  ... waiting for YAML PIM (40s elapsed, timeout=300s)
+  [1/2] PIM ready  (1048 chars, 48.13s)
+  [2/2] REQUEST_CONVERSION  mode=3  preset=1000
+  [2/2] NiFi JSON ready  (3 proc, 2 conn, 5.84s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 4397 in / 6008 out / 10405 total  |  cost: $0.009239
+  Result : [OK]  (137.57s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage2-extended-qwen36\runs\postgres-to-file__m3__p1000__a1__sp329ea448\raw_report.json

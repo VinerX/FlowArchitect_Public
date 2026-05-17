@@ -1,0 +1,42 @@
+flow:
+  id: orders_export_pipeline
+  name: Orders Export to JSON
+  description: Periodically select new records from PostgreSQL public.orders and save
+    to orders_export.json
+triggers:
+- id: schedule_trigger
+  type: schedule
+  condition: every 5 minutes
+sources:
+- id: source_postgres_orders
+  name: PostgreSQL Orders Table
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processing_elements:
+- id: process_new_records
+  name: Select New Records
+  operation: Filter
+  config:
+    condition: '{{NEW_RECORDS_CONDITION}}'
+sinks:
+- id: sink_json_file
+  name: JSON File Sink
+  type: File
+  location: orders_export.json
+processed_data:
+- id: orders_json
+  format: json
+links:
+- from_id: source_postgres_orders
+  to_id: process_new_records
+  data_ref: orders_json
+- from_id: process_new_records
+  to_id: sink_json_file
+  data_ref: orders_json

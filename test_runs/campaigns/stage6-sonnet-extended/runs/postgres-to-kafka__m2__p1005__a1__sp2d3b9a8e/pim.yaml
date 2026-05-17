@@ -1,0 +1,53 @@
+flow:
+  id: pending_transactions_to_kafka
+  name: Pending Transactions to Kafka
+  description: Читает записи со статусом PENDING из таблицы public.transactions, конвертирует
+    в JSON и публикует в Kafka-топик transactions.overdue
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 1 minute
+sources:
+- id: source_transactions
+  name: Read Pending Transactions
+  type: PostgreSQL
+  location: public.transactions
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+      query: SELECT * FROM public.transactions WHERE status = 'PENDING'
+processing_elements:
+- id: process_convert_json
+  name: Convert to JSON
+  operation: Serialize
+  config:
+    format: json
+    include_nulls: 'true'
+sinks:
+- id: sink_kafka
+  name: Publish to Kafka transactions.overdue
+  type: Kafka
+  location: transactions.overdue
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      topic: transactions.overdue
+      key_field: '{{KAFKA_MESSAGE_KEY_FIELD}}'
+      acks: all
+      retries: '3'
+processed_data:
+- id: pending_transactions_raw
+  format: relational
+- id: pending_transactions_json
+  format: json
+links:
+- from_id: source_transactions
+  to_id: process_convert_json
+  data_ref: pending_transactions_raw
+- from_id: process_convert_json
+  to_id: sink_kafka
+  data_ref: pending_transactions_json

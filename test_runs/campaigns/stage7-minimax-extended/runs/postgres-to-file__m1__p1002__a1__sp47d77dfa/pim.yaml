@@ -1,0 +1,55 @@
+flow:
+  id: orders_export_pipeline
+  name: Export Orders to JSON
+  description: Periodically export new orders from PostgreSQL to JSON file
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 5 minutes
+sources:
+- id: source_orders
+  name: Read Orders from PostgreSQL
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processing_elements:
+- id: filter_new_orders
+  name: Filter New Orders
+  operation: Filter
+  config:
+    condition: created_at > {{LAST_EXPORT_TIMESTAMP}}
+    watermark_column: created_at
+- id: convert_to_json
+  name: Convert to JSON
+  operation: Format
+  config:
+    output_format: json
+    array: true
+sinks:
+- id: sink_json_file
+  name: Write JSON File
+  type: File
+  location: /data/output/orders_export.json
+  connection:
+    properties:
+      file_format: json
+      overwrite: true
+processed_data:
+- id: orders_data
+  format: json
+links:
+- from_id: source_orders
+  to_id: filter_new_orders
+  data_ref: orders_data
+- from_id: filter_new_orders
+  to_id: convert_to_json
+  data_ref: orders_data
+- from_id: convert_to_json
+  to_id: sink_json_file
+  data_ref: orders_data

@@ -1,0 +1,32 @@
+
+================================================================
+Query  : ������� ����� �� S3 ������ raw-data, ��� ������������� ������������ �� �...
+Mode   : 3 � Adapter+LLM (NL->YAML->Adapter->LLM->JSON)
+Presets: [1000]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1000, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1000: openrouter qwen/qwen3.6-plus  [qwen/qwen3.6-plus] ---
+  [1/2] USER_QUERY  mode=3  preset=1000
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  ... waiting for YAML PIM (20s elapsed, timeout=300s)
+  ... waiting for YAML PIM (30s elapsed, timeout=300s)
+  ... waiting for YAML PIM (40s elapsed, timeout=300s)
+  ... waiting for YAML PIM (50s elapsed, timeout=300s)
+  [1/2] PIM ready  (1053 chars, 55.09s)
+  [2/2] REQUEST_CONVERSION  mode=3  preset=1000
+  [2/2] NiFi JSON ready  (3 proc, 2 conn, 4.48s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 4162 in / 6654 out / 10816 total  |  cost: $0.010003
+  Result : [OK]  (94.05s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage1-pilot-qwen36\runs\s3-to-hdfs__m3__p1000__a1__sp329ea448\raw_report.json

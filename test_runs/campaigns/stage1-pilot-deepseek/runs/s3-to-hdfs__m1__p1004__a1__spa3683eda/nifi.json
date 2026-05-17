@@ -1,0 +1,173 @@
+{
+  "flowContents": {
+    "identifier": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+    "name": "S3 to HDFS File Ingestion",
+    "comments": "Fetch files from S3 raw-data bucket, decompress if needed, and store in HDFS /data/raw",
+    "processors": [
+      {
+        "identifier": "53b65761-6d9d-4462-a6f7-06b56e529203",
+        "name": "Read S3 Files",
+        "comments": "Generated from PIM source 'source_s3' (S3)",
+        "type": "org.apache.nifi.processors.aws.s3.FetchS3Object",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-aws-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Bucket": "s3://raw-data",
+          "Object Key": "${filename}",
+          "Region": "{{AWS_REGION}}",
+          "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
+          "aws_secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}",
+          "region": "{{AWS_REGION}}"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      },
+      {
+        "identifier": "f4b517f9-346c-4cb2-91f4-d4adaf574b98",
+        "name": "Decompress Files",
+        "comments": "Generated from PIM processing element 'process_decompress' (Decompress)",
+        "type": "org.apache.nifi.processors.standard.CompressContent",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 460.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Mode": "decompress",
+          "Compression Format": "gzip",
+          "auto_detect": "true"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      },
+      {
+        "identifier": "5e465217-f0f9-485f-b336-4dca2eceeb27",
+        "name": "Write to HDFS",
+        "comments": "Generated from PIM sink 'sink_hdfs' (HDFS)",
+        "type": "org.apache.nifi.processors.hadoop.PutHDFS",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-hadoop-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Directory": "/data/raw",
+          "fs.defaultFS": "{{HDFS_DEFAULT_FS}}",
+          "user": "{{HDFS_USER}}"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "fd7f933e-1185-4b5b-b11c-aa551b038612",
+        "name": "Read S3 Files -> Decompress Files",
+        "comments": "data_files",
+        "source": {
+          "id": "53b65761-6d9d-4462-a6f7-06b56e529203",
+          "groupId": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+          "type": "PROCESSOR",
+          "name": "Read S3 Files"
+        },
+        "destination": {
+          "id": "f4b517f9-346c-4cb2-91f4-d4adaf574b98",
+          "groupId": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+          "type": "PROCESSOR",
+          "name": "Decompress Files"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      },
+      {
+        "identifier": "15bbb8a2-06eb-4e7f-8ce3-a8a6e4dc00d9",
+        "name": "Decompress Files -> Write to HDFS",
+        "comments": "data_files",
+        "source": {
+          "id": "f4b517f9-346c-4cb2-91f4-d4adaf574b98",
+          "groupId": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+          "type": "PROCESSOR",
+          "name": "Decompress Files"
+        },
+        "destination": {
+          "id": "5e465217-f0f9-485f-b336-4dca2eceeb27",
+          "groupId": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+          "type": "PROCESSOR",
+          "name": "Write to HDFS"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": []
+  }
+}

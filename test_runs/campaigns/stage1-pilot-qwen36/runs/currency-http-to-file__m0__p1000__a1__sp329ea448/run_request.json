@@ -1,0 +1,130 @@
+{
+  "run_id": "currency-http-to-file__m0__p1000__a1__sp329ea448",
+  "case_id": "currency-http-to-file",
+  "title": "Currency HTTP to File",
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 0,
+  "preset_id": 1000,
+  "stage_presets": {
+    "pim": 1000,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "http",
+      "file",
+      "baseline"
+    ],
+    "expected_behavior": "По расписанию обновляется файл rates.json с актуальными курсами.",
+    "manual_test_checklist": [
+      "Импортировать полученный nifi.json в тестовый NiFi.",
+      "Проверить, что flow проходит валидацию без ошибок.",
+      "Проверить, что данные действительно сохраняются в файл."
+    ]
+  },
+  "status": "running",
+  "comment_count": 3,
+  "history": [
+    {
+      "timestamp": "2026-05-03T13:33:08.013873+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-03T13:33:16.148296+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    },
+    {
+      "timestamp": "2026-05-03T13:33:39.503508+00:00",
+      "status": "failed_generation",
+      "reason": "runner_finished"
+    },
+    {
+      "timestamp": "2026-05-03T13:34:06.074221+00:00",
+      "status": "queued",
+      "reason": "manual_status_change"
+    },
+    {
+      "timestamp": "2026-05-03T13:34:13.942849+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    },
+    {
+      "timestamp": "2026-05-03T13:42:56.289594+00:00",
+      "status": "failed_generation",
+      "reason": "runner_finished"
+    },
+    {
+      "timestamp": "2026-05-03T13:43:49.779952+00:00",
+      "status": "queued",
+      "reason": "manual_status_change"
+    },
+    {
+      "timestamp": "2026-05-03T13:43:55.979271+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-03T13:43:55.979271+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\query.txt",
+    "--preset",
+    "1000",
+    "--mode",
+    "0",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\raw_report.json",
+    "--pim-preset",
+    "1000",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960,
+  "finished_at": "2026-05-03T13:42:56.287594+00:00",
+  "exit_code": 1,
+  "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\raw_report.json",
+  "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\runner_stdout.log",
+  "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\runner_stderr.log",
+  "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\query.txt",
+  "result_summary": {
+    "success": false,
+    "error": "timeout waiting for NiFi JSON (direct mode)",
+    "duration_sec": 300.25,
+    "stage1_duration_sec": null,
+    "stage2_duration_sec": null,
+    "prompt_tokens": null,
+    "completion_tokens": null,
+    "total_tokens": null,
+    "cost_usd": null,
+    "nifi_processor_count": null,
+    "nifi_connection_count": null,
+    "pim_source_count": null,
+    "pim_step_count": null,
+    "pim_sink_count": null,
+    "session_id": null,
+    "preset_id": 1000,
+    "preset_name": "openrouter qwen/qwen3.6-plus",
+    "preset_model": "qwen/qwen3.6-plus",
+    "llm_calls": [],
+    "llm_usage_by_purpose": {},
+    "nifi_import_success": null,
+    "nifi_error_count": null,
+    "nifi_import_error": null
+  },
+  "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\run_summary.json",
+  "last_comment_at": "2026-05-03T13:43:49.779952+00:00"
+}

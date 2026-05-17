@@ -1,0 +1,38 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл orders_export.json.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-11T18:15:22.267347+00:00",
+      "success": false,
+      "yaml_pim": null,
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for NiFi JSON (direct mode)",
+      "duration_sec": 300.24,
+      "stage1_duration_sec": null,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1004,
+        "nifi_corrector": 1004
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

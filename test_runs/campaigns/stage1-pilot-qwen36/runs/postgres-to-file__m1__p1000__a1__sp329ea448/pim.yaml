@@ -1,0 +1,46 @@
+flow:
+  id: postgres_orders_to_json
+  name: PostgreSQL Orders to JSON Export
+  description: Periodically extracts new records from PostgreSQL public.orders and
+    saves them to orders_export.json
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 1 hour
+sources:
+- id: source_postgres
+  name: Read from PostgreSQL
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{POSTGRES_HOST}}'
+      port: '{{POSTGRES_PORT}}'
+      database: '{{POSTGRES_DB}}'
+      username: '{{POSTGRES_USER}}'
+      password: '{{POSTGRES_PASSWORD}}'
+processing_elements:
+- id: process_incremental
+  name: Extract New Records
+  operation: IncrementalExtract
+  config:
+    tracking_column: created_at
+    mode: new_records_only
+sinks:
+- id: sink_json_file
+  name: Write to JSON File
+  type: File
+  location: orders_export.json
+  connection:
+    properties:
+      directory: '{{OUTPUT_DIR}}'
+processed_data:
+- id: orders_json
+  format: json
+links:
+- from_id: source_postgres
+  to_id: process_incremental
+  data_ref: orders_json
+- from_id: process_incremental
+  to_id: sink_json_file
+  data_ref: orders_json

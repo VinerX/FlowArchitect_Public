@@ -1,0 +1,215 @@
+{
+  "flowContents": {
+    "identifier": "99f84c09-256d-4f76-82fd-d4caaadbbb19",
+    "name": "Pending Transactions to Kafka",
+    "comments": "Reads PENDING transactions from PostgreSQL and publishes them to a Kafka topic in JSON format.",
+    "processors": [
+      {
+        "identifier": "fa1f8997-5860-4cda-98cf-c0ef7180042f",
+        "name": "PostgreSQL Transactions",
+        "comments": "Generated from PIM source 'source_pg_transactions' (PostgreSQL)",
+        "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Table Name": "public.transactions",
+          "Database Type": "PostgreSQL",
+          "Database Connection Pooling Service": "76736414-4394-4138-a425-92105c5efe9a",
+          "Record Writer": "0bd95664-8cd0-4fae-8060-de1506a3e7b0",
+          "query": "SELECT * FROM public.transactions WHERE status = 'PENDING'"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "60 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": []
+      },
+      {
+        "identifier": "316ec9b3-639b-43d9-8b1d-a08b85d2905a",
+        "name": "Convert to JSON",
+        "comments": "Generated from PIM processing element 'proc_json_conv' (FormatConversion)",
+        "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-update-attribute-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 460.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "target_format": "json"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": []
+      },
+      {
+        "identifier": "062c72c9-bf0f-4a01-873f-70e50fa8d192",
+        "name": "Kafka Overdue Topic",
+        "comments": "Generated from PIM sink 'sink_kafka_overdue' (Kafka)",
+        "type": "org.apache.nifi.kafka.processors.PublishKafka",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Topic Name": "transactions.overdue",
+          "Kafka Connection Service": "ff249ca3-4398-459f-9f21-95d858939093",
+          "acks": "all",
+          "key_serializer": "org.apache.kafka.common.serialization.StringSerializer",
+          "value_serializer": "org.apache.kafka.common.serialization.StringSerializer"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "bf78af2f-7282-4587-a6e3-832059d766b7",
+        "name": "PostgreSQL Transactions -> Convert to JSON",
+        "comments": "transaction_record",
+        "source": {
+          "id": "fa1f8997-5860-4cda-98cf-c0ef7180042f",
+          "groupId": "99f84c09-256d-4f76-82fd-d4caaadbbb19",
+          "type": "PROCESSOR",
+          "name": "PostgreSQL Transactions"
+        },
+        "destination": {
+          "id": "316ec9b3-639b-43d9-8b1d-a08b85d2905a",
+          "groupId": "99f84c09-256d-4f76-82fd-d4caaadbbb19",
+          "type": "PROCESSOR",
+          "name": "Convert to JSON"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      },
+      {
+        "identifier": "78b2d848-a636-4078-a59d-cd39b161a422",
+        "name": "Convert to JSON -> Kafka Overdue Topic",
+        "comments": "transaction_record",
+        "source": {
+          "id": "316ec9b3-639b-43d9-8b1d-a08b85d2905a",
+          "groupId": "99f84c09-256d-4f76-82fd-d4caaadbbb19",
+          "type": "PROCESSOR",
+          "name": "Convert to JSON"
+        },
+        "destination": {
+          "id": "062c72c9-bf0f-4a01-873f-70e50fa8d192",
+          "groupId": "99f84c09-256d-4f76-82fd-d4caaadbbb19",
+          "type": "PROCESSOR",
+          "name": "Kafka Overdue Topic"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": [
+      {
+        "identifier": "76736414-4394-4138-a425-92105c5efe9a",
+        "name": "DatabaseConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-dbcp-service-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database User": "{{DB_USER}}",
+          "Password": "{{DB_PASSWORD}}"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "ff249ca3-4398-459f-9f21-95d858939093",
+        "name": "KafkaConnectionService",
+        "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-3-service-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "bootstrap.servers": "{{KAFKA_BROKERS}}",
+          "security.protocol": "PLAINTEXT"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "0bd95664-8cd0-4fae-8060-de1506a3e7b0",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Write Strategy": "Do Not Write Schema"
+        },
+        "propertyDescriptors": {}
+      }
+    ]
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 60.48,
+  "stage1_duration_sec": 16.44,
+  "stage2_duration_sec": 7.24,
+  "prompt_tokens": 5882,
+  "completion_tokens": 4337,
+  "total_tokens": 10219,
+  "cost_usd": 0.006969,
+  "nifi_processor_count": 4,
+  "nifi_connection_count": 3,
+  "pim_source_count": 1,
+  "pim_step_count": 2,
+  "pim_sink_count": 1,
+  "session_id": 194,
+  "preset_id": 1002,
+  "preset_name": "openrouter minimax/minimax-m2.7",
+  "preset_model": "minimax/minimax-m2.7",
+  "llm_calls": [
+    {
+      "purpose": "pim_generation",
+      "provider": "common",
+      "model": "minimax/minimax-m2.7",
+      "prompt_tokens": 1258,
+      "completion_tokens": 639,
+      "total_tokens": 1897,
+      "duration_ms": 16062,
+      "cost_usd": 0.001144
+    },
+    {
+      "purpose": "nifi_correction",
+      "provider": "common",
+      "model": "google/gemini-2.5-flash-lite",
+      "prompt_tokens": 4516,
+      "completion_tokens": 3692,
+      "total_tokens": 8208,
+      "duration_ms": 7139,
+      "cost_usd": 0.001928
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "pim_generation": {
+      "calls": 1,
+      "prompt_tokens": 1258,
+      "completion_tokens": 639,
+      "total_tokens": 1897,
+      "duration_ms": 16062,
+      "cost_usd": 0.001144
+    },
+    "nifi_correction": {
+      "calls": 1,
+      "prompt_tokens": 4516,
+      "completion_tokens": 3692,
+      "total_tokens": 8208,
+      "duration_ms": 7139,
+      "cost_usd": 0.001928
+    }
+  },
+  "nifi_import_success": true,
+  "nifi_error_count": 3,
+  "nifi_import_error": null
+}

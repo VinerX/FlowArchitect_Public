@@ -1,0 +1,50 @@
+{
+  "encodingVersion": "1.0",
+  "snippet": {
+    "processors": [
+      {
+        "identifier": "get-exchange-rates",
+        "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+        "name": "InvokeHTTP - Get Exchange Rates",
+        "properties": {
+          "HTTP Method": "GET",
+          "Remote URL": "https://api.exchangerate.host/latest",
+          "Connection Timeout": "5 secs",
+          "Read Timeout": "15 secs"
+        },
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "1 hour"
+      },
+      {
+        "identifier": "save-to-file",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "name": "PutFile - Save Rates",
+        "properties": {
+          "Directory": "/data/output",
+          "Conflict Resolution Strategy": "replace",
+          "Create Missing Directories": "true"
+        }
+      },
+      {
+        "identifier": "rename-file",
+        "type": "org.apache.nifi.processors.standard.UpdateAttribute",
+        "name": "UpdateAttribute - Set Filename",
+        "properties": {
+          "filename": "rates.json"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "sourceIdentifier": "get-exchange-rates",
+        "sourceRelationship": "Response",
+        "destinationIdentifier": "rename-file"
+      },
+      {
+        "sourceIdentifier": "rename-file",
+        "sourceRelationship": "success",
+        "destinationIdentifier": "save-to-file"
+      }
+    ]
+  }
+}

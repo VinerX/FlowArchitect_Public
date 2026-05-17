@@ -1,0 +1,158 @@
+{
+  "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:14:34.821761+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "identifier": "7f8e9a1b-2c3d-4e5f-6a7b-8c9d0e1f2a3b",
+        "name": "Kafka to DB and Kafka Flow",
+        "componentType": "PROCESS_GROUP",
+        "processors": [
+          {
+            "identifier": "consume-kafka",
+            "name": "ConsumeKafka_2_6",
+            "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafka_2_6",
+            "properties": {
+              "bootstrap.servers": "localhost:9092",
+              "topic": "events.all",
+              "group.id": "nifi-consumer-group",
+              "honor.transactions": "false"
+            }
+          },
+          {
+            "identifier": "route-by-type",
+            "name": "RouteOnAttribute",
+            "type": "org.apache.nifi.processors.standard.RouteOnAttribute",
+            "properties": {
+              "Routing Strategy": "Route to Property name",
+              "purchase": "${type:equals('purchase')}",
+              "refund": "${type:equals('refund')}"
+            }
+          },
+          {
+            "identifier": "extract-type",
+            "name": "EvaluateJsonPath",
+            "type": "org.apache.nifi.processors.standard.EvaluateJsonPath",
+            "properties": {
+              "Destination": "flowfile-attribute",
+              "type": "$.type"
+            }
+          },
+          {
+            "identifier": "put-postgres-purchases",
+            "name": "PutDatabaseRecord_Purchases",
+            "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+            "properties": {
+              "Database Connection Pool": "PostgreSQL_Pool",
+              "Statement Type": "INSERT",
+              "Table Name": "purchases",
+              "Record Reader": "JSONTreeReader"
+            }
+          },
+          {
+            "identifier": "put-postgres-refunds",
+            "name": "PutDatabaseRecord_Refunds",
+            "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+            "properties": {
+              "Database Connection Pool": "PostgreSQL_Pool",
+              "Statement Type": "INSERT",
+              "Table Name": "refunds",
+              "Record Reader": "JSONTreeReader"
+            }
+          },
+          {
+            "identifier": "publish-unknown",
+            "name": "PublishKafka_2_6",
+            "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+            "properties": {
+              "bootstrap.servers": "localhost:9092",
+              "topic": "events.unknown"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "source": "consume-kafka",
+            "destination": "extract-type",
+            "relationship": "success"
+          },
+          {
+            "source": "extract-type",
+            "destination": "route-by-type",
+            "relationship": "matched"
+          },
+          {
+            "source": "route-by-type",
+            "destination": "put-postgres-purchases",
+            "relationship": "purchase"
+          },
+          {
+            "source": "route-by-type",
+            "destination": "put-postgres-refunds",
+            "relationship": "refund"
+          },
+          {
+            "source": "route-by-type",
+            "destination": "publish-unknown",
+            "relationship": "unmatched"
+          }
+        ]
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "HTTP 400: Cannot construct instance of `org.apache.nifi.flow.ConnectableComponent` (although at least one Creator exists): no String-argument constructor/factory method to deserialize from String value ('consume-kafka')\n at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 1869] (through reference chain: org.apache.nifi.web.api.entity.ProcessGroupEntity[\"versionedFlowSnapshot\"]->org.apache.nifi.registry.flow.RegisteredFlowSnapshot[\"flowContents\"]->org.apache.nifi.flow.VersionedProcessGroup[\"connections\"]->java.util.HashSet[0]->org.apache.nifi.flow.VersionedCon",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 23.88,
+      "stage1_duration_sec": 7.63,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 173,
+      "completion_tokens": 868,
+      "total_tokens": 1041,
+      "cost_usd": 0.002691,
+      "nifi_processor_count": 6,
+      "nifi_connection_count": 5,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 127,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 99,
+          "completion_tokens": 8,
+          "total_tokens": 107,
+          "duration_ms": 7312,
+          "cost_usd": 7.3e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 99,
+          "completion_tokens": 8,
+          "total_tokens": 107,
+          "duration_ms": 7312,
+          "cost_usd": 7.3e-05
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

@@ -1,0 +1,439 @@
+{
+  "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+  "mode": 3,
+  "mode_name": "Adapter+LLM (NL->YAML->Adapter->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-14T18:17:45.490275+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: events_routing_pipeline\n  name: Events Routing Pipeline\n  description: Read messages from Kafka topic events.all, route purchases to PostgreSQL\n    purchases table, refunds to PostgreSQL refunds table, and everything else to Kafka\n    topic events.unknown\ntriggers:\n- id: trigger_main\n  type: event\n  condition: New message in Kafka topic events.all\nsources:\n- id: source_kafka_events\n  name: Read from Kafka events.all\n  type: Kafka\n  location: events.all\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      group_id: '{{KAFKA_CONSUMER_GROUP_ID}}'\n      auto_offset_reset: earliest\nprocessing_elements:\n- id: process_router\n  name: Route by Event Type\n  operation: ContentBasedRouter\n  config:\n    field: type\n    routes:\n      purchase: sink_postgres_purchases\n      refund: sink_postgres_refunds\n      default: sink_kafka_unknown\nsinks:\n- id: sink_postgres_purchases\n  name: Write Purchases to PostgreSQL\n  type: PostgreSQL\n  location: public.purchases\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\n- id: sink_postgres_refunds\n  name: Write Refunds to PostgreSQL\n  type: PostgreSQL\n  location: public.refunds\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\n- id: sink_kafka_unknown\n  name: Write Unknown Events to Kafka events.unknown\n  type: Kafka\n  location: events.unknown\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\nprocessed_data:\n- id: event_message\n  format: json\n- id: purchase_event\n  format: json\n- id: refund_event\n  format: json\n- id: unknown_event\n  format: json\nlinks:\n- from_id: source_kafka_events\n  to_id: process_router\n  data_ref: event_message\n- from_id: process_router\n  to_id: sink_postgres_purchases\n  data_ref: purchase_event\n- from_id: process_router\n  to_id: sink_postgres_refunds\n  data_ref: refund_event\n- from_id: process_router\n  to_id: sink_kafka_unknown\n  data_ref: unknown_event",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "db966b84-5711-433c-b465-04683e7a17d5",
+          "name": "Events Routing Pipeline",
+          "comments": "Read messages from Kafka topic events.all, route purchases to PostgreSQL purchases table, refunds to PostgreSQL refunds table, and everything else to Kafka topic events.unknown",
+          "processors": [
+            {
+              "identifier": "01ec3680-1369-45bf-8460-32620457af63",
+              "name": "Read from Kafka events.all",
+              "comments": "Generated from PIM source 'source_kafka_events' (Kafka)",
+              "type": "org.apache.nifi.kafka.processors.ConsumeKafka",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Topics": "events.all",
+                "Topic Format": "names",
+                "Group ID": "{{KAFKA_CONSUMER_GROUP_ID}}",
+                "Processing Strategy": "RECORD",
+                "Output Strategy": "USE_VALUE",
+                "Kafka Connection Service": "a5d10ba3-047e-453c-828a-d0948a6cf8af",
+                "Record Writer": "876dc987-d397-46cf-b571-053ac67bfabd",
+                "Record Reader": "2220ee77-4ce7-448b-81f0-23923b206f2e",
+                "Auto Offset Reset": "earliest"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "parse failure"
+              ]
+            },
+            {
+              "identifier": "810bf6e6-9d3a-459b-afc6-7fb58f49624f",
+              "name": "Route by Event Type",
+              "comments": "Generated from PIM processing element 'process_router' (ContentBasedRouter)",
+              "type": "org.apache.nifi.processors.standard.RouteOnAttribute",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Routing Strategy": "Route to Property name",
+                "purchase": "${type:equals('purchase')}",
+                "refund": "${type:equals('refund')}"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "85e4c01f-ff87-4a39-861c-2efbdfc1d797",
+              "name": "Write Purchases to PostgreSQL",
+              "comments": "Generated from PIM sink 'sink_postgres_purchases' (PostgreSQL)",
+              "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Table Name": "public.purchases",
+                "Statement Type": "INSERT",
+                "Database Connection Pooling Service": "26a073bd-55d0-481c-9110-481c1c5443cb",
+                "Record Reader": "2220ee77-4ce7-448b-81f0-23923b206f2e"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure",
+                "retry"
+              ]
+            },
+            {
+              "identifier": "aba488a2-c63e-4bb0-8ee7-f71e259c23f3",
+              "name": "Write Refunds to PostgreSQL",
+              "comments": "Generated from PIM sink 'sink_postgres_refunds' (PostgreSQL)",
+              "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 260.0
+              },
+              "style": {},
+              "properties": {
+                "Table Name": "public.refunds",
+                "Statement Type": "INSERT",
+                "Database Connection Pooling Service": "26a073bd-55d0-481c-9110-481c1c5443cb",
+                "Record Reader": "2220ee77-4ce7-448b-81f0-23923b206f2e"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure",
+                "retry"
+              ]
+            },
+            {
+              "identifier": "146950c7-1cf9-42f2-9e06-41aaf425c437",
+              "name": "Write Unknown Events to Kafka events.unknown",
+              "comments": "Generated from PIM sink 'sink_kafka_unknown' (Kafka)",
+              "type": "org.apache.nifi.kafka.processors.PublishKafka",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 440.0
+              },
+              "style": {},
+              "properties": {
+                "Topic Name": "events.unknown",
+                "Kafka Connection Service": "a5d10ba3-047e-453c-828a-d0948a6cf8af"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "025657ad-b353-4baf-b691-26aa16952b5c",
+              "name": "Read from Kafka events.all -> Route by Event Type",
+              "comments": "event_message",
+              "source": {
+                "id": "01ec3680-1369-45bf-8460-32620457af63",
+                "groupId": "db966b84-5711-433c-b465-04683e7a17d5",
+                "type": "PROCESSOR",
+                "name": "Read from Kafka events.all"
+              },
+              "destination": {
+                "id": "810bf6e6-9d3a-459b-afc6-7fb58f49624f",
+                "groupId": "db966b84-5711-433c-b465-04683e7a17d5",
+                "type": "PROCESSOR",
+                "name": "Route by Event Type"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "05b5b4dc-1cd6-4f32-99a1-f3ca960d6177",
+              "name": "Route by Event Type -> Write Purchases to PostgreSQL",
+              "comments": "purchase_event",
+              "source": {
+                "id": "810bf6e6-9d3a-459b-afc6-7fb58f49624f",
+                "groupId": "db966b84-5711-433c-b465-04683e7a17d5",
+                "type": "PROCESSOR",
+                "name": "Route by Event Type"
+              },
+              "destination": {
+                "id": "85e4c01f-ff87-4a39-861c-2efbdfc1d797",
+                "groupId": "db966b84-5711-433c-b465-04683e7a17d5",
+                "type": "PROCESSOR",
+                "name": "Write Purchases to PostgreSQL"
+              },
+              "selectedRelationships": [
+                "purchase"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "6337008e-718d-46bd-8783-85f5776065b1",
+              "name": "Route by Event Type -> Write Refunds to PostgreSQL",
+              "comments": "refund_event",
+              "source": {
+                "id": "810bf6e6-9d3a-459b-afc6-7fb58f49624f",
+                "groupId": "db966b84-5711-433c-b465-04683e7a17d5",
+                "type": "PROCESSOR",
+                "name": "Route by Event Type"
+              },
+              "destination": {
+                "id": "aba488a2-c63e-4bb0-8ee7-f71e259c23f3",
+                "groupId": "db966b84-5711-433c-b465-04683e7a17d5",
+                "type": "PROCESSOR",
+                "name": "Write Refunds to PostgreSQL"
+              },
+              "selectedRelationships": [
+                "refund"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "85ad8245-b21b-4680-9611-dc63a79207f2",
+              "name": "Route by Event Type -> Write Unknown Events to Kafka events.unknown",
+              "comments": "unknown_event",
+              "source": {
+                "id": "810bf6e6-9d3a-459b-afc6-7fb58f49624f",
+                "groupId": "db966b84-5711-433c-b465-04683e7a17d5",
+                "type": "PROCESSOR",
+                "name": "Route by Event Type"
+              },
+              "destination": {
+                "id": "146950c7-1cf9-42f2-9e06-41aaf425c437",
+                "groupId": "db966b84-5711-433c-b465-04683e7a17d5",
+                "type": "PROCESSOR",
+                "name": "Write Unknown Events to Kafka events.unknown"
+              },
+              "selectedRelationships": [
+                "unmatched"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "26a073bd-55d0-481c-9110-481c1c5443cb",
+              "name": "DatabaseConnectionPool",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-dbcp-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database User": "{{DB_USERNAME}}",
+                "Password": "{{DB_PASSWORD}}"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "a5d10ba3-047e-453c-828a-d0948a6cf8af",
+              "name": "KafkaConnectionService",
+              "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-3-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "bootstrap.servers": "{{KAFKA_BROKERS}}",
+                "security.protocol": "PLAINTEXT"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "2220ee77-4ce7-448b-81f0-23923b206f2e",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "876dc987-d397-46cf-b571-053ac67bfabd",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "NiFi unreachable: Cannot connect to https://localhost:8443",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 68.88,
+      "stage1_duration_sec": 9.73,
+      "stage2_duration_sec": 54.74,
+      "prompt_tokens": 6939,
+      "completion_tokens": 5814,
+      "total_tokens": 12753,
+      "cost_usd": 0.108027,
+      "nifi_processor_count": 5,
+      "nifi_connection_count": 4,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 3,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 231,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 1459,
+          "completion_tokens": 969,
+          "total_tokens": 2428,
+          "duration_ms": 9359,
+          "cost_usd": 0.018912
+        },
+        {
+          "purpose": "nifi_correction",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 5344,
+          "completion_tokens": 4836,
+          "total_tokens": 10180,
+          "duration_ms": 54547,
+          "cost_usd": 0.088572
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1459,
+          "completion_tokens": 969,
+          "total_tokens": 2428,
+          "duration_ms": 9359,
+          "cost_usd": 0.018912
+        },
+        "nifi_correction": {
+          "calls": 1,
+          "prompt_tokens": 5344,
+          "completion_tokens": 4836,
+          "total_tokens": 10180,
+          "duration_ms": 54547,
+          "cost_usd": 0.088572
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

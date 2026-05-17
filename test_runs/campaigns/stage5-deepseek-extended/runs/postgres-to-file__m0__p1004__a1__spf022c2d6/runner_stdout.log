@@ -1,0 +1,50 @@
+
+================================================================
+Query  : ������������ ������� ����� ������ �� PostgreSQL public.orders � ��������...
+Mode   : 0 � Direct (NL->JSON)
+Presets: [1004]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1004, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1004: openrouter deepseek  [deepseek/deepseek-v4-pro] ---
+  [1/2] USER_QUERY  mode=0  preset=1004
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (40s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (50s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (60s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (70s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (80s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (90s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (100s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (110s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (120s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (130s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (140s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (150s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (160s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (170s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (180s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (190s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (200s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (210s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (220s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (230s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (240s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (250s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (3 proc, 2 conn, Nones)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: FAILED: HTTP 400: Message body is malformed. Unable to map into expected format.
+  tokens: 210 in / 8742 out / 8952 total  |  cost: $0.007697
+  Result : [OK]  (276.07s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage5-deepseek-extended\runs\postgres-to-file__m0__p1004__a1__spf022c2d6\raw_report.json

@@ -1,0 +1,63 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 57.33,
+  "stage1_duration_sec": 8.39,
+  "stage2_duration_sec": 44.55,
+  "prompt_tokens": 2574,
+  "completion_tokens": 5329,
+  "total_tokens": 7903,
+  "cost_usd": 0.087657,
+  "nifi_processor_count": 5,
+  "nifi_connection_count": 6,
+  "pim_source_count": 1,
+  "pim_step_count": 1,
+  "pim_sink_count": 1,
+  "session_id": 234,
+  "preset_id": 1005,
+  "preset_name": "openrouter sonnet 4.6",
+  "preset_model": "anthropic/claude-sonnet-4.6",
+  "llm_calls": [
+    {
+      "purpose": "pim_generation",
+      "provider": "common",
+      "model": "anthropic/claude-sonnet-4.6",
+      "prompt_tokens": 1448,
+      "completion_tokens": 698,
+      "total_tokens": 2146,
+      "duration_ms": 7937,
+      "cost_usd": 0.014814
+    },
+    {
+      "purpose": "psm_conversion",
+      "provider": "common",
+      "model": "anthropic/claude-sonnet-4.6",
+      "prompt_tokens": 1001,
+      "completion_tokens": 4617,
+      "total_tokens": 5618,
+      "duration_ms": 44358,
+      "cost_usd": 0.072258
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "pim_generation": {
+      "calls": 1,
+      "prompt_tokens": 1448,
+      "completion_tokens": 698,
+      "total_tokens": 2146,
+      "duration_ms": 7937,
+      "cost_usd": 0.014814
+    },
+    "psm_conversion": {
+      "calls": 1,
+      "prompt_tokens": 1001,
+      "completion_tokens": 4617,
+      "total_tokens": 5618,
+      "duration_ms": 44358,
+      "cost_usd": 0.072258
+    }
+  },
+  "nifi_import_success": false,
+  "nifi_error_count": 0,
+  "nifi_import_error": "NiFi unreachable: Cannot connect to https://localhost:8443"
+}

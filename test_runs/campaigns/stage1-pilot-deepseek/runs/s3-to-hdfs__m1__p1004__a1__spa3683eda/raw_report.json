@@ -1,0 +1,263 @@
+{
+  "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-11T17:53:57.338084+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: s3_to_hdfs_ingestion\n  name: S3 to HDFS File Ingestion\n  description: Fetch files from S3 raw-data bucket, decompress if needed, and store\n    in HDFS /data/raw\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 1 hour\nsources:\n- id: source_s3\n  name: Read S3 Files\n  type: S3\n  location: s3://raw-data\n  connection:\n    properties:\n      aws_access_key_id: '{{AWS_ACCESS_KEY_ID}}'\n      aws_secret_access_key: '{{AWS_SECRET_ACCESS_KEY}}'\n      region: '{{AWS_REGION}}'\nprocessing_elements:\n- id: process_decompress\n  name: Decompress Files\n  operation: Decompress\n  config:\n    auto_detect: 'true'\nsinks:\n- id: sink_hdfs\n  name: Write to HDFS\n  type: HDFS\n  location: /data/raw\n  connection:\n    properties:\n      fs.defaultFS: '{{HDFS_DEFAULT_FS}}'\n      user: '{{HDFS_USER}}'\nprocessed_data:\n- id: data_files\n  format: file\nlinks:\n- from_id: source_s3\n  to_id: process_decompress\n  data_ref: data_files\n- from_id: process_decompress\n  to_id: sink_hdfs\n  data_ref: data_files",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+          "name": "S3 to HDFS File Ingestion",
+          "comments": "Fetch files from S3 raw-data bucket, decompress if needed, and store in HDFS /data/raw",
+          "processors": [
+            {
+              "identifier": "53b65761-6d9d-4462-a6f7-06b56e529203",
+              "name": "Read S3 Files",
+              "comments": "Generated from PIM source 'source_s3' (S3)",
+              "type": "org.apache.nifi.processors.aws.s3.FetchS3Object",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-aws-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Bucket": "s3://raw-data",
+                "Object Key": "${filename}",
+                "Region": "{{AWS_REGION}}",
+                "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
+                "aws_secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}",
+                "region": "{{AWS_REGION}}"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            },
+            {
+              "identifier": "f4b517f9-346c-4cb2-91f4-d4adaf574b98",
+              "name": "Decompress Files",
+              "comments": "Generated from PIM processing element 'process_decompress' (Decompress)",
+              "type": "org.apache.nifi.processors.standard.CompressContent",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Mode": "decompress",
+                "Compression Format": "gzip",
+                "auto_detect": "true"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            },
+            {
+              "identifier": "5e465217-f0f9-485f-b336-4dca2eceeb27",
+              "name": "Write to HDFS",
+              "comments": "Generated from PIM sink 'sink_hdfs' (HDFS)",
+              "type": "org.apache.nifi.processors.hadoop.PutHDFS",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-hadoop-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/raw",
+                "fs.defaultFS": "{{HDFS_DEFAULT_FS}}",
+                "user": "{{HDFS_USER}}"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "fd7f933e-1185-4b5b-b11c-aa551b038612",
+              "name": "Read S3 Files -> Decompress Files",
+              "comments": "data_files",
+              "source": {
+                "id": "53b65761-6d9d-4462-a6f7-06b56e529203",
+                "groupId": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+                "type": "PROCESSOR",
+                "name": "Read S3 Files"
+              },
+              "destination": {
+                "id": "f4b517f9-346c-4cb2-91f4-d4adaf574b98",
+                "groupId": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+                "type": "PROCESSOR",
+                "name": "Decompress Files"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "15bbb8a2-06eb-4e7f-8ce3-a8a6e4dc00d9",
+              "name": "Decompress Files -> Write to HDFS",
+              "comments": "data_files",
+              "source": {
+                "id": "f4b517f9-346c-4cb2-91f4-d4adaf574b98",
+                "groupId": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+                "type": "PROCESSOR",
+                "name": "Decompress Files"
+              },
+              "destination": {
+                "id": "5e465217-f0f9-485f-b336-4dca2eceeb27",
+                "groupId": "1254b5d6-0f35-4410-b06f-3974e3be3e46",
+                "type": "PROCESSOR",
+                "name": "Write to HDFS"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": []
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "182d949a-019e-1000-1c77-d80eff44ad23",
+        "validation_errors": [
+          {
+            "name": "Decompress Files",
+            "type": "org.apache.nifi.processors.standard.CompressContent",
+            "errors": [
+              "'auto_detect' validated against 'true' is invalid because 'auto_detect' is not a supported property or has no Validator associated with it"
+            ]
+          },
+          {
+            "name": "Write to HDFS",
+            "type": "org.apache.nifi.processors.hadoop.PutHDFS",
+            "errors": [
+              "'Missing Processor' validated against 'Any Property' is invalid because Processor is of type org.apache.nifi.processors.hadoop.PutHDFS, but this is not a valid Processor type"
+            ]
+          },
+          {
+            "name": "Read S3 Files",
+            "type": "org.apache.nifi.processors.aws.s3.FetchS3Object",
+            "errors": [
+              "'aws_access_key_id' validated against '{{AWS_ACCESS_KEY_ID}}' is invalid because 'aws_access_key_id' is not a supported property or has no Validator associated with it",
+              "'aws_secret_access_key' validated against '{{AWS_SECRET_ACCESS_KEY}}' is invalid because 'aws_secret_access_key' is not a supported property or has no Validator associated with it",
+              "'Region' validated against '{{AWS_REGION}}' is invalid because Given value not found in allowed set 'us-gov-east-1, us-gov-west-1, af-south-1, ap-east-1, ap-south-2, ap-southeast-3, ap-southeast-5, ap-southeast-4, ap-south-1, ap-southeast-6, ap-northeast-3, ap-northeast-2, ap-southeast-1, ap-southeast-2, ap-east-2, ap-southeast-7, ap-northeast-1, ca-central-1, ca-west-1, cn-north-1, cn-northwest-1, eusc-de-east-1, eu-isoe-west-1, eu-central-1, eu-west-1, eu-west-2, eu-south-1, eu-west-3, eu-south-2, eu-north-1, eu-central-2, il-central-1, mx-central-1, me-south-1, me-central-1, sa-east-1, us-east-1, us-east-2, us-iso-east-1, us-iso-west-1, us-isob-east-1, us-isob-west-1, us-isof-east-1, us-isof-south-1, us-west-1, us-west-2, aws-global, aws-cn-global, aws-iso-global, aws-iso-b-global, aws-iso-e-global, aws-iso-f-global, aws-us-gov-global, use-custom-region'",
+              "'region' validated against '{{AWS_REGION}}' is invalid because 'region' is not a supported property or has no Validator associated with it",
+              "'Upstream Connections' is invalid because Processor requires an upstream connection but currently has none"
+            ]
+          }
+        ],
+        "error_count": 7,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 81.74,
+      "stage1_duration_sec": 38.77,
+      "stage2_duration_sec": 0.1,
+      "prompt_tokens": 1403,
+      "completion_tokens": 1818,
+      "total_tokens": 3221,
+      "cost_usd": 0.002192,
+      "nifi_processor_count": 3,
+      "nifi_connection_count": 2,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1004,
+        "nifi_corrector": 1004
+      },
+      "session_id": 70,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "deepseek/deepseek-v4-pro",
+          "prompt_tokens": 94,
+          "completion_tokens": 702,
+          "total_tokens": 796,
+          "duration_ms": 38422,
+          "cost_usd": 0.000652
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 94,
+          "completion_tokens": 702,
+          "total_tokens": 796,
+          "duration_ms": 38422,
+          "cost_usd": 0.000652
+        }
+      },
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

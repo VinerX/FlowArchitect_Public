@@ -1,0 +1,63 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 225.11,
+  "stage1_duration_sec": 54.46,
+  "stage2_duration_sec": 133.81,
+  "prompt_tokens": 4410,
+  "completion_tokens": 5991,
+  "total_tokens": 10401,
+  "cost_usd": 0.007131,
+  "nifi_processor_count": 3,
+  "nifi_connection_count": 2,
+  "pim_source_count": 1,
+  "pim_step_count": 1,
+  "pim_sink_count": 1,
+  "session_id": 62,
+  "preset_id": 1004,
+  "preset_name": "openrouter deepseek",
+  "preset_model": "deepseek/deepseek-v4-pro",
+  "llm_calls": [
+    {
+      "purpose": "pim_generation",
+      "provider": "common",
+      "model": "deepseek/deepseek-v4-pro",
+      "prompt_tokens": 1298,
+      "completion_tokens": 1578,
+      "total_tokens": 2876,
+      "duration_ms": 54171,
+      "cost_usd": 0.001937
+    },
+    {
+      "purpose": "nifi_correction",
+      "provider": "common",
+      "model": "deepseek/deepseek-v4-pro",
+      "prompt_tokens": 3029,
+      "completion_tokens": 4129,
+      "total_tokens": 7158,
+      "duration_ms": 133655,
+      "cost_usd": 0.00491
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "pim_generation": {
+      "calls": 1,
+      "prompt_tokens": 1298,
+      "completion_tokens": 1578,
+      "total_tokens": 2876,
+      "duration_ms": 54171,
+      "cost_usd": 0.001937
+    },
+    "nifi_correction": {
+      "calls": 1,
+      "prompt_tokens": 3029,
+      "completion_tokens": 4129,
+      "total_tokens": 7158,
+      "duration_ms": 133655,
+      "cost_usd": 0.00491
+    }
+  },
+  "nifi_import_success": true,
+  "nifi_error_count": 2,
+  "nifi_import_error": null
+}

@@ -1,0 +1,30 @@
+
+================================================================
+Query  : ������������ ������� ����� ������ �� PostgreSQL public.orders � ��������...
+Mode   : 3 � Adapter+LLM (NL->YAML->Adapter->LLM->JSON)
+Presets: [1004]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1004, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1004: openrouter deepseek  [deepseek/deepseek-v4-pro] ---
+  [1/2] USER_QUERY  mode=3  preset=1004
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  ... waiting for YAML PIM (20s elapsed, timeout=300s)
+  ... waiting for YAML PIM (30s elapsed, timeout=300s)
+  [1/2] PIM ready  (822 chars, 39.2s)
+  [2/2] REQUEST_CONVERSION  mode=3  preset=1004
+  [2/2] NiFi JSON ready  (2 proc, 1 conn, 3.87s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 3639 in / 3177 out / 6816 total  |  cost: $0.004347
+  Result : [OK]  (117.52s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage5-deepseek-extended\runs\postgres-to-file__m3__p1004__a1__spf022c2d6\raw_report.json

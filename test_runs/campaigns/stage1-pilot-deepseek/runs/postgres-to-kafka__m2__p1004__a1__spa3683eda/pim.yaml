@@ -1,0 +1,47 @@
+flow:
+  id: postgres_to_kafka_events
+  name: PostgreSQL to Kafka Events Pipeline
+  description: Periodically select new records from PostgreSQL and publish to Kafka
+    topic analytics.events in JSON format
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 5 minutes
+sources:
+- id: source_postgres
+  name: PostgreSQL Source
+  type: PostgreSQL
+  location: '{{POSTGRES_TABLE}}'
+  connection:
+    properties:
+      host: '{{PG_HOST}}'
+      port: '{{PG_PORT}}'
+      database: '{{PG_DATABASE}}'
+      username: '{{PG_USERNAME}}'
+      password: '{{PG_PASSWORD}}'
+      query: SELECT * FROM {{POSTGRES_TABLE}} WHERE updated_at > '{{LAST_CHECK_TIMESTAMP}}'
+processing_elements:
+- id: process_serialize_json
+  name: Serialize to JSON
+  operation: Serialize
+  config:
+    format: json
+sinks:
+- id: sink_kafka
+  name: Kafka Sink
+  type: Kafka
+  location: analytics.events
+  connection:
+    properties:
+      bootstrap.servers: '{{KAFKA_BOOTSTRAP_SERVERS}}'
+      topic: analytics.events
+processed_data:
+- id: json_records
+  format: json
+links:
+- from_id: source_postgres
+  to_id: process_serialize_json
+  data_ref: json_records
+- from_id: process_serialize_json
+  to_id: sink_kafka
+  data_ref: json_records

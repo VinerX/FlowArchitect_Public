@@ -1,0 +1,46 @@
+flow:
+  id: s3_to_hdfs_ingestion
+  name: S3 to HDFS Ingestion
+  description: Ingest files from S3 bucket raw-data, decompress if necessary, and
+    store in HDFS /data/raw
+triggers:
+- id: trigger_s3_poll
+  type: schedule
+  condition: every 5 minutes
+sources:
+- id: source_s3
+  name: Read from S3 bucket raw-data
+  type: S3
+  location: raw-data
+  connection:
+    properties:
+      aws_access_key_id: '{{AWS_ACCESS_KEY_ID}}'
+      aws_secret_access_key: '{{AWS_SECRET_ACCESS_KEY}}'
+      region: '{{AWS_REGION}}'
+      endpoint_url: '{{S3_ENDPOINT_URL}}'
+processing_elements:
+- id: process_unpack
+  name: Unpack if compressed
+  operation: Decompress
+  config:
+    auto_detect: true
+sinks:
+- id: sink_hdfs
+  name: Write to HDFS
+  type: HDFS
+  location: /data/raw
+  connection:
+    properties:
+      namenode: '{{HDFS_NAMENODE}}'
+      user: '{{HDFS_USER}}'
+      fs.defaultFS: '{{HDFS_DEFAULT_FS}}'
+processed_data:
+- id: raw_files
+  format: binary
+links:
+- from_id: source_s3
+  to_id: process_unpack
+  data_ref: raw_files
+- from_id: process_unpack
+  to_id: sink_hdfs
+  data_ref: raw_files

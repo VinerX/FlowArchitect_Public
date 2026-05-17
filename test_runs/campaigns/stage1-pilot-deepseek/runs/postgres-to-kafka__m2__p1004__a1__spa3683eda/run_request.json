@@ -1,0 +1,67 @@
+{
+  "run_id": "postgres-to-kafka__m2__p1004__a1__spa3683eda",
+  "case_id": "postgres-to-kafka",
+  "title": "PostgreSQL to Kafka",
+  "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 2,
+  "preset_id": 1004,
+  "stage_presets": {
+    "pim": 1004,
+    "corrector": 1004
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "postgres",
+      "kafka",
+      "batch"
+    ],
+    "expected_behavior": "Новые записи из PostgreSQL публикуются в Kafka topic analytics.events.",
+    "manual_test_checklist": [
+      "Импортировать полученный nifi.json в тестовый NiFi.",
+      "Проверить наличие корректного источника чтения из PostgreSQL.",
+      "Проверить наличие корректной публикации в Kafka в формате JSON."
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-11T16:11:44.576079+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-11T17:18:24.848787+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-11T17:18:24.848787+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m2__p1004__a1__spa3683eda\\query.txt",
+    "--preset",
+    "1004",
+    "--mode",
+    "2",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m2__p1004__a1__spa3683eda\\raw_report.json",
+    "--pim-preset",
+    "1004",
+    "--corrector-preset",
+    "1004",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

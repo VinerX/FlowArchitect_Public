@@ -1,0 +1,67 @@
+{
+  "run_id": "currency-http-to-file__m2__p1006__a1__spec98e7be",
+  "case_id": "currency-http-to-file",
+  "title": "Currency HTTP to File",
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 2,
+  "preset_id": 1006,
+  "stage_presets": {
+    "pim": 1006,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "http",
+      "file",
+      "baseline",
+      "level-1"
+    ],
+    "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.",
+    "manual_test_checklist": [
+      "Импортировать nifi.json в NiFi.",
+      "Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту."
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-13T10:58:32.983152+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-13T10:59:34.879729+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-13T10:59:34.879729+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m2__p1006__a1__spec98e7be\\query.txt",
+    "--preset",
+    "1006",
+    "--mode",
+    "2",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m2__p1006__a1__spec98e7be\\raw_report.json",
+    "--pim-preset",
+    "1006",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

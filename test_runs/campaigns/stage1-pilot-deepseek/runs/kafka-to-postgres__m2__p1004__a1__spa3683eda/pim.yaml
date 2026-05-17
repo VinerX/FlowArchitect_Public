@@ -1,0 +1,49 @@
+flow:
+  id: kafka_orders_to_postgres
+  name: Kafka Orders to PostgreSQL
+  description: Read JSON messages from Kafka topic orders, transform to table rows,
+    write to PostgreSQL
+triggers:
+- id: trigger_on_message
+  type: event
+  condition: on new message in Kafka topic orders
+sources:
+- id: source_kafka_orders
+  name: Read orders from Kafka
+  type: Kafka
+  location: orders
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_GROUP_ID}}'
+      topic: orders
+processing_elements:
+- id: process_json_to_row
+  name: Convert JSON to Table Row
+  operation: json_to_row
+  config:
+    mapping: '{{TABLE_MAPPING}}'
+sinks:
+- id: sink_postgres
+  name: Write to PostgreSQL
+  type: PostgreSQL
+  location: '{{TABLE_NAME}}'
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processed_data:
+- id: orders_json
+  format: json
+- id: orders_row
+  format: tabular
+links:
+- from_id: source_kafka_orders
+  to_id: process_json_to_row
+  data_ref: orders_json
+- from_id: process_json_to_row
+  to_id: sink_postgres
+  data_ref: orders_row

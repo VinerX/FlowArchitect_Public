@@ -1,0 +1,108 @@
+{
+  "revision": {
+    "version": 0
+  },
+  "component": {
+    "contents": {
+      "processors": [
+        {
+          "id": "get-file-proc",
+          "name": "GetFile",
+          "type": "org.apache.nifi.processors.standard.GetFile",
+          "config": {
+            "properties": {
+              "Input Directory": "/data/input/orders/",
+              "Keep Source File": "false"
+            }
+          }
+        },
+        {
+          "id": "query-record-proc",
+          "name": "QueryRecord",
+          "type": "org.apache.nifi.processors.standard.QueryRecord",
+          "config": {
+            "properties": {
+              "record-reader": "csv-reader",
+              "record-writer": "csv-writer",
+              "completed_rows": "SELECT * FROM FLOWFILE WHERE status = 'COMPLETED'"
+            }
+          }
+        },
+        {
+          "id": "put-file-proc",
+          "name": "PutFile",
+          "type": "org.apache.nifi.processors.standard.PutFile",
+          "config": {
+            "properties": {
+              "Directory": "/data/output/",
+              "Conflict Strategy": "replace"
+            }
+          }
+        },
+        {
+          "id": "update-attribute-proc",
+          "name": "UpdateAttribute",
+          "type": "org.apache.nifi.processors.standard.UpdateAttribute",
+          "config": {
+            "properties": {
+              "filename": "completed_orders.csv"
+            }
+          }
+        }
+      ],
+      "connections": [
+        {
+          "source": {
+            "id": "get-file-proc",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "query-record-proc",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "success"
+          ]
+        },
+        {
+          "source": {
+            "id": "query-record-proc",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "update-attribute-proc",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "completed_rows"
+          ]
+        },
+        {
+          "source": {
+            "id": "update-attribute-proc",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "put-file-proc",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "success"
+          ]
+        }
+      ],
+      "controllerServices": [
+        {
+          "id": "csv-reader",
+          "name": "CSVReader",
+          "type": "org.apache.nifi.csv.CSVReader"
+        },
+        {
+          "id": "csv-writer",
+          "name": "CSVRecordSetWriter",
+          "type": "org.apache.nifi.csv.CSVRecordSetWriter"
+        }
+      ]
+    }
+  }
+}

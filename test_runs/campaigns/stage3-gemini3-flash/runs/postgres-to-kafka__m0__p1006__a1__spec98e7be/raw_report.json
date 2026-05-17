@@ -1,0 +1,123 @@
+{
+  "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:11:14.700673+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "encodingVersion": "2.0",
+        "snapshot": {
+          "processors": [
+            {
+              "identifier": "query-db",
+              "name": "QueryDatabaseTable",
+              "type": "org.apache.nifi.processors.standard.QueryDatabaseTable",
+              "properties": {
+                "db-fetch-dbcp-service": "PostgreSQL_Pool",
+                "table-name": "public.transactions",
+                "db-fetch-where-clause": "status = 'PENDING'"
+              },
+              "componentType": "PROCESSOR"
+            },
+            {
+              "identifier": "convert-avro-json",
+              "name": "ConvertAvroToJSON",
+              "type": "org.apache.nifi.processors.avro.ConvertAvroToJSON",
+              "componentType": "PROCESSOR"
+            },
+            {
+              "identifier": "publish-kafka",
+              "name": "PublishKafka_2_6",
+              "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+              "properties": {
+                "bootstrap.servers": "localhost:9092",
+                "topic": "transactions.overdue",
+                "acks": "all"
+              },
+              "componentType": "PROCESSOR"
+            }
+          ],
+          "connections": [
+            {
+              "source": {
+                "id": "query-db"
+              },
+              "destination": {
+                "id": "convert-avro-json"
+              },
+              "selectedRelationships": [
+                "success"
+              ]
+            },
+            {
+              "source": {
+                "id": "convert-avro-json"
+              },
+              "destination": {
+                "id": "publish-kafka"
+              },
+              "selectedRelationships": [
+                "success"
+              ]
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "2108eea2-019e-1000-0b17-e8f669728e68",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 37.79,
+      "stage1_duration_sec": 3.48,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 139,
+      "completion_tokens": 425,
+      "total_tokens": 564,
+      "cost_usd": 0.001344,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 123,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 82,
+          "completion_tokens": 6,
+          "total_tokens": 88,
+          "duration_ms": 3202,
+          "cost_usd": 5.9e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 82,
+          "completion_tokens": 6,
+          "total_tokens": 88,
+          "duration_ms": 3202,
+          "cost_usd": 5.9e-05
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

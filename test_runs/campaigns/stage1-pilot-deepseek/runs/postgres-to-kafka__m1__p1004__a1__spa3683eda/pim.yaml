@@ -1,0 +1,46 @@
+flow:
+  id: postgres_to_kafka
+  name: PostgreSQL to Kafka CDC
+  description: Periodically select new records from PostgreSQL and publish them to
+    Kafka topic analytics.events in JSON format
+triggers:
+- id: trigger_periodic
+  type: schedule
+  condition: '{{SCHEDULE_INTERVAL}}'
+sources:
+- id: source_postgres
+  name: Read from PostgreSQL
+  type: PostgreSQL
+  location: '{{POSTGRES_TABLE}}'
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+      query: '{{SELECT_QUERY}}'
+processing_elements:
+- id: process_to_json
+  name: Convert to JSON
+  operation: ConvertFormat
+  config:
+    format: json
+sinks:
+- id: sink_kafka
+  name: Publish to Kafka
+  type: Kafka
+  location: analytics.events
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: records_json
+  format: json
+links:
+- from_id: source_postgres
+  to_id: process_to_json
+  data_ref: records_json
+- from_id: process_to_json
+  to_id: sink_kafka
+  data_ref: records_json

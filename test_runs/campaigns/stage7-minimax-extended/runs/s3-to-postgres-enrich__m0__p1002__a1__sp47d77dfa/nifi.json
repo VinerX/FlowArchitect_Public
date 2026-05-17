@@ -1,0 +1,109 @@
+{
+  "flow": {
+    "name": "S3 JSON to PostgreSQL ETL",
+    "scheduling": {
+      "type": "TIMER_DRIVEN",
+      "interval": "1 hour"
+    },
+    "processors": [
+      {
+        "id": "list-s3-raw-logs",
+        "type": "ListS3",
+        "properties": {
+          "Bucket": "raw-logs",
+          "Region": "us-east-1",
+          "Prefix": "",
+          "Delimiter": "/",
+          "List Filter": "*.json"
+        },
+        "scheduling": {
+          "type": "CRON",
+          "value": "0 0 * * * *"
+        }
+      },
+      {
+        "id": "fetch-s3-object",
+        "type": "FetchS3Object",
+        "properties": {
+          "Bucket": "raw-logs",
+          "Region": "us-east-1"
+        },
+        "inputRelationship": "success"
+      },
+      {
+        "id": "add-processed-at",
+        "type": "JoltTransformJSON",
+        "properties": {
+          "jolt-spec": "[{\"operation\":\"modify-overwrite-beta\",\"spec\":{\"processed_at\":\"${now():format('yyyy-MM-dd\\'T\\'HH:mm:ss.SSS\\'Z\\''):prepend(''):append('')}\"},\"path\":\"processed_at\"}]",
+          "Transformation Strategy": "jolt-transform-json"
+        },
+        "inputRelationship": "success"
+      },
+      {
+        "id": "split-json-records",
+        "type": "SplitJson",
+        "properties": {
+          "JsonPath Expression": "$.*"
+        },
+        "inputRelationship": "success"
+      },
+      {
+        "id": "put-to-postgresql",
+        "type": "PutSQL",
+        "properties": {
+          "Database Connection Pooling Service": "postgresql-pool",
+          "SQL Statement": "INSERT INTO public.event_log SELECT * FROM JSON_PARSE(?)"
+        },
+        "inputRelationship": "success"
+      }
+    ],
+    "connections": [
+      {
+        "from": "list-s3-raw-logs",
+        "to": "fetch-s3-object",
+        "relationship": "success"
+      },
+      {
+        "from": "fetch-s3-object",
+        "to": "add-processed-at",
+        "relationship": "success"
+      },
+      {
+        "from": "add-processed-at",
+        "to": "split-json-records",
+        "relationship": "success"
+      },
+      {
+        "from": "split-json-records",
+        "to": "put-to-postgresql",
+        "relationship": "success"
+      }
+    ],
+    "controller-services": [
+      {
+        "id": "postgresql-pool",
+        "type": "DBCPConnectionPool",
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://localhost:5432/mydb",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database Driver Location": "/path/to/postgresql.jar",
+          "Username": "postgres",
+          "Password": "changeme"
+        }
+      },
+      {
+        "id": "aws-credentials",
+        "type": "AWSCredentialsProvider",
+        "properties": {
+          "Access Key": "your-access-key",
+          "Secret Key": "your-secret-key"
+        }
+      }
+    ],
+    "parameters": {
+      "s3-bucket": "raw-logs",
+      "s3-region": "us-east-1",
+      "target-table": "public.event_log"
+    }
+  }
+}

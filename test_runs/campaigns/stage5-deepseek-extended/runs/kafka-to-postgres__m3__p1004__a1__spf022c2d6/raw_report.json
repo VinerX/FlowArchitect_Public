@@ -1,0 +1,337 @@
+{
+  "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+  "mode": 3,
+  "mode_name": "Adapter+LLM (NL->YAML->Adapter->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T17:48:27.790651+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: kafka_orders_to_postgres\n  name: Kafka Orders to PostgreSQL\n  description: Stream orders from Kafka topic orders.created, parse JSON, extract\n    fields, and insert into PostgreSQL table public.orders\ntriggers:\n- id: trigger_kafka\n  type: event\n  condition: on Kafka message arrival from topic orders.created\nsources:\n- id: source_kafka\n  name: Read from Kafka orders.created\n  type: Kafka\n  location: orders.created\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      group_id: orders_consumer_group\nprocessing_elements:\n- id: pe_parse_extract\n  name: Parse JSON and Extract Fields\n  operation: Transform\n  config:\n    action: json_extract\n    fields:\n    - order_id\n    - user_id\n    - amount\n    - created_at\nsinks:\n- id: sink_postgres\n  name: Write to PostgreSQL public.orders\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{POSTGRES_HOST}}'\n      port: '{{POSTGRES_PORT}}'\n      database: '{{POSTGRES_DATABASE}}'\n      username: '{{POSTGRES_USERNAME}}'\n      password: '{{POSTGRES_PASSWORD}}'\nprocessed_data:\n- id: orders_json\n  format: json\nlinks:\n- from_id: source_kafka\n  to_id: pe_parse_extract\n  data_ref: orders_json\n- from_id: pe_parse_extract\n  to_id: sink_postgres\n  data_ref: orders_json",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "3fa4166b-4d38-476e-89be-923dd593c438",
+          "name": "Kafka Orders to PostgreSQL",
+          "comments": "Stream orders from Kafka topic orders.created, parse JSON, extract fields, and insert into PostgreSQL table public.orders",
+          "processors": [
+            {
+              "identifier": "efffc252-c7c9-4be6-9fdf-dac3721afac3",
+              "name": "Read from Kafka orders.created",
+              "comments": "Generated from PIM source 'source_kafka' (Kafka)",
+              "type": "org.apache.nifi.kafka.processors.ConsumeKafka",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Topics": "orders.created",
+                "Topic Format": "names",
+                "Group ID": "orders_consumer_group",
+                "Processing Strategy": "RECORD",
+                "Output Strategy": "USE_VALUE",
+                "Kafka Connection Service": "e8981bf9-ed62-4f20-b3b7-96eac7617c84",
+                "Record Writer": "49d389da-7829-42f8-b27d-36f0b779a16e",
+                "Record Reader": "2e5d3994-e456-4abf-9ff2-a9d7977e0b82"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "parse failure"
+              ]
+            },
+            {
+              "identifier": "d072e695-71c6-4c6d-a459-cce0dfe8f184",
+              "name": "Parse JSON and Extract Fields",
+              "comments": "Generated from PIM processing element 'pe_parse_extract' (Transform)",
+              "type": "org.apache.nifi.processors.standard.UpdateRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Record Writer": "49d389da-7829-42f8-b27d-36f0b779a16e",
+                "Record Reader": "2e5d3994-e456-4abf-9ff2-a9d7977e0b82",
+                "action": "json_extract",
+                "fields": "order_id, user_id, amount, created_at"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            },
+            {
+              "identifier": "5d842c55-1f1a-4ac6-9bfa-b51a6155185e",
+              "name": "Write to PostgreSQL public.orders",
+              "comments": "Generated from PIM sink 'sink_postgres' (PostgreSQL)",
+              "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Table Name": "public.orders",
+                "Statement Type": "INSERT",
+                "Database Connection Pooling Service": "6d37a18e-8a19-40af-bdb0-a3c7f2f113fd",
+                "Record Reader": "2e5d3994-e456-4abf-9ff2-a9d7977e0b82"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure",
+                "retry"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "f1d657bc-d6d5-4bc2-bad1-80f3eb697599",
+              "name": "Read from Kafka orders.created -> Parse JSON and Extract Fields",
+              "comments": "orders_json",
+              "source": {
+                "id": "efffc252-c7c9-4be6-9fdf-dac3721afac3",
+                "groupId": "3fa4166b-4d38-476e-89be-923dd593c438",
+                "type": "PROCESSOR",
+                "name": "Read from Kafka orders.created"
+              },
+              "destination": {
+                "id": "d072e695-71c6-4c6d-a459-cce0dfe8f184",
+                "groupId": "3fa4166b-4d38-476e-89be-923dd593c438",
+                "type": "PROCESSOR",
+                "name": "Parse JSON and Extract Fields"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "f1faf01a-972b-4242-84a5-062361d3ea0f",
+              "name": "Parse JSON and Extract Fields -> Write to PostgreSQL public.orders",
+              "comments": "orders_json",
+              "source": {
+                "id": "d072e695-71c6-4c6d-a459-cce0dfe8f184",
+                "groupId": "3fa4166b-4d38-476e-89be-923dd593c438",
+                "type": "PROCESSOR",
+                "name": "Parse JSON and Extract Fields"
+              },
+              "destination": {
+                "id": "5d842c55-1f1a-4ac6-9bfa-b51a6155185e",
+                "groupId": "3fa4166b-4d38-476e-89be-923dd593c438",
+                "type": "PROCESSOR",
+                "name": "Write to PostgreSQL public.orders"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "6d37a18e-8a19-40af-bdb0-a3c7f2f113fd",
+              "name": "DatabaseConnectionPool",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-dbcp-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{POSTGRES_HOST}}:{{POSTGRES_PORT}}/{{POSTGRES_DATABASE}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database User": "{{POSTGRES_USERNAME}}",
+                "Password": "{{POSTGRES_PASSWORD}}"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "e8981bf9-ed62-4f20-b3b7-96eac7617c84",
+              "name": "KafkaConnectionService",
+              "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-3-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "bootstrap.servers": "{{KAFKA_BROKERS}}",
+                "security.protocol": "PLAINTEXT"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "2e5d3994-e456-4abf-9ff2-a9d7977e0b82",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "49d389da-7829-42f8-b27d-36f0b779a16e",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22754caf-019e-1000-fed0-fcd6f1643320",
+        "validation_errors": [
+          {
+            "name": "Parse JSON and Extract Fields",
+            "type": "org.apache.nifi.processors.standard.UpdateRecord",
+            "errors": [
+              "'action' validated against 'json_extract' is invalid because Property Name is not a valid RecordPath value: Unexpected token '<EOF>' at line 1, column 6. Query: action",
+              "'fields' validated against 'order_id, user_id, amount, created_at' is invalid because Property Name is not a valid RecordPath value: Unexpected token '<EOF>' at line 1, column 6. Query: fields"
+            ]
+          },
+          {
+            "name": "Write to PostgreSQL public.orders",
+            "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+            "errors": [
+              "'Database Connection Pooling Service' validated against '6bf04156-d886-3fbe-6028-10055b072c4c' is invalid because Controller Service [Database Connection Pooling Service] Identifier [6bf04156-d886-3fbe-6028-10055b072c4c] state is Enabling"
+            ]
+          }
+        ],
+        "error_count": 3,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 86.66,
+      "stage1_duration_sec": 35.02,
+      "stage2_duration_sec": 5.89,
+      "prompt_tokens": 5072,
+      "completion_tokens": 4337,
+      "total_tokens": 9409,
+      "cost_usd": 0.00598,
+      "nifi_processor_count": 3,
+      "nifi_connection_count": 2,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 166,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "deepseek/deepseek-v4-pro",
+          "prompt_tokens": 1314,
+          "completion_tokens": 1083,
+          "total_tokens": 2397,
+          "duration_ms": 34671,
+          "cost_usd": 0.001514
+        },
+        {
+          "purpose": "nifi_correction",
+          "provider": "common",
+          "model": "google/gemini-2.5-flash-lite",
+          "prompt_tokens": 99,
+          "completion_tokens": 327,
+          "total_tokens": 426,
+          "duration_ms": 5733,
+          "cost_usd": 0.000141
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1314,
+          "completion_tokens": 1083,
+          "total_tokens": 2397,
+          "duration_ms": 34671,
+          "cost_usd": 0.001514
+        },
+        "nifi_correction": {
+          "calls": 1,
+          "prompt_tokens": 99,
+          "completion_tokens": 327,
+          "total_tokens": 426,
+          "duration_ms": 5733,
+          "cost_usd": 0.000141
+        }
+      },
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

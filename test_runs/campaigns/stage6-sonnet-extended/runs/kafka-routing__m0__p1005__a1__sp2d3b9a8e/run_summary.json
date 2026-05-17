@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 58.34,
+  "stage1_duration_sec": 53.93,
+  "stage2_duration_sec": null,
+  "prompt_tokens": 242,
+  "completion_tokens": 5723,
+  "total_tokens": 5965,
+  "cost_usd": 0.086571,
+  "nifi_processor_count": 6,
+  "nifi_connection_count": 11,
+  "pim_source_count": null,
+  "pim_step_count": null,
+  "pim_sink_count": null,
+  "session_id": 228,
+  "preset_id": 1005,
+  "preset_name": "openrouter sonnet 4.6",
+  "preset_model": "anthropic/claude-sonnet-4.6",
+  "llm_calls": [
+    {
+      "purpose": "direct",
+      "provider": "common",
+      "model": "anthropic/claude-sonnet-4.6",
+      "prompt_tokens": 136,
+      "completion_tokens": 9,
+      "total_tokens": 145,
+      "duration_ms": 53485,
+      "cost_usd": 0.000543
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "direct": {
+      "calls": 1,
+      "prompt_tokens": 136,
+      "completion_tokens": 9,
+      "total_tokens": 145,
+      "duration_ms": 53485,
+      "cost_usd": 0.000543
+    }
+  },
+  "nifi_import_success": false,
+  "nifi_error_count": 0,
+  "nifi_import_error": "NiFi unreachable: Cannot connect to https://localhost:8443"
+}

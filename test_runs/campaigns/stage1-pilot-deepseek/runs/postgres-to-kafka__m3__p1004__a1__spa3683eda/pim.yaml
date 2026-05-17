@@ -1,0 +1,38 @@
+flow:
+  id: postgres_to_kafka_analytics
+  name: PostgreSQL to Kafka Analytics Events
+  description: Periodically select new records from PostgreSQL and publish to Kafka
+    topic analytics.events in JSON
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 5 minutes
+sources:
+- id: source_postgres
+  name: Read New Records from PostgreSQL
+  type: PostgreSQL
+  location: public.source_table
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processing_elements: []
+sinks:
+- id: sink_kafka
+  name: Publish to Kafka
+  type: Kafka
+  location: analytics.events
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      topic: analytics.events
+processed_data:
+- id: json_data
+  format: json
+links:
+- from_id: source_postgres
+  to_id: sink_kafka
+  data_ref: json_data

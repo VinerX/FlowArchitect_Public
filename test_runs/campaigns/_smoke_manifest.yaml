@@ -1,0 +1,74 @@
+campaign:
+  id: thesis-global-validation-202605
+  title: Глобальная серия валидации для ВКР
+  owner: Дмитрий Макаров
+  objective: >
+    Сравнить режимы 0, 1 и 3 на фиксированном наборе кейсов и собрать
+    артефакты для анализа качества, устойчивости и экономии времени.
+  tags:
+    - thesis
+    - global-validation
+
+defaults:
+  presets:
+    - 1000
+  modes:
+    - 0
+    - 1
+    - 3
+  stage_presets:
+    pim: 1000
+    corrector: 1003
+  repeat: 1
+  timeout_sec: 300
+  nifi_validate: true
+  manual_nifi_required: true
+  requires_user_input: false
+  stop_after_statuses:
+    - needs_user_input
+    - needs_nifi_manual_test
+
+cases:
+  - id: currency-http-to-file
+    title: Получение курсов валют в файл
+    query: >
+      Получай курсы валют с https://api.exchangerate.host/latest и сохраняй
+      результат в файл rates.json.
+    tags:
+      - http
+      - file
+      - baseline
+    expected_behavior: Файл rates.json должен обновляться по расписанию.
+    manual_test_checklist:
+      - Импортировать сохраненный nifi.json в тестовый NiFi.
+      - Проверить, что flow проходит валидацию и пишет файл.
+
+  - id: kafka-to-postgres
+    title: Kafka в PostgreSQL
+    query: >
+      Считывай сообщения из Kafka topic orders, преобразуй JSON в строки
+      таблицы и записывай их в PostgreSQL.
+    tags:
+      - kafka
+      - postgres
+      - streaming
+
+  - id: postgres-to-kafka
+    title: PostgreSQL в Kafka
+    query: >
+      Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka
+      topic analytics.events в формате JSON.
+    tags:
+      - postgres
+      - kafka
+      - batch
+
+  - id: s3-to-hdfs
+    title: S3 в HDFS
+    query: >
+      Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их
+      и складывай в HDFS в каталог /data/raw.
+    tags:
+      - s3
+      - hdfs
+      - file-transfer

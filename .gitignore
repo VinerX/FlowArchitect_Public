@@ -15,5 +15,7 @@ src/SavedMessages/last_attempt_log/combined_messages.json
 .claude/settings.local.json
 CLAUDE.md
 AGENTS.md
-/test_runs
+/test_runs/*
+!/test_runs/campaigns/
+!/test_runs/campaigns/**
 config/settings.json

@@ -1,0 +1,442 @@
+{
+  "query": "Забирай данные о транзакциях из REST API банка https://api.bank.example.com/transactions каждые 30 секунд, фильтруй транзакции на сумму более 100000 рублей, обогащай данные информацией о клиенте из PostgreSQL-таблицы public.clients по полю client_id, результат публикуй в Kafka-топик high_value_transactions и параллельно сохраняй в S3 бакет compliance-archive с партиционированием по дате.",
+  "mode": 3,
+  "mode_name": "Adapter+LLM (NL->YAML->Adapter->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T15:51:46.801402+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: bank_transactions_pipeline\n  name: High-Value Transactions ETL\n  description: Fetch transactions from REST API every 30s, filter >100k RUB, enrich\n    with client data from PostgreSQL, output to Kafka and S3\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 30 seconds\nsources:\n- id: source_rest_api\n  name: Fetch Bank Transactions\n  type: REST API\n  location: https://api.bank.example.com/transactions\n  connection:\n    properties:\n      auth_token: '{{REST_API_AUTH_TOKEN}}'\nprocessing_elements:\n- id: process_filter\n  name: Filter High Value\n  operation: Filter\n  config:\n    condition: amount > 100000\n- id: process_enrich\n  name: Enrich Client Data\n  operation: Join\n  config:\n    lookup_table: public.clients\n    join_key: client_id\n    join_type: left\nsinks:\n- id: sink_kafka\n  name: Publish to Kafka\n  type: Kafka\n  location: high_value_transactions\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n- id: sink_s3\n  name: Archive to S3\n  type: S3\n  location: compliance-archive\n  connection:\n    properties:\n      region: '{{AWS_REGION}}'\n      access_key_id: '{{AWS_ACCESS_KEY_ID}}'\n      secret_access_key: '{{AWS_SECRET_ACCESS_KEY}}'\nprocessed_data:\n- id: enriched_transactions_json\n  format: json\nlinks:\n- from_id: source_rest_api\n  to_id: process_filter\n  data_ref: enriched_transactions_json\n- from_id: process_filter\n  to_id: process_enrich\n  data_ref: enriched_transactions_json\n- from_id: process_enrich\n  to_id: sink_kafka\n  data_ref: enriched_transactions_json\n- from_id: process_enrich\n  to_id: sink_s3\n  data_ref: enriched_transactions_json",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "1a1de434-2c7d-4dfe-9f95-053419dc056b",
+          "name": "High-Value Transactions ETL",
+          "comments": "Fetch transactions from REST API every 30s, filter >100k RUB, enrich with client data from PostgreSQL, output to Kafka and S3",
+          "processors": [
+            {
+              "identifier": "6d510501-d232-4d87-b077-64de1d5a8b23",
+              "name": "Fetch Bank Transactions",
+              "comments": "Generated from PIM source 'source_rest_api' (REST API)",
+              "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "HTTP URL": "https://api.bank.example.com/transactions",
+                "HTTP Method": "GET",
+                "auth_token": "{{REST_API_AUTH_TOKEN}}"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "30 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "Original",
+                "Retry",
+                "No Retry",
+                "Failure"
+              ]
+            },
+            {
+              "identifier": "ea6da11f-8931-40b0-b5b4-fd424eb1ba22",
+              "name": "Filter High Value",
+              "comments": "Generated from PIM processing element 'process_filter' (Filter)",
+              "type": "org.apache.nifi.processors.standard.QueryRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "filtered": "SELECT * FROM FLOWFILE WHERE amount > 100000",
+                "Record Writer": "5bf0f77c-574a-49c8-b0a5-5e5ea0bd8242",
+                "Record Reader": "43a29533-c672-4350-a2f9-79f2144dd501"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure",
+                "original"
+              ]
+            },
+            {
+              "identifier": "eb832ff0-44be-4398-a3fd-1e8a212d15f1",
+              "name": "Enrich Client Data",
+              "comments": "Generated from PIM processing element 'process_enrich' (Join)",
+              "type": "org.apache.nifi.processors.standard.LookupRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Record Writer": "5bf0f77c-574a-49c8-b0a5-5e5ea0bd8242",
+                "Record Reader": "43a29533-c672-4350-a2f9-79f2144dd501",
+                "lookup_table": "public.clients",
+                "join_key": "client_id",
+                "join_type": "left"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure",
+                "matched",
+                "unmatched"
+              ]
+            },
+            {
+              "identifier": "cf3b5698-c6ee-4b0e-94ae-21339bf83341",
+              "name": "Publish to Kafka",
+              "comments": "Generated from PIM sink 'sink_kafka' (Kafka)",
+              "type": "org.apache.nifi.kafka.processors.PublishKafka",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 1220.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Topic Name": "high_value_transactions",
+                "Kafka Connection Service": "1db908d1-321f-4fa9-a46d-025b9c82fd6d"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            },
+            {
+              "identifier": "fbcd4de4-4a91-4fe4-8d2c-2fcf8f404417",
+              "name": "Archive to S3",
+              "comments": "Generated from PIM sink 'sink_s3' (S3)",
+              "type": "org.apache.nifi.processors.aws.s3.PutS3Object",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-aws-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 1220.0,
+                "y": 260.0
+              },
+              "style": {},
+              "properties": {
+                "Bucket": "compliance-archive",
+                "Object Key": "${filename}",
+                "Region": "{{AWS_REGION}}",
+                "access_key_id": "{{AWS_ACCESS_KEY_ID}}",
+                "secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "7b03ad37-1606-48b1-8a38-ae2702a6f1cd",
+              "name": "Fetch Bank Transactions -> Filter High Value",
+              "comments": "enriched_transactions_json",
+              "source": {
+                "id": "6d510501-d232-4d87-b077-64de1d5a8b23",
+                "groupId": "1a1de434-2c7d-4dfe-9f95-053419dc056b",
+                "type": "PROCESSOR",
+                "name": "Fetch Bank Transactions"
+              },
+              "destination": {
+                "id": "ea6da11f-8931-40b0-b5b4-fd424eb1ba22",
+                "groupId": "1a1de434-2c7d-4dfe-9f95-053419dc056b",
+                "type": "PROCESSOR",
+                "name": "Filter High Value"
+              },
+              "selectedRelationships": [
+                "Response"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "8913c03f-90e6-4c5c-8eb6-60f680182c97",
+              "name": "Filter High Value -> Enrich Client Data",
+              "comments": "enriched_transactions_json",
+              "source": {
+                "id": "ea6da11f-8931-40b0-b5b4-fd424eb1ba22",
+                "groupId": "1a1de434-2c7d-4dfe-9f95-053419dc056b",
+                "type": "PROCESSOR",
+                "name": "Filter High Value"
+              },
+              "destination": {
+                "id": "eb832ff0-44be-4398-a3fd-1e8a212d15f1",
+                "groupId": "1a1de434-2c7d-4dfe-9f95-053419dc056b",
+                "type": "PROCESSOR",
+                "name": "Enrich Client Data"
+              },
+              "selectedRelationships": [
+                "filtered"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "13455a60-29a8-4232-81dc-eeed40ad4291",
+              "name": "Enrich Client Data -> Publish to Kafka",
+              "comments": "enriched_transactions_json",
+              "source": {
+                "id": "eb832ff0-44be-4398-a3fd-1e8a212d15f1",
+                "groupId": "1a1de434-2c7d-4dfe-9f95-053419dc056b",
+                "type": "PROCESSOR",
+                "name": "Enrich Client Data"
+              },
+              "destination": {
+                "id": "cf3b5698-c6ee-4b0e-94ae-21339bf83341",
+                "groupId": "1a1de434-2c7d-4dfe-9f95-053419dc056b",
+                "type": "PROCESSOR",
+                "name": "Publish to Kafka"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "f3773034-5d0e-473c-8569-83d9e60e574f",
+              "name": "Enrich Client Data -> Archive to S3",
+              "comments": "enriched_transactions_json",
+              "source": {
+                "id": "eb832ff0-44be-4398-a3fd-1e8a212d15f1",
+                "groupId": "1a1de434-2c7d-4dfe-9f95-053419dc056b",
+                "type": "PROCESSOR",
+                "name": "Enrich Client Data"
+              },
+              "destination": {
+                "id": "fbcd4de4-4a91-4fe4-8d2c-2fcf8f404417",
+                "groupId": "1a1de434-2c7d-4dfe-9f95-053419dc056b",
+                "type": "PROCESSOR",
+                "name": "Archive to S3"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "1db908d1-321f-4fa9-a46d-025b9c82fd6d",
+              "name": "KafkaConnectionService",
+              "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-3-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "bootstrap.servers": "{{KAFKA_BROKERS}}",
+                "security.protocol": "PLAINTEXT"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "43a29533-c672-4350-a2f9-79f2144dd501",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "5bf0f77c-574a-49c8-b0a5-5e5ea0bd8242",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "220c3ea4-019e-1000-15d0-396ae7cad0d3",
+        "validation_errors": [
+          {
+            "name": "Enrich Client Data",
+            "type": "org.apache.nifi.processors.standard.LookupRecord",
+            "errors": [
+              "'lookup_table' validated against 'public.clients' is invalid because Property Value is not a valid RecordPath value: Unexpected token '<EOF>' at line 1, column 14. Query: public.clients",
+              "'join_type' validated against 'left' is invalid because Property Value is not a valid RecordPath value: Unexpected token '<EOF>' at line 1, column 4. Query: left",
+              "'Lookup Service' is invalid because Lookup Service is required",
+              "'join_key' validated against 'client_id' is invalid because Property Value is not a valid RecordPath value: Unexpected token '<EOF>' at line 1, column 9. Query: client_id"
+            ]
+          },
+          {
+            "name": "Archive to S3",
+            "type": "org.apache.nifi.processors.aws.s3.PutS3Object",
+            "errors": [
+              "'Region' validated against '{{AWS_REGION}}' is invalid because Given value not found in allowed set 'us-gov-east-1, us-gov-west-1, af-south-1, ap-east-1, ap-south-2, ap-southeast-3, ap-southeast-5, ap-southeast-4, ap-south-1, ap-southeast-6, ap-northeast-3, ap-northeast-2, ap-southeast-1, ap-southeast-2, ap-east-2, ap-southeast-7, ap-northeast-1, ca-central-1, ca-west-1, cn-north-1, cn-northwest-1, eusc-de-east-1, eu-isoe-west-1, eu-central-1, eu-west-1, eu-west-2, eu-south-1, eu-west-3, eu-south-2, eu-north-1, eu-central-2, il-central-1, mx-central-1, me-south-1, me-central-1, sa-east-1, us-east-1, us-east-2, us-iso-east-1, us-iso-west-1, us-isob-east-1, us-isob-west-1, us-isof-east-1, us-isof-south-1, us-west-1, us-west-2, aws-global, aws-cn-global, aws-iso-global, aws-iso-b-global, aws-iso-e-global, aws-iso-f-global, aws-us-gov-global, use-custom-region'"
+            ]
+          }
+        ],
+        "error_count": 5,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 184.55,
+      "stage1_duration_sec": 157.1,
+      "stage2_duration_sec": 8.66,
+      "prompt_tokens": 7939,
+      "completion_tokens": 13776,
+      "total_tokens": 21715,
+      "cost_usd": 0.020489,
+      "nifi_processor_count": 5,
+      "nifi_connection_count": 4,
+      "pim_source_count": 1,
+      "pim_step_count": 2,
+      "pim_sink_count": 2,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 147,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 1411,
+          "completion_tokens": 3195,
+          "total_tokens": 4606,
+          "duration_ms": 156639,
+          "cost_usd": 0.004612
+        },
+        {
+          "purpose": "nifi_correction",
+          "provider": "common",
+          "model": "google/gemini-2.5-flash-lite",
+          "prompt_tokens": 168,
+          "completion_tokens": 1321,
+          "total_tokens": 1489,
+          "duration_ms": 8407,
+          "cost_usd": 0.000545
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1411,
+          "completion_tokens": 3195,
+          "total_tokens": 4606,
+          "duration_ms": 156639,
+          "cost_usd": 0.004612
+        },
+        "nifi_correction": {
+          "calls": 1,
+          "prompt_tokens": 168,
+          "completion_tokens": 1321,
+          "total_tokens": 1489,
+          "duration_ms": 8407,
+          "cost_usd": 0.000545
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

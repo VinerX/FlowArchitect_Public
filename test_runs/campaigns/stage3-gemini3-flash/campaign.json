@@ -1,0 +1,3753 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-05-13T10:58:32.984152+00:00",
+  "updated_at": "2026-05-13T11:20:32.556622+00:00",
+  "campaign": {
+    "id": "stage3-gemini3-flash",
+    "title": "Этап 3 — Gemini 3 Flash как основной генератор PIM",
+    "meta": {
+      "id": "stage3-gemini3-flash",
+      "title": "Этап 3 — Gemini 3 Flash как основной генератор PIM",
+      "owner": "Дмитрий Макаров",
+      "objective": "Прямое сравнение с stage2-extended-qwen36 на том же наборе кейсов и режимов. Цель — проверить две гипотезы: (1) Gemini Flash как более быстрая модель решает проблему таймаута в Mode 2 (LLM-цепочка); (2) меньше ли у Flash артефактов \"пустых Process Group\" в Mode 0 по сравнению с Qwen. Корректор оставлен Gemini 2.5 Flash Lite (1003) для сопоставимости с stage2.\n",
+      "tags": [
+        "thesis",
+        "stage3",
+        "gemini3-flash"
+      ]
+    },
+    "manifest_source": "F:\\Education\\Diplom\\FlowArchitect\\config\\campaigns\\stage3_gemini3_flash.yaml"
+  },
+  "defaults": {
+    "presets": [
+      1006
+    ],
+    "modes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "stage_presets": {
+      "pim": 1006,
+      "corrector": 1003
+    },
+    "repeat": 1,
+    "timeout_sec": 300,
+    "nifi_validate": true,
+    "manual_nifi_required": true,
+    "requires_user_input": false,
+    "stop_after_statuses": [
+      "cancelled"
+    ]
+  },
+  "run_order": [
+    "currency-http-to-file__m0__p1006__a1__spec98e7be",
+    "currency-http-to-file__m1__p1006__a1__spec98e7be",
+    "currency-http-to-file__m2__p1006__a1__spec98e7be",
+    "currency-http-to-file__m3__p1006__a1__spec98e7be",
+    "file-csv-filter__m0__p1006__a1__spec98e7be",
+    "file-csv-filter__m1__p1006__a1__spec98e7be",
+    "file-csv-filter__m2__p1006__a1__spec98e7be",
+    "file-csv-filter__m3__p1006__a1__spec98e7be",
+    "postgres-to-file__m0__p1006__a1__spec98e7be",
+    "postgres-to-file__m1__p1006__a1__spec98e7be",
+    "postgres-to-file__m2__p1006__a1__spec98e7be",
+    "postgres-to-file__m3__p1006__a1__spec98e7be",
+    "kafka-to-postgres__m0__p1006__a1__spec98e7be",
+    "kafka-to-postgres__m1__p1006__a1__spec98e7be",
+    "kafka-to-postgres__m2__p1006__a1__spec98e7be",
+    "kafka-to-postgres__m3__p1006__a1__spec98e7be",
+    "postgres-to-kafka__m0__p1006__a1__spec98e7be",
+    "postgres-to-kafka__m1__p1006__a1__spec98e7be",
+    "postgres-to-kafka__m2__p1006__a1__spec98e7be",
+    "postgres-to-kafka__m3__p1006__a1__spec98e7be",
+    "kafka-routing__m0__p1006__a1__spec98e7be",
+    "kafka-routing__m1__p1006__a1__spec98e7be",
+    "kafka-routing__m2__p1006__a1__spec98e7be",
+    "kafka-routing__m3__p1006__a1__spec98e7be",
+    "s3-to-postgres-enrich__m0__p1006__a1__spec98e7be",
+    "s3-to-postgres-enrich__m1__p1006__a1__spec98e7be",
+    "s3-to-postgres-enrich__m2__p1006__a1__spec98e7be",
+    "s3-to-postgres-enrich__m3__p1006__a1__spec98e7be"
+  ],
+  "runs": {
+    "currency-http-to-file__m0__p1006__a1__spec98e7be": {
+      "run_id": "currency-http-to-file__m0__p1006__a1__spec98e7be",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.983152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T10:58:47.002352+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T10:59:10.615503+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T10:58:47.002352+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m0__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m0__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T10:59:10.612502+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m0__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m0__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m0__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m0__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 21.67,
+        "stage1_duration_sec": 4.19,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 139,
+        "completion_tokens": 413,
+        "total_tokens": 552,
+        "cost_usd": 0.001308,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 107,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 3733,
+            "cost_usd": 5.9e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 3733,
+            "cost_usd": 5.9e-05
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "NiFi unreachable: HTTPSConnectionPool(host='localhost', port=8443): Read timed out. (read timeout=15)"
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m0__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "currency-http-to-file__m1__p1006__a1__spec98e7be": {
+      "run_id": "currency-http-to-file__m1__p1006__a1__spec98e7be",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.983152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T10:59:10.623505+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T10:59:34.871727+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T10:59:10.623505+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m1__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m1__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T10:59:34.866726+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m1__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m1__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m1__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m1__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 22.65,
+        "stage1_duration_sec": 5.07,
+        "stage2_duration_sec": 0.19,
+        "prompt_tokens": 1454,
+        "completion_tokens": 417,
+        "total_tokens": 1871,
+        "cost_usd": 0.001978,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 108,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 3358,
+            "cost_usd": 5.9e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 3358,
+            "cost_usd": 5.9e-05
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "NiFi unreachable: HTTPSConnectionPool(host='localhost', port=8443): Read timed out. (read timeout=15)"
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m1__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "currency-http-to-file__m2__p1006__a1__spec98e7be": {
+      "run_id": "currency-http-to-file__m2__p1006__a1__spec98e7be",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.983152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T10:59:34.879729+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:00:40.226385+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T10:59:34.879729+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m2__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m2__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:00:40.221384+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m2__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m2__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m2__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m2__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 63.41,
+        "stage1_duration_sec": 10.07,
+        "stage2_duration_sec": 8.56,
+        "prompt_tokens": 2146,
+        "completion_tokens": 1803,
+        "total_tokens": 3949,
+        "cost_usd": 0.006482,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 109,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1372,
+            "completion_tokens": 411,
+            "total_tokens": 1783,
+            "duration_ms": 9733,
+            "cost_usd": 0.001919
+          },
+          {
+            "purpose": "psm_conversion",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 692,
+            "completion_tokens": 1386,
+            "total_tokens": 2078,
+            "duration_ms": 7717,
+            "cost_usd": 0.004504
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1372,
+            "completion_tokens": 411,
+            "total_tokens": 1783,
+            "duration_ms": 9733,
+            "cost_usd": 0.001919
+          },
+          "psm_conversion": {
+            "calls": 1,
+            "prompt_tokens": 692,
+            "completion_tokens": 1386,
+            "total_tokens": 2078,
+            "duration_ms": 7717,
+            "cost_usd": 0.004504
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m2__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "currency-http-to-file__m3__p1006__a1__spec98e7be": {
+      "run_id": "currency-http-to-file__m3__p1006__a1__spec98e7be",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.983152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:00:40.234387+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:01:23.873995+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:00:40.234387+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m3__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m3__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:01:23.866994+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m3__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m3__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m3__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m3__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 41.96,
+        "stage1_duration_sec": 3.85,
+        "stage2_duration_sec": 3.48,
+        "prompt_tokens": 3270,
+        "completion_tokens": 1687,
+        "total_tokens": 4957,
+        "cost_usd": 0.006696,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 110,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1372,
+            "completion_tokens": 414,
+            "total_tokens": 1786,
+            "duration_ms": 3578,
+            "cost_usd": 0.001928
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 1816,
+            "completion_tokens": 1267,
+            "total_tokens": 3083,
+            "duration_ms": 3250,
+            "cost_usd": 0.000688
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1372,
+            "completion_tokens": 414,
+            "total_tokens": 1786,
+            "duration_ms": 3578,
+            "cost_usd": 0.001928
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 1816,
+            "completion_tokens": 1267,
+            "total_tokens": 3083,
+            "duration_ms": 3250,
+            "cost_usd": 0.000688
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 5,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\currency-http-to-file__m3__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "file-csv-filter__m0__p1006__a1__spec98e7be": {
+      "run_id": "file-csv-filter__m0__p1006__a1__spec98e7be",
+      "case_id": "file-csv-filter",
+      "title": "File CSV Filter (TC-02)",
+      "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "file",
+          "filter",
+          "level-1"
+        ],
+        "expected_behavior": "Файлы из /data/input/orders/ фильтруются и попадают в /data/output/completed_orders.csv только со статусом COMPLETED.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Положить тестовый CSV в /data/input/orders/.",
+          "Запустить поток и проверить содержимое /data/output/completed_orders.csv."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.983152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:01:23.882997+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:02:06.893030+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:01:23.882997+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m0__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m0__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:02:06.891029+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m0__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m0__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m0__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m0__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 41.41,
+        "stage1_duration_sec": 6.93,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 157,
+        "completion_tokens": 716,
+        "total_tokens": 873,
+        "cost_usd": 0.002227,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 111,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 91,
+            "completion_tokens": 6,
+            "total_tokens": 97,
+            "duration_ms": 6609,
+            "cost_usd": 6.3e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 91,
+            "completion_tokens": 6,
+            "total_tokens": 97,
+            "duration_ms": 6609,
+            "cost_usd": 6.3e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m0__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "file-csv-filter__m1__p1006__a1__spec98e7be": {
+      "run_id": "file-csv-filter__m1__p1006__a1__spec98e7be",
+      "case_id": "file-csv-filter",
+      "title": "File CSV Filter (TC-02)",
+      "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "file",
+          "filter",
+          "level-1"
+        ],
+        "expected_behavior": "Файлы из /data/input/orders/ фильтруются и попадают в /data/output/completed_orders.csv только со статусом COMPLETED.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Положить тестовый CSV в /data/input/orders/.",
+          "Запустить поток и проверить содержимое /data/output/completed_orders.csv."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.983152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:02:06.897030+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:02:14.756087+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:02:06.897030+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m1__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m1__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:02:14.753085+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m1__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m1__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m1__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m1__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": {
+          "error": "manual_trigger_warning",
+          "details": "Trigger(s) ['trigger_manual'] have type 'manual'.\nThe flow will NOT start automatically in NiFi — someone must press Run in the NiFi UI.\nChange trigger type to 'schedule' or 'event' for production use."
+        },
+        "duration_sec": 4.78,
+        "stage1_duration_sec": 4.7,
+        "stage2_duration_sec": 0.07,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m1__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "file-csv-filter__m2__p1006__a1__spec98e7be": {
+      "run_id": "file-csv-filter__m2__p1006__a1__spec98e7be",
+      "case_id": "file-csv-filter",
+      "title": "File CSV Filter (TC-02)",
+      "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "file",
+          "filter",
+          "level-1"
+        ],
+        "expected_behavior": "Файлы из /data/input/orders/ фильтруются и попадают в /data/output/completed_orders.csv только со статусом COMPLETED.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Положить тестовый CSV в /data/input/orders/.",
+          "Запустить поток и проверить содержимое /data/output/completed_orders.csv."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.983152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:02:14.765708+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:03:05.545510+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:02:14.765708+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m2__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m2__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:03:05.538647+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m2__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m2__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m2__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m2__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 48.99,
+        "stage1_duration_sec": 5.34,
+        "stage2_duration_sec": 9.03,
+        "prompt_tokens": 2222,
+        "completion_tokens": 2036,
+        "total_tokens": 4258,
+        "cost_usd": 0.007219,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 113,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1381,
+            "completion_tokens": 508,
+            "total_tokens": 1889,
+            "duration_ms": 5078,
+            "cost_usd": 0.002214
+          },
+          {
+            "purpose": "psm_conversion",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 750,
+            "completion_tokens": 1522,
+            "total_tokens": 2272,
+            "duration_ms": 8812,
+            "cost_usd": 0.004941
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1381,
+            "completion_tokens": 508,
+            "total_tokens": 1889,
+            "duration_ms": 5078,
+            "cost_usd": 0.002214
+          },
+          "psm_conversion": {
+            "calls": 1,
+            "prompt_tokens": 750,
+            "completion_tokens": 1522,
+            "total_tokens": 2272,
+            "duration_ms": 8812,
+            "cost_usd": 0.004941
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m2__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "file-csv-filter__m3__p1006__a1__spec98e7be": {
+      "run_id": "file-csv-filter__m3__p1006__a1__spec98e7be",
+      "case_id": "file-csv-filter",
+      "title": "File CSV Filter (TC-02)",
+      "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "file",
+          "filter",
+          "level-1"
+        ],
+        "expected_behavior": "Файлы из /data/input/orders/ фильтруются и попадают в /data/output/completed_orders.csv только со статусом COMPLETED.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Положить тестовый CSV в /data/input/orders/.",
+          "Запустить поток и проверить содержимое /data/output/completed_orders.csv."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.983152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:03:05.556498+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:03:16.515937+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:03:05.556498+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m3__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m3__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:03:16.513938+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m3__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m3__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m3__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m3__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": {
+          "error": "manual_trigger_warning",
+          "details": "Trigger(s) ['trigger_manual'] have type 'manual'.\nThe flow will NOT start automatically in NiFi — someone must press Run in the NiFi UI.\nChange trigger type to 'schedule' or 'event' for production use."
+        },
+        "duration_sec": 4.25,
+        "stage1_duration_sec": 4.2,
+        "stage2_duration_sec": 0.04,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\file-csv-filter__m3__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "postgres-to-file__m0__p1006__a1__spec98e7be": {
+      "run_id": "postgres-to-file__m0__p1006__a1__spec98e7be",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi, подставить JDBC параметры.",
+          "Запустить поток, проверить наличие orders_export.json."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:03:16.523938+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:03:58.156454+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:03:16.523938+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m0__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m0__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:03:58.154451+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m0__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m0__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m0__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m0__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 39.87,
+        "stage1_duration_sec": 5.51,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 139,
+        "completion_tokens": 482,
+        "total_tokens": 621,
+        "cost_usd": 0.001515,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 115,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 5250,
+            "cost_usd": 5.9e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 5250,
+            "cost_usd": 5.9e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m0__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "postgres-to-file__m1__p1006__a1__spec98e7be": {
+      "run_id": "postgres-to-file__m1__p1006__a1__spec98e7be",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi, подставить JDBC параметры.",
+          "Запустить поток, проверить наличие orders_export.json."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:03:58.161455+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:05:28.288810+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:03:58.161455+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m1__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m1__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:05:28.283809+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m1__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m1__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m1__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m1__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 88.4,
+        "stage1_duration_sec": 4.3,
+        "stage2_duration_sec": 0.1,
+        "prompt_tokens": 1454,
+        "completion_tokens": 561,
+        "total_tokens": 2015,
+        "cost_usd": 0.00241,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 116,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 3953,
+            "cost_usd": 5.9e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 3953,
+            "cost_usd": 5.9e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 1,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m1__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "postgres-to-file__m2__p1006__a1__spec98e7be": {
+      "run_id": "postgres-to-file__m2__p1006__a1__spec98e7be",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi, подставить JDBC параметры.",
+          "Запустить поток, проверить наличие orders_export.json."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:05:28.294812+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:06:15.950923+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:05:28.294812+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m2__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m2__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:06:15.944921+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m2__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m2__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m2__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m2__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 46.12,
+        "stage1_duration_sec": 4.71,
+        "stage2_duration_sec": 7.33,
+        "prompt_tokens": 2259,
+        "completion_tokens": 1865,
+        "total_tokens": 4124,
+        "cost_usd": 0.006724,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 117,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1372,
+            "completion_tokens": 561,
+            "total_tokens": 1933,
+            "duration_ms": 4389,
+            "cost_usd": 0.002369
+          },
+          {
+            "purpose": "psm_conversion",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 805,
+            "completion_tokens": 1298,
+            "total_tokens": 2103,
+            "duration_ms": 7125,
+            "cost_usd": 0.004296
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1372,
+            "completion_tokens": 561,
+            "total_tokens": 1933,
+            "duration_ms": 4389,
+            "cost_usd": 0.002369
+          },
+          "psm_conversion": {
+            "calls": 1,
+            "prompt_tokens": 805,
+            "completion_tokens": 1298,
+            "total_tokens": 2103,
+            "duration_ms": 7125,
+            "cost_usd": 0.004296
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m2__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "postgres-to-file__m3__p1006__a1__spec98e7be": {
+      "run_id": "postgres-to-file__m3__p1006__a1__spec98e7be",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi, подставить JDBC параметры.",
+          "Запустить поток, проверить наличие orders_export.json."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:06:15.961925+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:07:40.673631+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:06:15.961925+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m3__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m3__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:07:40.671631+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m3__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m3__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m3__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m3__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 83.04,
+        "stage1_duration_sec": 3.91,
+        "stage2_duration_sec": 4.13,
+        "prompt_tokens": 3734,
+        "completion_tokens": 2158,
+        "total_tokens": 5892,
+        "cost_usd": 0.008341,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 118,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1372,
+            "completion_tokens": 459,
+            "total_tokens": 1831,
+            "duration_ms": 3594,
+            "cost_usd": 0.002063
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 2280,
+            "completion_tokens": 1693,
+            "total_tokens": 3973,
+            "duration_ms": 3937,
+            "cost_usd": 0.000905
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1372,
+            "completion_tokens": 459,
+            "total_tokens": 1831,
+            "duration_ms": 3594,
+            "cost_usd": 0.002063
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 2280,
+            "completion_tokens": 1693,
+            "total_tokens": 3973,
+            "duration_ms": 3937,
+            "cost_usd": 0.000905
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 3,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m3__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "kafka-to-postgres__m0__p1006__a1__spec98e7be": {
+      "run_id": "kafka-to-postgres__m0__p1006__a1__spec98e7be",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Прокинуть тестовое сообщение через rpk topic produce.",
+          "Проверить SELECT FROM public.orders."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:07:40.679674+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:08:23.404412+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:07:40.679674+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m0__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m0__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:08:23.399409+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m0__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m0__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m0__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m0__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 40.91,
+        "stage1_duration_sec": 6.52,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 161,
+        "completion_tokens": 956,
+        "total_tokens": 1117,
+        "cost_usd": 0.002949,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 119,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 93,
+            "completion_tokens": 6,
+            "total_tokens": 99,
+            "duration_ms": 6219,
+            "cost_usd": 6.4e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 93,
+            "completion_tokens": 6,
+            "total_tokens": 99,
+            "duration_ms": 6219,
+            "cost_usd": 6.4e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m0__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "kafka-to-postgres__m1__p1006__a1__spec98e7be": {
+      "run_id": "kafka-to-postgres__m1__p1006__a1__spec98e7be",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Прокинуть тестовое сообщение через rpk topic produce.",
+          "Проверить SELECT FROM public.orders."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:08:23.409412+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:09:15.769623+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:08:23.409412+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m1__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m1__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:09:15.764621+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m1__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m1__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m1__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m1__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 50.76,
+        "stage1_duration_sec": 4.55,
+        "stage2_duration_sec": 0.11,
+        "prompt_tokens": 1476,
+        "completion_tokens": 610,
+        "total_tokens": 2086,
+        "cost_usd": 0.002568,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 120,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 93,
+            "completion_tokens": 6,
+            "total_tokens": 99,
+            "duration_ms": 4219,
+            "cost_usd": 6.4e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 93,
+            "completion_tokens": 6,
+            "total_tokens": 99,
+            "duration_ms": 4219,
+            "cost_usd": 6.4e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m1__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "kafka-to-postgres__m2__p1006__a1__spec98e7be": {
+      "run_id": "kafka-to-postgres__m2__p1006__a1__spec98e7be",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Прокинуть тестовое сообщение через rpk topic produce.",
+          "Проверить SELECT FROM public.orders."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:09:15.781626+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:10:14.644602+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:09:15.781626+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m2__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m2__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:10:14.639601+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m2__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m2__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m2__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m2__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 56.96,
+        "stage1_duration_sec": 5.0,
+        "stage2_duration_sec": 8.84,
+        "prompt_tokens": 2325,
+        "completion_tokens": 2195,
+        "total_tokens": 4520,
+        "cost_usd": 0.007748,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 121,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1383,
+            "completion_tokens": 608,
+            "total_tokens": 1991,
+            "duration_ms": 4687,
+            "cost_usd": 0.002515
+          },
+          {
+            "purpose": "psm_conversion",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 849,
+            "completion_tokens": 1581,
+            "total_tokens": 2430,
+            "duration_ms": 8657,
+            "cost_usd": 0.005168
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1383,
+            "completion_tokens": 608,
+            "total_tokens": 1991,
+            "duration_ms": 4687,
+            "cost_usd": 0.002515
+          },
+          "psm_conversion": {
+            "calls": 1,
+            "prompt_tokens": 849,
+            "completion_tokens": 1581,
+            "total_tokens": 2430,
+            "duration_ms": 8657,
+            "cost_usd": 0.005168
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m2__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "kafka-to-postgres__m3__p1006__a1__spec98e7be": {
+      "run_id": "kafka-to-postgres__m3__p1006__a1__spec98e7be",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Прокинуть тестовое сообщение через rpk topic produce.",
+          "Проверить SELECT FROM public.orders."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:10:14.655606+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:11:13.310108+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:10:14.655606+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m3__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m3__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:11:13.307108+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m3__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m3__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m3__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m3__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 57.03,
+        "stage1_duration_sec": 4.8,
+        "stage2_duration_sec": 6.04,
+        "prompt_tokens": 5081,
+        "completion_tokens": 3539,
+        "total_tokens": 8620,
+        "cost_usd": 0.013158,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 122,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1383,
+            "completion_tokens": 601,
+            "total_tokens": 1984,
+            "duration_ms": 4453,
+            "cost_usd": 0.002495
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 3605,
+            "completion_tokens": 2932,
+            "total_tokens": 6537,
+            "duration_ms": 5875,
+            "cost_usd": 0.001533
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1383,
+            "completion_tokens": 601,
+            "total_tokens": 1984,
+            "duration_ms": 4453,
+            "cost_usd": 0.002495
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 3605,
+            "completion_tokens": 2932,
+            "total_tokens": 6537,
+            "duration_ms": 5875,
+            "cost_usd": 0.001533
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 5,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-to-postgres__m3__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "postgres-to-kafka__m0__p1006__a1__spec98e7be": {
+      "run_id": "postgres-to-kafka__m0__p1006__a1__spec98e7be",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "level-2"
+        ],
+        "expected_behavior": "PENDING-записи публикуются в transactions.overdue.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Запустить поток.",
+          "Проверить сообщения через rpk topic consume transactions.overdue."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:11:13.314937+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:11:52.616808+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:11:13.314937+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m0__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m0__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:11:52.612950+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m0__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m0__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m0__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m0__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 37.79,
+        "stage1_duration_sec": 3.48,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 139,
+        "completion_tokens": 425,
+        "total_tokens": 564,
+        "cost_usd": 0.001344,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 123,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 3202,
+            "cost_usd": 5.9e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 82,
+            "completion_tokens": 6,
+            "total_tokens": 88,
+            "duration_ms": 3202,
+            "cost_usd": 5.9e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m0__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "postgres-to-kafka__m1__p1006__a1__spec98e7be": {
+      "run_id": "postgres-to-kafka__m1__p1006__a1__spec98e7be",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "level-2"
+        ],
+        "expected_behavior": "PENDING-записи публикуются в transactions.overdue.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Запустить поток.",
+          "Проверить сообщения через rpk topic consume transactions.overdue."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:11:52.629902+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:12:44.792931+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:11:52.629902+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m1__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m1__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:12:44.788930+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m1__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m1__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m1__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m1__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 50.71,
+        "stage1_duration_sec": 4.67,
+        "stage2_duration_sec": 0.08,
+        "prompt_tokens": 1454,
+        "completion_tokens": 624,
+        "total_tokens": 2078,
+        "cost_usd": 0.002599,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 124,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 82,
+            "completion_tokens": 5,
+            "total_tokens": 87,
+            "duration_ms": 4375,
+            "cost_usd": 5.6e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 82,
+            "completion_tokens": 5,
+            "total_tokens": 87,
+            "duration_ms": 4375,
+            "cost_usd": 5.6e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 3,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m1__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "postgres-to-kafka__m2__p1006__a1__spec98e7be": {
+      "run_id": "postgres-to-kafka__m2__p1006__a1__spec98e7be",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "level-2"
+        ],
+        "expected_behavior": "PENDING-записи публикуются в transactions.overdue.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Запустить поток.",
+          "Проверить сообщения через rpk topic consume transactions.overdue."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:12:44.799007+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:13:35.583637+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:12:44.799007+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m2__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m2__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:13:35.577552+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m2__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m2__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m2__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m2__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 49.16,
+        "stage1_duration_sec": 4.51,
+        "stage2_duration_sec": 10.49,
+        "prompt_tokens": 2277,
+        "completion_tokens": 2508,
+        "total_tokens": 4785,
+        "cost_usd": 0.008663,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 125,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1372,
+            "completion_tokens": 581,
+            "total_tokens": 1953,
+            "duration_ms": 4141,
+            "cost_usd": 0.002429
+          },
+          {
+            "purpose": "psm_conversion",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 823,
+            "completion_tokens": 1921,
+            "total_tokens": 2744,
+            "duration_ms": 10280,
+            "cost_usd": 0.006175
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1372,
+            "completion_tokens": 581,
+            "total_tokens": 1953,
+            "duration_ms": 4141,
+            "cost_usd": 0.002429
+          },
+          "psm_conversion": {
+            "calls": 1,
+            "prompt_tokens": 823,
+            "completion_tokens": 1921,
+            "total_tokens": 2744,
+            "duration_ms": 10280,
+            "cost_usd": 0.006175
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m2__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "postgres-to-kafka__m3__p1006__a1__spec98e7be": {
+      "run_id": "postgres-to-kafka__m3__p1006__a1__spec98e7be",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "level-2"
+        ],
+        "expected_behavior": "PENDING-записи публикуются в transactions.overdue.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Запустить поток.",
+          "Проверить сообщения через rpk topic consume transactions.overdue."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:13:35.599038+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:14:33.478842+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:13:35.599038+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m3__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m3__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:14:33.471839+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m3__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m3__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m3__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m3__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 56.14,
+        "stage1_duration_sec": 4.64,
+        "stage2_duration_sec": 5.78,
+        "prompt_tokens": 4953,
+        "completion_tokens": 3366,
+        "total_tokens": 8319,
+        "cost_usd": 0.012575,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 126,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1372,
+            "completion_tokens": 594,
+            "total_tokens": 1966,
+            "duration_ms": 4312,
+            "cost_usd": 0.002468
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 3499,
+            "completion_tokens": 2766,
+            "total_tokens": 6265,
+            "duration_ms": 5594,
+            "cost_usd": 0.001456
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1372,
+            "completion_tokens": 594,
+            "total_tokens": 1966,
+            "duration_ms": 4312,
+            "cost_usd": 0.002468
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 3499,
+            "completion_tokens": 2766,
+            "total_tokens": 6265,
+            "duration_ms": 5594,
+            "cost_usd": 0.001456
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 3,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m3__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "kafka-routing__m0__p1006__a1__spec98e7be": {
+      "run_id": "kafka-routing__m0__p1006__a1__spec98e7be",
+      "case_id": "kafka-routing",
+      "title": "Kafka Content-Based Routing (TC-07)",
+      "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "routing",
+          "level-3"
+        ],
+        "expected_behavior": "Сообщения корректно маршрутизируются по полю type.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Опубликовать в events.all сообщения с type=purchase, refund, other.",
+          "Проверить заполнение purchases/refunds таблиц и топика events.unknown."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:14:33.493846+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:14:58.817681+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:14:33.493846+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m0__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m0__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:14:58.814662+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m0__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m0__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m0__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m0__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 23.88,
+        "stage1_duration_sec": 7.63,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 173,
+        "completion_tokens": 868,
+        "total_tokens": 1041,
+        "cost_usd": 0.002691,
+        "nifi_processor_count": 6,
+        "nifi_connection_count": 5,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 127,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 99,
+            "completion_tokens": 8,
+            "total_tokens": 107,
+            "duration_ms": 7312,
+            "cost_usd": 7.3e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 99,
+            "completion_tokens": 8,
+            "total_tokens": 107,
+            "duration_ms": 7312,
+            "cost_usd": 7.3e-05
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "HTTP 400: Cannot construct instance of `org.apache.nifi.flow.ConnectableComponent` (although at least one Creator exists): no String-argument constructor/factory method to deserialize from String value ('consume-kafka')\n at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 1869] (through reference chain: org.apache.nifi.web.api.entity.ProcessGroupEntity[\"versionedFlowSnapshot\"]->org.apache.nifi.registry.flow.RegisteredFlowSnapshot[\"flowContents\"]->org.apache.nifi.flow.VersionedProcessGroup[\"connections\"]->java.util.HashSet[0]->org.apache.nifi.flow.VersionedCon"
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m0__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "kafka-routing__m1__p1006__a1__spec98e7be": {
+      "run_id": "kafka-routing__m1__p1006__a1__spec98e7be",
+      "case_id": "kafka-routing",
+      "title": "Kafka Content-Based Routing (TC-07)",
+      "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "routing",
+          "level-3"
+        ],
+        "expected_behavior": "Сообщения корректно маршрутизируются по полю type.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Опубликовать в events.all сообщения с type=purchase, refund, other.",
+          "Проверить заполнение purchases/refunds таблиц и топика events.unknown."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:14:58.830780+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:15:43.367953+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:14:58.830780+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m1__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m1__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:15:43.361952+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m1__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m1__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m1__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m1__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 42.94,
+        "stage1_duration_sec": 5.64,
+        "stage2_duration_sec": 0.08,
+        "prompt_tokens": 1488,
+        "completion_tokens": 850,
+        "total_tokens": 2338,
+        "cost_usd": 0.003294,
+        "nifi_processor_count": 5,
+        "nifi_connection_count": 4,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 3,
+        "session_id": 128,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 99,
+            "completion_tokens": 7,
+            "total_tokens": 106,
+            "duration_ms": 5296,
+            "cost_usd": 7.1e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 99,
+            "completion_tokens": 7,
+            "total_tokens": 106,
+            "duration_ms": 5296,
+            "cost_usd": 7.1e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 4,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m1__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "kafka-routing__m2__p1006__a1__spec98e7be": {
+      "run_id": "kafka-routing__m2__p1006__a1__spec98e7be",
+      "case_id": "kafka-routing",
+      "title": "Kafka Content-Based Routing (TC-07)",
+      "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "routing",
+          "level-3"
+        ],
+        "expected_behavior": "Сообщения корректно маршрутизируются по полю type.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Опубликовать в events.all сообщения с type=purchase, refund, other.",
+          "Проверить заполнение purchases/refunds таблиц и топика events.unknown."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:15:43.382957+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:16:37.293389+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:15:43.382957+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m2__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m2__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:16:37.290339+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m2__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m2__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m2__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m2__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 52.33,
+        "stage1_duration_sec": 5.95,
+        "stage2_duration_sec": 12.47,
+        "prompt_tokens": 2497,
+        "completion_tokens": 3141,
+        "total_tokens": 5638,
+        "cost_usd": 0.010672,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 3,
+        "session_id": 129,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1389,
+            "completion_tokens": 847,
+            "total_tokens": 2236,
+            "duration_ms": 5328,
+            "cost_usd": 0.003236
+          },
+          {
+            "purpose": "psm_conversion",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1009,
+            "completion_tokens": 2287,
+            "total_tokens": 3296,
+            "duration_ms": 12250,
+            "cost_usd": 0.007365
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1389,
+            "completion_tokens": 847,
+            "total_tokens": 2236,
+            "duration_ms": 5328,
+            "cost_usd": 0.003236
+          },
+          "psm_conversion": {
+            "calls": 1,
+            "prompt_tokens": 1009,
+            "completion_tokens": 2287,
+            "total_tokens": 3296,
+            "duration_ms": 12250,
+            "cost_usd": 0.007365
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m2__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "kafka-routing__m3__p1006__a1__spec98e7be": {
+      "run_id": "kafka-routing__m3__p1006__a1__spec98e7be",
+      "case_id": "kafka-routing",
+      "title": "Kafka Content-Based Routing (TC-07)",
+      "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "routing",
+          "level-3"
+        ],
+        "expected_behavior": "Сообщения корректно маршрутизируются по полю type.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Опубликовать в events.all сообщения с type=purchase, refund, other.",
+          "Проверить заполнение purchases/refunds таблиц и топика events.unknown."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:16:37.300416+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:17:39.326634+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:16:37.300416+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m3__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m3__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:17:39.319502+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m3__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m3__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m3__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m3__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 60.48,
+        "stage1_duration_sec": 5.64,
+        "stage2_duration_sec": 9.01,
+        "prompt_tokens": 6733,
+        "completion_tokens": 5166,
+        "total_tokens": 11899,
+        "cost_usd": 0.018864,
+        "nifi_processor_count": 5,
+        "nifi_connection_count": 4,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 3,
+        "session_id": 130,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1389,
+            "completion_tokens": 838,
+            "total_tokens": 2227,
+            "duration_ms": 5328,
+            "cost_usd": 0.003208
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 5245,
+            "completion_tokens": 4321,
+            "total_tokens": 9566,
+            "duration_ms": 8250,
+            "cost_usd": 0.002253
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1389,
+            "completion_tokens": 838,
+            "total_tokens": 2227,
+            "duration_ms": 5328,
+            "cost_usd": 0.003208
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 5245,
+            "completion_tokens": 4321,
+            "total_tokens": 9566,
+            "duration_ms": 8250,
+            "cost_usd": 0.002253
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 5,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\kafka-routing__m3__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "s3-to-postgres-enrich__m0__p1006__a1__spec98e7be": {
+      "run_id": "s3-to-postgres-enrich__m0__p1006__a1__spec98e7be",
+      "case_id": "s3-to-postgres-enrich",
+      "title": "S3 to PostgreSQL with enrichment (TC-08)",
+      "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "postgres",
+          "enrichment",
+          "level-3"
+        ],
+        "expected_behavior": "JSON из raw-logs появляется в public.event_log с processed_at.",
+        "manual_test_checklist": [
+          "Создать таблицу public.event_log заранее.",
+          "Импортировать nifi.json, подставить S3 endpoint и credentials.",
+          "Запустить поток, проверить вставку записей с processed_at."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:17:39.339750+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:18:19.993543+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:17:39.339750+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m0__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m0__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:18:19.991780+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m0__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m0__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m0__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m0__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 39.08,
+        "stage1_duration_sec": 4.86,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 163,
+        "completion_tokens": 572,
+        "total_tokens": 735,
+        "cost_usd": 0.001798,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 131,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 94,
+            "completion_tokens": 6,
+            "total_tokens": 100,
+            "duration_ms": 4640,
+            "cost_usd": 6.5e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 94,
+            "completion_tokens": 6,
+            "total_tokens": 100,
+            "duration_ms": 4640,
+            "cost_usd": 6.5e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m0__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "s3-to-postgres-enrich__m1__p1006__a1__spec98e7be": {
+      "run_id": "s3-to-postgres-enrich__m1__p1006__a1__spec98e7be",
+      "case_id": "s3-to-postgres-enrich",
+      "title": "S3 to PostgreSQL with enrichment (TC-08)",
+      "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "postgres",
+          "enrichment",
+          "level-3"
+        ],
+        "expected_behavior": "JSON из raw-logs появляется в public.event_log с processed_at.",
+        "manual_test_checklist": [
+          "Создать таблицу public.event_log заранее.",
+          "Импортировать nifi.json, подставить S3 endpoint и credentials.",
+          "Запустить поток, проверить вставку записей с processed_at."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:18:20.003891+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:19:03.237707+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:18:20.003891+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m1__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m1__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:19:03.231609+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m1__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m1__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m1__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m1__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 41.64,
+        "stage1_duration_sec": 4.71,
+        "stage2_duration_sec": 0.1,
+        "prompt_tokens": 1478,
+        "completion_tokens": 597,
+        "total_tokens": 2075,
+        "cost_usd": 0.00253,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 132,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 94,
+            "completion_tokens": 7,
+            "total_tokens": 101,
+            "duration_ms": 4266,
+            "cost_usd": 6.8e-05
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 94,
+            "completion_tokens": 7,
+            "total_tokens": 101,
+            "duration_ms": 4266,
+            "cost_usd": 6.8e-05
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 8,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m1__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "s3-to-postgres-enrich__m2__p1006__a1__spec98e7be": {
+      "run_id": "s3-to-postgres-enrich__m2__p1006__a1__spec98e7be",
+      "case_id": "s3-to-postgres-enrich",
+      "title": "S3 to PostgreSQL with enrichment (TC-08)",
+      "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "postgres",
+          "enrichment",
+          "level-3"
+        ],
+        "expected_behavior": "JSON из raw-logs появляется в public.event_log с processed_at.",
+        "manual_test_checklist": [
+          "Создать таблицу public.event_log заранее.",
+          "Импортировать nifi.json, подставить S3 endpoint и credentials.",
+          "Запустить поток, проверить вставку записей с processed_at."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:19:03.253982+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:19:34.788038+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:19:03.253982+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m2__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m2__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:19:34.782989+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m2__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m2__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m2__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m2__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 29.81,
+        "stage1_duration_sec": 4.58,
+        "stage2_duration_sec": 8.89,
+        "prompt_tokens": 2325,
+        "completion_tokens": 2191,
+        "total_tokens": 4516,
+        "cost_usd": 0.007736,
+        "nifi_processor_count": 4,
+        "nifi_connection_count": 3,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 133,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1384,
+            "completion_tokens": 598,
+            "total_tokens": 1982,
+            "duration_ms": 4281,
+            "cost_usd": 0.002486
+          },
+          {
+            "purpose": "psm_conversion",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 847,
+            "completion_tokens": 1586,
+            "total_tokens": 2433,
+            "duration_ms": 8671,
+            "cost_usd": 0.005182
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1384,
+            "completion_tokens": 598,
+            "total_tokens": 1982,
+            "duration_ms": 4281,
+            "cost_usd": 0.002486
+          },
+          "psm_conversion": {
+            "calls": 1,
+            "prompt_tokens": 847,
+            "completion_tokens": 1586,
+            "total_tokens": 2433,
+            "duration_ms": 8671,
+            "cost_usd": 0.005182
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details."
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m2__p1006__a1__spec98e7be\\run_summary.json"
+    },
+    "s3-to-postgres-enrich__m3__p1006__a1__spec98e7be": {
+      "run_id": "s3-to-postgres-enrich__m3__p1006__a1__spec98e7be",
+      "case_id": "s3-to-postgres-enrich",
+      "title": "S3 to PostgreSQL with enrichment (TC-08)",
+      "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1006,
+      "stage_presets": {
+        "pim": 1006,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "postgres",
+          "enrichment",
+          "level-3"
+        ],
+        "expected_behavior": "JSON из raw-logs появляется в public.event_log с processed_at.",
+        "manual_test_checklist": [
+          "Создать таблицу public.event_log заранее.",
+          "Импортировать nifi.json, подставить S3 endpoint и credentials.",
+          "Запустить поток, проверить вставку записей с processed_at."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T10:58:32.984152+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T11:19:34.804166+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T11:20:32.556622+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T11:19:34.804166+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m3__p1006__a1__spec98e7be\\query.txt",
+        "--preset",
+        "1006",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m3__p1006__a1__spec98e7be\\raw_report.json",
+        "--pim-preset",
+        "1006",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T11:20:32.550566+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m3__p1006__a1__spec98e7be\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m3__p1006__a1__spec98e7be\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m3__p1006__a1__spec98e7be\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m3__p1006__a1__spec98e7be\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 56.25,
+        "stage1_duration_sec": 4.5,
+        "stage2_duration_sec": 5.64,
+        "prompt_tokens": 4853,
+        "completion_tokens": 3206,
+        "total_tokens": 8059,
+        "cost_usd": 0.012044,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 134,
+        "preset_id": 1006,
+        "preset_name": "openrouter gemini 3 flash",
+        "preset_model": "google/gemini-3-flash-preview",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "google/gemini-3-flash-preview",
+            "prompt_tokens": 1384,
+            "completion_tokens": 583,
+            "total_tokens": 1967,
+            "duration_ms": 4078,
+            "cost_usd": 0.002441
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 3375,
+            "completion_tokens": 2616,
+            "total_tokens": 5991,
+            "duration_ms": 5344,
+            "cost_usd": 0.001384
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1384,
+            "completion_tokens": 583,
+            "total_tokens": 1967,
+            "duration_ms": 4078,
+            "cost_usd": 0.002441
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 3375,
+            "completion_tokens": 2616,
+            "total_tokens": 5991,
+            "duration_ms": 5344,
+            "cost_usd": 0.001384
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 6,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\s3-to-postgres-enrich__m3__p1006__a1__spec98e7be\\run_summary.json"
+    }
+  },
+  "status_counts": {
+    "failed_generation": 2,
+    "needs_nifi_manual_test": 11,
+    "failed_import": 15
+  }
+}

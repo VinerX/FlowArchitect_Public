@@ -1,0 +1,67 @@
+{
+  "run_id": "kafka-to-postgres__m0__p1000__a1__sp329ea448",
+  "case_id": "kafka-to-postgres",
+  "title": "Kafka to PostgreSQL",
+  "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 0,
+  "preset_id": 1000,
+  "stage_presets": {
+    "pim": 1000,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "kafka",
+      "postgres",
+      "streaming"
+    ],
+    "expected_behavior": "Сообщения из Kafka появляются в таблице PostgreSQL после преобразования.",
+    "manual_test_checklist": [
+      "Импортировать полученный nifi.json в тестовый NiFi.",
+      "Проверить наличие всех обязательных процессоров и соединений.",
+      "Проверить, что схема потока соответствует задаче Kafka -> PostgreSQL."
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-03T13:33:08.013873+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-03T14:28:22.291113+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-03T14:28:22.291113+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m0__p1000__a1__sp329ea448\\query.txt",
+    "--preset",
+    "1000",
+    "--mode",
+    "0",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m0__p1000__a1__sp329ea448\\raw_report.json",
+    "--pim-preset",
+    "1000",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

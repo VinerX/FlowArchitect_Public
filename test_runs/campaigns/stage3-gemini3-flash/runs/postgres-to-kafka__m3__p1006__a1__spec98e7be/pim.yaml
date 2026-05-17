@@ -1,0 +1,49 @@
+flow:
+  id: pending_transactions_to_kafka
+  name: Pending Transactions to Kafka
+  description: Reads pending transactions from PostgreSQL and publishes them to a
+    Kafka topic as JSON.
+triggers:
+- id: trigger_poll
+  type: schedule
+  condition: every 1 minute
+sources:
+- id: src_pg_transactions
+  name: PostgreSQL Transactions Table
+  type: PostgreSQL
+  location: public.transactions
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USER}}'
+      password: '{{DB_PASSWORD}}'
+      query: SELECT * FROM public.transactions WHERE status = 'PENDING'
+processing_elements:
+- id: proc_to_json
+  name: Convert to JSON
+  operation: Transform
+  config:
+    format: json
+    mapping: identity
+sinks:
+- id: sink_kafka_overdue
+  name: Kafka Overdue Topic
+  type: Kafka
+  location: transactions.overdue
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      client_id: flow_producer_overdue
+      acks: all
+processed_data:
+- id: transaction_record
+  format: json
+links:
+- from_id: src_pg_transactions
+  to_id: proc_to_json
+  data_ref: transaction_record
+- from_id: proc_to_json
+  to_id: sink_kafka_overdue
+  data_ref: transaction_record

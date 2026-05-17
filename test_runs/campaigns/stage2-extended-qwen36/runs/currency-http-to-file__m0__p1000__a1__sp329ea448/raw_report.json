@@ -1,0 +1,210 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-12T18:50:07.502103+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "processGroupFlow": {
+          "id": "root",
+          "uri": "http://localhost:8080/nifi-api/process-groups/root/flow",
+          "processGroupFlow": {
+            "id": "root",
+            "parentGroupId": null,
+            "processGroup": {
+              "id": "root",
+              "parentGroupId": null,
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "name": "Exchange Rates Flow"
+            },
+            "processors": [
+              {
+                "id": "550e8400-e29b-41d4-a716-446655440000",
+                "parentGroupId": "root",
+                "position": {
+                  "x": 200,
+                  "y": 200
+                },
+                "config": {
+                  "name": "InvokeHTTP",
+                  "comments": "",
+                  "schedulingPeriod": "0 sec",
+                  "schedulingStrategy": "TIMER_DRIVEN",
+                  "executionNode": "ALL",
+                  "penaltyDuration": "30 sec",
+                  "yieldDuration": "1 sec",
+                  "bulletinLevel": "WARN",
+                  "runDurationMillis": 0,
+                  "concurrentlySchedulableTaskCount": 1,
+                  "autoTerminatedRelationships": [
+                    "Failure",
+                    "No Retry",
+                    "Original",
+                    "Retry"
+                  ],
+                  "properties": {
+                    "HTTP Method": "GET",
+                    "Remote URL": "https://api.exchangerate.host/latest",
+                    "Connection Timeout": "5 secs",
+                    "Read Timeout": "15 secs",
+                    "Include Response Body": "true"
+                  },
+                  "propertyDescriptors": {
+                    "HTTP Method": {
+                      "displayName": "HTTP Method",
+                      "identifiesControllerService": false,
+                      "sensitive": false
+                    },
+                    "Remote URL": {
+                      "displayName": "Remote URL",
+                      "identifiesControllerService": false,
+                      "sensitive": false
+                    }
+                  }
+                },
+                "style": {},
+                "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-standard-nar",
+                  "version": "1.23.2"
+                }
+              },
+              {
+                "id": "660e8400-e29b-41d4-a716-446655440001",
+                "parentGroupId": "root",
+                "position": {
+                  "x": 600,
+                  "y": 200
+                },
+                "config": {
+                  "name": "PutFile",
+                  "comments": "",
+                  "schedulingPeriod": "0 sec",
+                  "schedulingStrategy": "TIMER_DRIVEN",
+                  "executionNode": "ALL",
+                  "penaltyDuration": "30 sec",
+                  "yieldDuration": "1 sec",
+                  "bulletinLevel": "WARN",
+                  "runDurationMillis": 0,
+                  "concurrentlySchedulableTaskCount": 1,
+                  "autoTerminatedRelationships": [
+                    "failure"
+                  ],
+                  "properties": {
+                    "Directory": "/data/output",
+                    "Conflict Resolution Strategy": "replace"
+                  },
+                  "propertyDescriptors": {
+                    "Directory": {
+                      "displayName": "Directory",
+                      "identifiesControllerService": false,
+                      "sensitive": false
+                    },
+                    "Conflict Resolution Strategy": {
+                      "displayName": "Conflict Resolution Strategy",
+                      "identifiesControllerService": false,
+                      "sensitive": false
+                    }
+                  }
+                },
+                "style": {},
+                "type": "org.apache.nifi.processors.standard.PutFile",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-standard-nar",
+                  "version": "1.23.2"
+                }
+              }
+            ],
+            "connections": [
+              {
+                "id": "770e8400-e29b-41d4-a716-446655440002",
+                "parentGroupId": "root",
+                "source": {
+                  "id": "550e8400-e29b-41d4-a716-446655440000",
+                  "type": "PROCESSOR",
+                  "groupId": "root",
+                  "name": "InvokeHTTP"
+                },
+                "destination": {
+                  "id": "660e8400-e29b-41d4-a716-446655440001",
+                  "type": "PROCESSOR",
+                  "groupId": "root",
+                  "name": "PutFile"
+                },
+                "selectedRelationships": [
+                  "Response"
+                ],
+                "backPressureObjectThreshold": 10000,
+                "backPressureDataSizeThreshold": "1 GB",
+                "flowFileExpiration": "0 sec",
+                "labelIndex": 0,
+                "zIndex": 0,
+                "name": "InvokeHTTP to PutFile"
+              }
+            ]
+          }
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "1d885c1c-019e-1000-45e1-42268ae03904",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 147.2,
+      "stage1_duration_sec": 112.94,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 159,
+      "completion_tokens": 7031,
+      "total_tokens": 7190,
+      "cost_usd": 0.009192,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 105,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 93,
+          "completion_tokens": 881,
+          "total_tokens": 974,
+          "duration_ms": 112280,
+          "cost_usd": 0.001176
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 93,
+          "completion_tokens": 881,
+          "total_tokens": 974,
+          "duration_ms": 112280,
+          "cost_usd": 0.001176
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

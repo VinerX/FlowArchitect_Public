@@ -1,0 +1,362 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T19:46:56.780090+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: orders_export_pipeline\n  name: Export Orders to JSON\n  description: Periodically export new orders from PostgreSQL to JSON file\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 5 minutes\nsources:\n- id: source_orders\n  name: Read Orders from PostgreSQL\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\nprocessing_elements:\n- id: filter_new_orders\n  name: Filter New Orders\n  operation: Filter\n  config:\n    condition: created_at > {{LAST_EXPORT_TIMESTAMP}}\n    watermark_column: created_at\n- id: convert_to_json\n  name: Convert to JSON\n  operation: Format\n  config:\n    output_format: json\n    array: true\nsinks:\n- id: sink_json_file\n  name: Write JSON File\n  type: File\n  location: /data/output/orders_export.json\n  connection:\n    properties:\n      file_format: json\n      overwrite: true\nprocessed_data:\n- id: orders_data\n  format: json\nlinks:\n- from_id: source_orders\n  to_id: filter_new_orders\n  data_ref: orders_data\n- from_id: filter_new_orders\n  to_id: convert_to_json\n  data_ref: orders_data\n- from_id: convert_to_json\n  to_id: sink_json_file\n  data_ref: orders_data",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "4eabaf12-bbdd-40f2-8a0b-4a12dbcb9049",
+          "name": "Export Orders to JSON",
+          "comments": "Periodically export new orders from PostgreSQL to JSON file",
+          "processors": [
+            {
+              "identifier": "237c9608-1bd5-4812-b142-503765fe70d4",
+              "name": "Read Orders from PostgreSQL",
+              "comments": "Generated from PIM source 'source_orders' (PostgreSQL)",
+              "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Table Name": "public.orders",
+                "Database Type": "PostgreSQL",
+                "Database Connection Pooling Service": "95e799bc-7760-4bbe-b807-734faf69a046",
+                "Record Writer": "b6845881-a627-4b72-99ad-8a8e5886df79"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "60 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "b5664bd2-d16c-4973-80c7-37a615996424",
+              "name": "Filter New Orders",
+              "comments": "Generated from PIM processing element 'filter_new_orders' (Filter)",
+              "type": "org.apache.nifi.processors.standard.QueryRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "filtered": "SELECT * FROM FLOWFILE WHERE created_at > {{LAST_EXPORT_TIMESTAMP}}",
+                "Record Writer": "b6845881-a627-4b72-99ad-8a8e5886df79",
+                "Record Reader": "860231c9-58bc-4e43-9032-e87d08e84bd1",
+                "watermark_column": "created_at"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure",
+                "original"
+              ]
+            },
+            {
+              "identifier": "13dc2edb-d948-409d-b612-519ed22efe7b",
+              "name": "Convert to JSON",
+              "comments": "Generated from PIM processing element 'convert_to_json' (Format)",
+              "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-update-attribute-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "output_format": "json",
+                "array": "true"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "220cdbb1-a4a8-4e19-848a-972018cf2496",
+              "name": "Write JSON File",
+              "comments": "Generated from PIM sink 'sink_json_file' (File)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 1220.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/output",
+                "file_format": "json",
+                "overwrite": "true"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "28a7409f-5edc-4287-841e-871c7a7610e3",
+              "name": "Read Orders from PostgreSQL -> Filter New Orders",
+              "comments": "orders_data",
+              "source": {
+                "id": "237c9608-1bd5-4812-b142-503765fe70d4",
+                "groupId": "4eabaf12-bbdd-40f2-8a0b-4a12dbcb9049",
+                "type": "PROCESSOR",
+                "name": "Read Orders from PostgreSQL"
+              },
+              "destination": {
+                "id": "b5664bd2-d16c-4973-80c7-37a615996424",
+                "groupId": "4eabaf12-bbdd-40f2-8a0b-4a12dbcb9049",
+                "type": "PROCESSOR",
+                "name": "Filter New Orders"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "19d462a4-2c44-4f7b-aa4c-3ecb16820067",
+              "name": "Filter New Orders -> Convert to JSON",
+              "comments": "orders_data",
+              "source": {
+                "id": "b5664bd2-d16c-4973-80c7-37a615996424",
+                "groupId": "4eabaf12-bbdd-40f2-8a0b-4a12dbcb9049",
+                "type": "PROCESSOR",
+                "name": "Filter New Orders"
+              },
+              "destination": {
+                "id": "13dc2edb-d948-409d-b612-519ed22efe7b",
+                "groupId": "4eabaf12-bbdd-40f2-8a0b-4a12dbcb9049",
+                "type": "PROCESSOR",
+                "name": "Convert to JSON"
+              },
+              "selectedRelationships": [
+                "filtered"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "11e3605a-8ce5-4723-8c8a-7c03f75e72c0",
+              "name": "Convert to JSON -> Write JSON File",
+              "comments": "orders_data",
+              "source": {
+                "id": "13dc2edb-d948-409d-b612-519ed22efe7b",
+                "groupId": "4eabaf12-bbdd-40f2-8a0b-4a12dbcb9049",
+                "type": "PROCESSOR",
+                "name": "Convert to JSON"
+              },
+              "destination": {
+                "id": "220cdbb1-a4a8-4e19-848a-972018cf2496",
+                "groupId": "4eabaf12-bbdd-40f2-8a0b-4a12dbcb9049",
+                "type": "PROCESSOR",
+                "name": "Write JSON File"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "95e799bc-7760-4bbe-b807-734faf69a046",
+              "name": "DatabaseConnectionPool",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-dbcp-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database User": "{{DB_USERNAME}}",
+                "Password": "{{DB_PASSWORD}}"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "860231c9-58bc-4e43-9032-e87d08e84bd1",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "b6845881-a627-4b72-99ad-8a8e5886df79",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22e1562f-019e-1000-d431-2ea0536640e4",
+        "validation_errors": [
+          {
+            "name": "Filter New Orders",
+            "type": "org.apache.nifi.processors.standard.QueryRecord",
+            "errors": [
+              "'watermark_column' validated against 'created_at' is invalid because Not a valid SQL Statement: Non-query expression encountered in illegal context",
+              "'filtered' validated against 'SELECT * FROM FLOWFILE WHERE created_at > {{LAST_EXPORT_TIMESTAMP}}' is invalid because Not a valid SQL Statement: Encountered \"> {\" at line 1, column 41.\r\nWas expecting one of:\r\n    <EOF> \r\n    \"EXCEPT\" ...\r\n    \"FETCH\" ...\r\n    \"GROUP\" ...\r\n    \"HAVING\" ...\r\n    \"INTERSECT\" ...\r\n    \"LIMIT\" ...\r\n    \"OFFSET\" ...\r\n    \"ORDER\" ...\r\n    \"QUALIFY\" ...\r\n    \"MINUS\" ...\r\n    \"UNION\" ...\r\n    \"WINDOW\" ...\r\n    \".\" ...\r\n    \"NOT\" ...\r\n    \"IN\" ...\r\n    \"<\" ...\r\n    \"<=\" ...\r\n    \">\" \"SOME\" ...\r\n    \">\" \"ANY\" ...\r\n    \">\" \"ALL\" ...\r\n    \"BETWEEN\" ...\r\n    \"LIKE\" ...\r\n    \"ILIKE\" ...\r\n    \"RLIKE\" ...\r\n    \"SIMILAR\" ...\r\n    \"=\" ...\r\n    \"<<\" ...\r\n    \">\" \"+\" ...\r\n    \">\" \"-\" ...\r\n    \">\" \"NOT\" ...\r\n    \">\" \"EXISTS\" ...\r\n    \">\" \"UNIQUE\" ...\r\n    \">\" \"INTERVAL\" ...\r\n    \">\" <UNSIGNED_INTEGER_LITERAL> ...\r\n    \">\" <DECIMAL_NUMERIC_LITERAL> ...\r\n    \">\" \"DECIMAL\" ...\r\n    \">\" <APPROX_NUMERIC_LITERAL> ...\r\n    \">\" <BINARY_STRING_LITERAL> ...\r\n    \">\" <PREFIXED_STRING_LITERAL> ...\r\n    \">\" <QUOTED_STRING> ...\r\n    \">\" <UNICODE_STRING_LITERAL> ...\r\n    \">\" <C_STYLE_ESCAPED_STRING_LITERAL> ...\r\n    \">\" <BIG_QUERY_DOUBLE_QUOTED_STRING> ...\r\n    \">\" <BIG_QUERY_QUOTED_STRING> ...\r\n    \">\" \"TRUE\" ...\r\n    \">\" \"FALSE\" ...\r\n    \">\" \"UNKNOWN\" ...\r\n    \">\" \"NULL\" ...\r\n    \">\" <LBRACE_D> ...\r\n    \">\" <LBRACE_T> ...\r\n    \">\" <LBRACE_TS> ...\r\n    \">\" \"DATE\" ...\r\n    \">\" \"DATETIME\" ...\r\n    \">\" \"TIME\" ...\r\n    \">\" \"UUID\" ...\r\n    \">\" \"TIMESTAMP\" ...\r\n    \">\" \"?\" ...\r\n    \">\" \"CAST\" ...\r\n    \">\" \"SAFE_CAST\" ...\r\n    \">\" \"TRY_CAST\" ...\r\n    \">\" \"EXTRACT\" ...\r\n    \">\" \"POSITION\" ...\r\n    \">\" \"CONVERT\" ...\r\n    \">\" \"TRANSLATE\" ...\r\n    \">\" \"OVERLAY\" ...\r\n    \">\" \"FLOOR\" ...\r\n    \">\" \"CEIL\" ...\r\n    \">\" \"CEILING\" ...\r\n    \">\" \"SUBSTRING\" ...\r\n    \">\" \"TRIM\" ...\r\n    \">\" \"CLASSIFIER\" ...\r\n    \">\" \"MATCH_NUMBER\" ...\r\n    \">\" \"RUNNING\" ...\r\n    \">\" \"PREV\" ...\r\n    \">\" \"NEXT\" ...\r\n    \">\" \"JSON_EXISTS\" ...\r\n    \">\" \"JSON_VALUE\" ...\r\n    \">\" \"JSON_QUERY\" ...\r\n    \">\" \"JSON_OBJECT\" ...\r\n    \">\" \"JSON_OBJECTAGG\" ...\r\n    \">\" \"JSON_ARRAY\" ...\r\n    \">\" \"JSON_ARRAYAGG\" ...\r\n    \">\" <LBRACE_FN> ...\r\n    \">\" \"MULTISET\" ...\r\n    \">\" \"ARRAY\" ...\r\n    \">\" \"PERIOD\" ...\r\n    \">\" \"PERCENTILE_CONT\" ...\r\n    \">\" \"PERCENTILE_DISC\" ...\r\n    \">\" \"SPECIFIC\" ...\r\n    \">\" <IDENTIFIER> ...\r\n    \">\" <HYPHENATED_IDENTIFIER> ...\r\n    \">\" <QUOTED_IDENTIFIER> ...\r\n    \">\" <BACK_QUOTED_IDENTIFIER> ...\r\n    \">\" <BIG_QUERY_BACK_QUOTED_IDENTIFIER> ...\r\n    \">\" <BRACKET_QUOTED_IDENTIFIER> ...\r\n    \">\" <UNICODE_QUOTED_IDENTIFIER> ...\r\n    \">\" \"ABS\" ...\r\n    \">\" \"AVG\" ...\r\n    \">\" \"CARDINALITY\" ...\r\n    \">\" \"CHAR\" ...\r\n    \">\" \"CHAR_LENGTH\" ...\r\n    \">\" \"CHARACTER_LENGTH\" ...\r\n    \">\" \"COALESCE\" ...\r\n    \">\" \"COLLECT\" ...\r\n    \">\" \"COVAR_POP\" ...\r\n    \">\" \"COVAR_SAMP\" ...\r\n    \">\" \"CUME_DIST\" ...\r\n    \">\" \"COUNT\" ...\r\n    \">\" \"CURRENT_DATE\" ...\r\n    \">\" \"CURRENT_TIME\" ...\r\n    \">\" \"CURRENT_TIMESTAMP\" ...\r\n    \">\" \"DENSE_RANK\" ...\r\n    \">\" \"ELEMENT\" ...\r\n    \">\" \"EVERY\" ...\r\n    \">\" \"EXP\" ...\r\n    \">\" \"FIRST_VALUE\" ...\r\n    \">\" \"FUSION\" ...\r\n    \">\" \"INTERSECTION\" ...\r\n    \">\" \"GROUPING\" ...\r\n    \">\" \"HOUR\" ...\r\n    \">\" \"LAG\" ...\r\n    \">\" \"LEAD\" ...\r\n    \">\" \"LEFT\" ...\r\n    \">\" \"LAST_VALUE\" ...\r\n    \">\" \"LN\" ...\r\n    \">\" \"LOCALTIME\" ...\r\n    \">\" \"LOCALTIMESTAMP\" ...\r\n    \">\" \"LOWER\" ...\r\n    \">\" \"MAX\" ...\r\n    \">\" \"MIN\" ...\r\n    \">\" \"MINUTE\" ...\r\n    \">\" \"MOD\" ...\r\n    \">\" \"MONTH\" ...\r\n    \">\" \"NTH_VALUE\" ...\r\n    \">\" \"NTILE\" ...\r\n    \">\" \"NULLIF\" ...\r\n    \">\" \"OCTET_LENGTH\" ...\r\n    \">\" \"PERCENT_RANK\" ...\r\n    \">\" \"POWER\" ...\r\n    \">\" \"RANK\" ...\r\n    \">\" \"REGR_COUNT\" ...\r\n    \">\" \"REGR_SXX\" ...\r\n    \">\" \"REGR_SYY\" ...\r\n    \">\" \"RIGHT\" ...\r\n    \">\" \"ROW_NUMBER\" ...\r\n    \">\" \"SECOND\" ...\r\n    \">\" \"SQRT\" ...\r\n    \">\" \"STDDEV_POP\" ...\r\n    \">\" \"STDDEV_SAMP\" ...\r\n    \">\" \"SUM\" ...\r\n    \">\" \"UPPER\" ...\r\n    \">\" \"TRUNCATE\" ...\r\n    \">\" \"USER\" ...\r\n    \">\" \"VAR_POP\" ...\r\n    \">\" \"VAR_SAMP\" ...\r\n    \">\" \"YEAR\" ...\r\n    \">\" \"CURRENT_CATALOG\" ...\r\n    \">\" \"CURRENT_DEFAULT_TRANSFORM_GROUP\" ...\r\n    \">\" \"CURRENT_PATH\" ...\r\n    \">\" \"CURRENT_ROLE\" ...\r\n    \">\" \"CURRENT_SCHEMA\" ...\r\n    \">\" \"CURRENT_USER\" ...\r\n    \">\" \"SESSION_USER\" ...\r\n    \">\" \"SYSTEM_USER\" ...\r\n    \">\" \"NEW\" ...\r\n    \">\" \"CASE\" ...\r\n    \">\" \"CURRENT\" ...\r\n    \">\" \"CURSOR\" ...\r\n    \">\" \"ROW\" ...\r\n    \">\" \"(\" ...\r\n    \"[\" ...\r\n    \"IS\" ...\r\n    \"FORMAT\" ...\r\n    \"(\" ...\r\n    ",
+              "'Relationship watermark_column' is invalid because Relationship 'watermark_column' is not connected to any component and is not auto-terminated"
+            ]
+          },
+          {
+            "name": "Write JSON File",
+            "type": "org.apache.nifi.processors.standard.PutFile",
+            "errors": [
+              "'file_format' validated against 'json' is invalid because 'file_format' is not a supported property or has no Validator associated with it",
+              "'overwrite' validated against 'true' is invalid because 'overwrite' is not a supported property or has no Validator associated with it"
+            ]
+          },
+          {
+            "name": "Read Orders from PostgreSQL",
+            "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+            "errors": [
+              "'Database Connection Pooling Service' validated against 'd53b782d-8778-37e2-c94f-02d937bb9d53' is invalid because Controller Service [Database Connection Pooling Service] Identifier [d53b782d-8778-37e2-c94f-02d937bb9d53] state is Enabling"
+            ]
+          }
+        ],
+        "error_count": 6,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 58.14,
+      "stage1_duration_sec": 12.42,
+      "stage2_duration_sec": 0.08,
+      "prompt_tokens": 1344,
+      "completion_tokens": 726,
+      "total_tokens": 2070,
+      "cost_usd": 0.001274,
+      "nifi_processor_count": 4,
+      "nifi_connection_count": 3,
+      "pim_source_count": 1,
+      "pim_step_count": 2,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 188,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 97,
+          "completion_tokens": 6,
+          "total_tokens": 103,
+          "duration_ms": 12109,
+          "cost_usd": 3.6e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 97,
+          "completion_tokens": 6,
+          "total_tokens": 103,
+          "duration_ms": 12109,
+          "cost_usd": 3.6e-05
+        }
+      },
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "run_id": "currency-http-to-file__m2__p1005__a1__sp2d3b9a8e",
+  "case_id": "currency-http-to-file",
+  "title": "Currency HTTP to File",
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 2,
+  "preset_id": 1005,
+  "stage_presets": {
+    "pim": 1005,
+    "corrector": 1005
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": false,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "http",
+      "file",
+      "baseline",
+      "level-1"
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-13T16:06:44.324134+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-13T20:21:55.170621+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-13T20:21:55.170621+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage6-sonnet-extended\\runs\\currency-http-to-file__m2__p1005__a1__sp2d3b9a8e\\query.txt",
+    "--preset",
+    "1005",
+    "--mode",
+    "2",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage6-sonnet-extended\\runs\\currency-http-to-file__m2__p1005__a1__sp2d3b9a8e\\raw_report.json",
+    "--pim-preset",
+    "1005",
+    "--corrector-preset",
+    "1005",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

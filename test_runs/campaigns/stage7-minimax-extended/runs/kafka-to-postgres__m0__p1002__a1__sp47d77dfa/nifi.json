@@ -1,0 +1,79 @@
+{
+  "flow": {
+    "name": "Kafka to PostgreSQL Orders Flow",
+    "description": "Consume orders.created from Kafka and insert into public.orders",
+    "processors": [
+      {
+        "id": "consume-kafka-1",
+        "name": "ConsumeKafka_2_6",
+        "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafka_2_6",
+        "properties": {
+          "bootstrap.servers": "localhost:9092",
+          "topic": "orders.created",
+          "group.id": "orders-consumer-group",
+          "auto.offset.reset": "earliest",
+          "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+          "value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+          "max.poll.records": "100"
+        },
+        "scheduling": "0 0 * * * *",
+        "auto-terminated": []
+      },
+      {
+        "id": "put-database-record-1",
+        "name": "PutDatabaseRecord",
+        "type": "org.apache.nifi.processors Standard.PutDatabaseRecord",
+        "properties": {
+          "dcp-connection-pool": "postgresql-conn-pool",
+          "table-name": "orders",
+          "schema-name": "public",
+          "catalog-name": "",
+          "record-reader": "json-reader",
+          "sql-start-statement": "INSERT INTO public.orders (order_id, user_id, amount, created_at) VALUES (?, ?, ?, ?)",
+          "update-keys": "",
+          "quote-table-name": "true",
+          "unsupported-field-behavior": "FAIL"
+        },
+        "scheduling": "0 0 * * * *",
+        "auto-terminated": []
+      }
+    ],
+    "controller-services": [
+      {
+        "id": "json-reader",
+        "name": "JsonPathReader",
+        "type": "org.apache.nifi.processors Standard.JSONPathReader",
+        "properties": {
+          "json-reader": "JsonTreeReader",
+          "schema-name": "orders-schema",
+          "schema-text": "{\"type\":\"record\",\"name\":\"orders\",\"fields\":[{\"name\":\"order_id\",\"type\":\"string\"},{\"name\":\"user_id\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":\"double\"},{\"name\":\"created_at\",\"type\":\"string\"}]}"
+        }
+      },
+      {
+        "id": "postgresql-conn-pool",
+        "name": "DBCPConnectionPool",
+        "type": "org.apache.nifi.dbcp.impl.HikariCPConnectionPool",
+        "properties": {
+          "database-driver-classes": "org.postgresql.Driver",
+          "database-url": "jdbc:postgresql://localhost:5432/mydb",
+          "database-user": "postgres",
+          "database-password": "password",
+          "max-connections": "10"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "id": "kafka-to-db",
+        "sourceId": "consume-kafka-1",
+        "targetId": "put-database-record-1",
+        "relationship": "Success"
+      }
+    ],
+    "input_ports": [],
+    "output_ports": [],
+    "labels": [],
+    "remote_process_groups": [],
+    "funnels": []
+  }
+}

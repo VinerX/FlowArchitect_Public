@@ -1,0 +1,2503 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-05-11T16:11:44.577079+00:00",
+  "updated_at": "2026-05-11T18:41:53.972347+00:00",
+  "campaign": {
+    "id": "stage1-pilot-deepseek",
+    "title": "Этап 1 — pilot-валидация кейсов на DeepSeek V4 Pro",
+    "meta": {
+      "id": "stage1-pilot-deepseek",
+      "title": "Этап 1 — pilot-валидация кейсов на DeepSeek V4 Pro",
+      "owner": "Дмитрий Макаров",
+      "objective": "Повторить pilot-серию на том же наборе кейсов, но с DeepSeek V4 Pro как основной моделью и моделью коррекции, чтобы сравнить влияние более сильного генератора и корректора на import-валидность, семантику и стоимость.\n",
+      "tags": [
+        "thesis",
+        "stage1",
+        "pilot",
+        "deepseek"
+      ]
+    },
+    "manifest_source": "F:\\Education\\Diplom\\FlowArchitect\\config\\campaigns\\stage1_pilot_deepseek.yaml"
+  },
+  "defaults": {
+    "presets": [
+      1004
+    ],
+    "modes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "stage_presets": {
+      "pim": 1004,
+      "corrector": 1004
+    },
+    "repeat": 1,
+    "timeout_sec": 300,
+    "nifi_validate": true,
+    "manual_nifi_required": true,
+    "requires_user_input": false,
+    "stop_after_statuses": [
+      "needs_user_input",
+      "needs_nifi_manual_test"
+    ]
+  },
+  "run_order": [
+    "currency-http-to-file__m0__p1004__a1__spa3683eda",
+    "currency-http-to-file__m1__p1004__a1__spa3683eda",
+    "currency-http-to-file__m2__p1004__a1__spa3683eda",
+    "currency-http-to-file__m3__p1004__a1__spa3683eda",
+    "kafka-to-postgres__m0__p1004__a1__spa3683eda",
+    "kafka-to-postgres__m1__p1004__a1__spa3683eda",
+    "kafka-to-postgres__m2__p1004__a1__spa3683eda",
+    "kafka-to-postgres__m3__p1004__a1__spa3683eda",
+    "postgres-to-kafka__m0__p1004__a1__spa3683eda",
+    "postgres-to-kafka__m1__p1004__a1__spa3683eda",
+    "postgres-to-kafka__m2__p1004__a1__spa3683eda",
+    "postgres-to-kafka__m3__p1004__a1__spa3683eda",
+    "s3-to-hdfs__m0__p1004__a1__spa3683eda",
+    "s3-to-hdfs__m1__p1004__a1__spa3683eda",
+    "s3-to-hdfs__m2__p1004__a1__spa3683eda",
+    "s3-to-hdfs__m3__p1004__a1__spa3683eda",
+    "postgres-to-file__m0__p1004__a1__spa3683eda",
+    "postgres-to-file__m1__p1004__a1__spa3683eda",
+    "postgres-to-file__m2__p1004__a1__spa3683eda",
+    "postgres-to-file__m3__p1004__a1__spa3683eda"
+  ],
+  "runs": {
+    "currency-http-to-file__m0__p1004__a1__spa3683eda": {
+      "run_id": "currency-http-to-file__m0__p1004__a1__spa3683eda",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline"
+        ],
+        "expected_behavior": "По расписанию обновляется файл rates.json с актуальными курсами валют.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что flow проходит валидацию без ошибок.",
+          "Проверить, что данные действительно сохраняются в файл."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T16:12:07.559173+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T16:27:42.694218+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T16:12:07.559173+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m0__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m0__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T16:27:42.692217+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m0__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m0__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m0__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m0__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON (direct mode)",
+        "duration_sec": 300.21,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m0__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "currency-http-to-file__m1__p1004__a1__spa3683eda": {
+      "run_id": "currency-http-to-file__m1__p1004__a1__spa3683eda",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline"
+        ],
+        "expected_behavior": "По расписанию обновляется файл rates.json с актуальными курсами валют.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что flow проходит валидацию без ошибок.",
+          "Проверить, что данные действительно сохраняются в файл."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T16:27:42.733908+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T16:29:19.130299+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T16:27:42.733908+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m1__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m1__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T16:29:19.123959+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m1__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m1__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m1__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m1__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 94.3,
+        "stage1_duration_sec": 59.77,
+        "stage2_duration_sec": 0.09,
+        "prompt_tokens": 1385,
+        "completion_tokens": 1849,
+        "total_tokens": 3234,
+        "cost_usd": 0.002211,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 52,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 85,
+            "completion_tokens": 131,
+            "total_tokens": 216,
+            "duration_ms": 59390,
+            "cost_usd": 0.000151
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 85,
+            "completion_tokens": 131,
+            "total_tokens": 216,
+            "duration_ms": 59390,
+            "cost_usd": 0.000151
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 1,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m1__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "currency-http-to-file__m2__p1004__a1__spa3683eda": {
+      "run_id": "currency-http-to-file__m2__p1004__a1__spa3683eda",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline"
+        ],
+        "expected_behavior": "По расписанию обновляется файл rates.json с актуальными курсами валют.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что flow проходит валидацию без ошибок.",
+          "Проверить, что данные действительно сохраняются в файл."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T16:29:19.158822+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T16:42:58.907907+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T16:29:19.158822+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m2__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m2__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T16:42:58.888997+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m2__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m2__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m2__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m2__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON",
+        "duration_sec": 335.11,
+        "stage1_duration_sec": 34.85,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m2__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "currency-http-to-file__m3__p1004__a1__spa3683eda": {
+      "run_id": "currency-http-to-file__m3__p1004__a1__spa3683eda",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline"
+        ],
+        "expected_behavior": "По расписанию обновляется файл rates.json с актуальными курсами валют.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что flow проходит валидацию без ошибок.",
+          "Проверить, что данные действительно сохраняются в файл."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T16:42:58.915913+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T16:46:43.067083+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T16:42:58.915913+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m3__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m3__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T16:46:43.064083+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m3__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m3__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m3__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m3__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 222.31,
+        "stage1_duration_sec": 38.62,
+        "stage2_duration_sec": 149.2,
+        "prompt_tokens": 2928,
+        "completion_tokens": 5531,
+        "total_tokens": 8459,
+        "cost_usd": 0.006086,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 54,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 1300,
+            "completion_tokens": 1109,
+            "total_tokens": 2409,
+            "duration_ms": 38155,
+            "cost_usd": 0.00153
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 1543,
+            "completion_tokens": 4157,
+            "total_tokens": 5700,
+            "duration_ms": 148780,
+            "cost_usd": 0.004288
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1300,
+            "completion_tokens": 1109,
+            "total_tokens": 2409,
+            "duration_ms": 38155,
+            "cost_usd": 0.00153
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 1543,
+            "completion_tokens": 4157,
+            "total_tokens": 5700,
+            "duration_ms": 148780,
+            "cost_usd": 0.004288
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\currency-http-to-file__m3__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "kafka-to-postgres__m0__p1004__a1__spa3683eda": {
+      "run_id": "kafka-to-postgres__m0__p1004__a1__spa3683eda",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "streaming"
+        ],
+        "expected_behavior": "Сообщения из Kafka появляются в таблице PostgreSQL после преобразования.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие всех обязательных процессоров и соединений.",
+          "Проверить, что схема потока соответствует задаче Kafka -> PostgreSQL."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T16:46:43.091457+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T16:55:22.546617+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T16:46:43.091457+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m0__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m0__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T16:55:22.543615+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m0__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m0__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m0__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m0__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON (direct mode)",
+        "duration_sec": 300.24,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m0__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "kafka-to-postgres__m1__p1004__a1__spa3683eda": {
+      "run_id": "kafka-to-postgres__m1__p1004__a1__spa3683eda",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "streaming"
+        ],
+        "expected_behavior": "Сообщения из Kafka появляются в таблице PostgreSQL после преобразования.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие всех обязательных процессоров и соединений.",
+          "Проверить, что схема потока соответствует задаче Kafka -> PostgreSQL."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T16:55:22.601414+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T16:57:41.004072+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T16:55:22.601414+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m1__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m1__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T16:57:40.999531+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m1__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m1__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m1__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m1__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 136.37,
+        "stage1_duration_sec": 98.85,
+        "stage2_duration_sec": 0.18,
+        "prompt_tokens": 2679,
+        "completion_tokens": 3033,
+        "total_tokens": 5712,
+        "cost_usd": 0.003804,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 56,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 83,
+            "completion_tokens": 141,
+            "total_tokens": 224,
+            "duration_ms": 98469,
+            "cost_usd": 0.000159
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 83,
+            "completion_tokens": 141,
+            "total_tokens": 224,
+            "duration_ms": 98469,
+            "cost_usd": 0.000159
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 1,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m1__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "kafka-to-postgres__m2__p1004__a1__spa3683eda": {
+      "run_id": "kafka-to-postgres__m2__p1004__a1__spa3683eda",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "streaming"
+        ],
+        "expected_behavior": "Сообщения из Kafka появляются в таблице PostgreSQL после преобразования.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие всех обязательных процессоров и соединений.",
+          "Проверить, что схема потока соответствует задаче Kafka -> PostgreSQL."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T16:57:41.008064+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:08:36.172344+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T16:57:41.008064+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m2__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m2__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:08:36.169339+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m2__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m2__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m2__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m2__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON",
+        "duration_sec": 353.91,
+        "stage1_duration_sec": 53.68,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m2__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "kafka-to-postgres__m3__p1004__a1__spa3683eda": {
+      "run_id": "kafka-to-postgres__m3__p1004__a1__spa3683eda",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "streaming"
+        ],
+        "expected_behavior": "Сообщения из Kafka появляются в таблице PostgreSQL после преобразования.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие всех обязательных процессоров и соединений.",
+          "Проверить, что схема потока соответствует задаче Kafka -> PostgreSQL."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:08:36.180222+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:12:22.689102+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:08:36.180222+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m3__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m3__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:12:22.686101+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m3__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m3__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m3__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m3__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 225.11,
+        "stage1_duration_sec": 54.46,
+        "stage2_duration_sec": 133.81,
+        "prompt_tokens": 4410,
+        "completion_tokens": 5991,
+        "total_tokens": 10401,
+        "cost_usd": 0.007131,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 62,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 1298,
+            "completion_tokens": 1578,
+            "total_tokens": 2876,
+            "duration_ms": 54171,
+            "cost_usd": 0.001937
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 3029,
+            "completion_tokens": 4129,
+            "total_tokens": 7158,
+            "duration_ms": 133655,
+            "cost_usd": 0.00491
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1298,
+            "completion_tokens": 1578,
+            "total_tokens": 2876,
+            "duration_ms": 54171,
+            "cost_usd": 0.001937
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 3029,
+            "completion_tokens": 4129,
+            "total_tokens": 7158,
+            "duration_ms": 133655,
+            "cost_usd": 0.00491
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\kafka-to-postgres__m3__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "postgres-to-kafka__m0__p1004__a1__spa3683eda": {
+      "run_id": "postgres-to-kafka__m0__p1004__a1__spa3683eda",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "batch"
+        ],
+        "expected_behavior": "Новые записи из PostgreSQL публикуются в Kafka topic analytics.events.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие корректного источника чтения из PostgreSQL.",
+          "Проверить наличие корректной публикации в Kafka в формате JSON."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:12:22.693119+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:14:36.266209+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:12:22.693119+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m0__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m0__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:14:36.264209+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m0__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m0__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m0__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m0__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 131.86,
+        "stage1_duration_sec": 115.34,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 135,
+        "completion_tokens": 3901,
+        "total_tokens": 4036,
+        "cost_usd": 0.003453,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 63,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 81,
+            "completion_tokens": 348,
+            "total_tokens": 429,
+            "duration_ms": 115139,
+            "cost_usd": 0.000338
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 81,
+            "completion_tokens": 348,
+            "total_tokens": 429,
+            "duration_ms": 115139,
+            "cost_usd": 0.000338
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details."
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m0__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "postgres-to-kafka__m1__p1004__a1__spa3683eda": {
+      "run_id": "postgres-to-kafka__m1__p1004__a1__spa3683eda",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "batch"
+        ],
+        "expected_behavior": "Новые записи из PostgreSQL публикуются в Kafka topic analytics.events.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие корректного источника чтения из PostgreSQL.",
+          "Проверить наличие корректной публикации в Kafka в формате JSON."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:14:36.269210+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:18:24.812063+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:14:36.269210+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m1__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m1__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:18:24.806051+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m1__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m1__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m1__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m1__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 226.56,
+        "stage1_duration_sec": 189.25,
+        "stage2_duration_sec": 0.09,
+        "prompt_tokens": 3969,
+        "completion_tokens": 5914,
+        "total_tokens": 9883,
+        "cost_usd": 0.006872,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 64,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 81,
+            "completion_tokens": 266,
+            "total_tokens": 347,
+            "duration_ms": 188969,
+            "cost_usd": 0.000267
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 81,
+            "completion_tokens": 266,
+            "total_tokens": 347,
+            "duration_ms": 188969,
+            "cost_usd": 0.000267
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 1,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m1__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "postgres-to-kafka__m2__p1004__a1__spa3683eda": {
+      "run_id": "postgres-to-kafka__m2__p1004__a1__spa3683eda",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "batch"
+        ],
+        "expected_behavior": "Новые записи из PostgreSQL публикуются в Kafka topic analytics.events.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие корректного источника чтения из PostgreSQL.",
+          "Проверить наличие корректной публикации в Kafka в формате JSON."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:18:24.848787+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:34:24.903072+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:18:24.848787+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m2__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m2__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:34:24.884278+00:00",
+      "exit_code": -1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m2__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m2__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m2__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m2__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON",
+        "duration_sec": 357.85,
+        "stage1_duration_sec": 57.63,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m2__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "postgres-to-kafka__m3__p1004__a1__spa3683eda": {
+      "run_id": "postgres-to-kafka__m3__p1004__a1__spa3683eda",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "batch"
+        ],
+        "expected_behavior": "Новые записи из PostgreSQL публикуются в Kafka topic analytics.events.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие корректного источника чтения из PostgreSQL.",
+          "Проверить наличие корректной публикации в Kafka в формате JSON."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:34:24.913079+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:37:55.846853+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:34:24.913079+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m3__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m3__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:37:55.839878+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m3__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m3__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m3__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m3__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 209.17,
+        "stage1_duration_sec": 41.07,
+        "stage2_duration_sec": 131.2,
+        "prompt_tokens": 3540,
+        "completion_tokens": 5373,
+        "total_tokens": 8913,
+        "cost_usd": 0.006214,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 68,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 1296,
+            "completion_tokens": 1221,
+            "total_tokens": 2517,
+            "duration_ms": 40782,
+            "cost_usd": 0.001626
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 2163,
+            "completion_tokens": 3805,
+            "total_tokens": 5968,
+            "duration_ms": 131030,
+            "cost_usd": 0.004251
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1296,
+            "completion_tokens": 1221,
+            "total_tokens": 2517,
+            "duration_ms": 40782,
+            "cost_usd": 0.001626
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 2163,
+            "completion_tokens": 3805,
+            "total_tokens": 5968,
+            "duration_ms": 131030,
+            "cost_usd": 0.004251
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 1,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-kafka__m3__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "s3-to-hdfs__m0__p1004__a1__spa3683eda": {
+      "run_id": "s3-to-hdfs__m0__p1004__a1__spa3683eda",
+      "case_id": "s3-to-hdfs",
+      "title": "S3 to HDFS",
+      "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "hdfs",
+          "file-transfer"
+        ],
+        "expected_behavior": "Файлы попадают из S3 в HDFS /data/raw с учетом шага распаковки при необходимости.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что поток отражает маршрут S3 -> optional unpack -> HDFS.",
+          "Проверить, что конфигурация не теряет целевой каталог /data/raw."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:37:55.919032+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:53:56.007951+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:37:55.919032+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m0__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m0__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:53:56.004944+00:00",
+      "exit_code": -1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m0__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m0__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m0__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m0__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON (direct mode)",
+        "duration_sec": 300.24,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m0__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "s3-to-hdfs__m1__p1004__a1__spa3683eda": {
+      "run_id": "s3-to-hdfs__m1__p1004__a1__spa3683eda",
+      "case_id": "s3-to-hdfs",
+      "title": "S3 to HDFS",
+      "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "hdfs",
+          "file-transfer"
+        ],
+        "expected_behavior": "Файлы попадают из S3 в HDFS /data/raw с учетом шага распаковки при необходимости.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что поток отражает маршрут S3 -> optional unpack -> HDFS.",
+          "Проверить, что конфигурация не теряет целевой каталог /data/raw."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.576079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:53:56.041118+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:55:19.260653+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:53:56.041118+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m1__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m1__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:55:19.214647+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m1__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m1__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m1__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m1__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 81.74,
+        "stage1_duration_sec": 38.77,
+        "stage2_duration_sec": 0.1,
+        "prompt_tokens": 1403,
+        "completion_tokens": 1818,
+        "total_tokens": 3221,
+        "cost_usd": 0.002192,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 70,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 94,
+            "completion_tokens": 702,
+            "total_tokens": 796,
+            "duration_ms": 38422,
+            "cost_usd": 0.000652
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 94,
+            "completion_tokens": 702,
+            "total_tokens": 796,
+            "duration_ms": 38422,
+            "cost_usd": 0.000652
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 7,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m1__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "s3-to-hdfs__m2__p1004__a1__spa3683eda": {
+      "run_id": "s3-to-hdfs__m2__p1004__a1__spa3683eda",
+      "case_id": "s3-to-hdfs",
+      "title": "S3 to HDFS",
+      "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "hdfs",
+          "file-transfer"
+        ],
+        "expected_behavior": "Файлы попадают из S3 в HDFS /data/raw с учетом шага распаковки при необходимости.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что поток отражает маршрут S3 -> optional unpack -> HDFS.",
+          "Проверить, что конфигурация не теряет целевой каталог /data/raw."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.577079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:55:19.306791+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T18:11:19.453509+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:55:19.306791+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m2__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m2__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T18:11:19.449506+00:00",
+      "exit_code": -1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m2__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m2__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m2__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m2__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON",
+        "duration_sec": 355.07,
+        "stage1_duration_sec": 54.78,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m2__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "s3-to-hdfs__m3__p1004__a1__spa3683eda": {
+      "run_id": "s3-to-hdfs__m3__p1004__a1__spa3683eda",
+      "case_id": "s3-to-hdfs",
+      "title": "S3 to HDFS",
+      "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "hdfs",
+          "file-transfer"
+        ],
+        "expected_behavior": "Файлы попадают из S3 в HDFS /data/raw с учетом шага распаковки при необходимости.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что поток отражает маршрут S3 -> optional unpack -> HDFS.",
+          "Проверить, что конфигурация не теряет целевой каталог /data/raw."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.577079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T18:11:19.471795+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T18:15:20.849193+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T18:11:19.471795+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m3__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m3__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T18:15:20.817232+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m3__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m3__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m3__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m3__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 238.91,
+        "stage1_duration_sec": 36.53,
+        "stage2_duration_sec": 159.26,
+        "prompt_tokens": 3732,
+        "completion_tokens": 5432,
+        "total_tokens": 9164,
+        "cost_usd": 0.006349,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 72,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 1309,
+            "completion_tokens": 1100,
+            "total_tokens": 2409,
+            "duration_ms": 36186,
+            "cost_usd": 0.001526
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 2329,
+            "completion_tokens": 3970,
+            "total_tokens": 6299,
+            "duration_ms": 158484,
+            "cost_usd": 0.004467
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1309,
+            "completion_tokens": 1100,
+            "total_tokens": 2409,
+            "duration_ms": 36186,
+            "cost_usd": 0.001526
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 2329,
+            "completion_tokens": 3970,
+            "total_tokens": 6299,
+            "duration_ms": 158484,
+            "cost_usd": 0.004467
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 4,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m3__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "postgres-to-file__m0__p1004__a1__spa3683eda": {
+      "run_id": "postgres-to-file__m0__p1004__a1__spa3683eda",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "functional"
+        ],
+        "expected_behavior": "Записи из PostgreSQL public.orders экспортируются в JSON-файл.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что source корректно читает public.orders из PostgreSQL.",
+          "Проверить, что flow сохраняет результат в файл по явному пути."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.577079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T18:15:20.878372+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T18:30:19.847484+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T18:15:20.878372+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m0__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m0__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T18:30:19.806735+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m0__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m0__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m0__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m0__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON (direct mode)",
+        "duration_sec": 300.24,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m0__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "postgres-to-file__m1__p1004__a1__spa3683eda": {
+      "run_id": "postgres-to-file__m1__p1004__a1__spa3683eda",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "functional"
+        ],
+        "expected_behavior": "Записи из PostgreSQL public.orders экспортируются в JSON-файл.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что source корректно читает public.orders из PostgreSQL.",
+          "Проверить, что flow сохраняет результат в файл по явному пути."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.577079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T18:30:19.868384+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T18:33:57.840906+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T18:30:19.868384+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m1__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m1__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T18:33:57.834902+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m1__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m1__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m1__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m1__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 216.3,
+        "stage1_duration_sec": 179.8,
+        "stage2_duration_sec": 0.1,
+        "prompt_tokens": 3982,
+        "completion_tokens": 5665,
+        "total_tokens": 9647,
+        "cost_usd": 0.006661,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 74,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 84,
+            "completion_tokens": 192,
+            "total_tokens": 276,
+            "duration_ms": 178578,
+            "cost_usd": 0.000204
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 84,
+            "completion_tokens": 192,
+            "total_tokens": 276,
+            "duration_ms": 178578,
+            "cost_usd": 0.000204
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m1__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "postgres-to-file__m2__p1004__a1__spa3683eda": {
+      "run_id": "postgres-to-file__m2__p1004__a1__spa3683eda",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "functional"
+        ],
+        "expected_behavior": "Записи из PostgreSQL public.orders экспортируются в JSON-файл.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что source корректно читает public.orders из PostgreSQL.",
+          "Проверить, что flow сохраняет результат в файл по явному пути."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.577079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T18:33:57.852417+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T18:36:53.036490+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T18:33:57.852417+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m2__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m2__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T18:36:53.010321+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m2__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m2__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m2__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m2__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 173.64,
+        "stage1_duration_sec": 55.84,
+        "stage2_duration_sec": 92.91,
+        "prompt_tokens": 2137,
+        "completion_tokens": 4771,
+        "total_tokens": 6908,
+        "cost_usd": 0.00508,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 75,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 1299,
+            "completion_tokens": 1664,
+            "total_tokens": 2963,
+            "duration_ms": 55578,
+            "cost_usd": 0.002013
+          },
+          {
+            "purpose": "psm_conversion",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 754,
+            "completion_tokens": 2929,
+            "total_tokens": 3683,
+            "duration_ms": 92750,
+            "cost_usd": 0.002876
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1299,
+            "completion_tokens": 1664,
+            "total_tokens": 2963,
+            "duration_ms": 55578,
+            "cost_usd": 0.002013
+          },
+          "psm_conversion": {
+            "calls": 1,
+            "prompt_tokens": 754,
+            "completion_tokens": 2929,
+            "total_tokens": 3683,
+            "duration_ms": 92750,
+            "cost_usd": 0.002876
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details."
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m2__p1004__a1__spa3683eda\\run_summary.json"
+    },
+    "postgres-to-file__m3__p1004__a1__spa3683eda": {
+      "run_id": "postgres-to-file__m3__p1004__a1__spa3683eda",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1004,
+      "stage_presets": {
+        "pim": 1004,
+        "corrector": 1004
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "functional"
+        ],
+        "expected_behavior": "Записи из PostgreSQL public.orders экспортируются в JSON-файл.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что source корректно читает public.orders из PostgreSQL.",
+          "Проверить, что flow сохраняет результат в файл по явному пути."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T16:11:44.577079+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T18:36:53.060609+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T18:41:53.972347+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T18:36:53.060609+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m3__p1004__a1__spa3683eda\\query.txt",
+        "--preset",
+        "1004",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m3__p1004__a1__spa3683eda\\raw_report.json",
+        "--pim-preset",
+        "1004",
+        "--corrector-preset",
+        "1004",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T18:41:53.942339+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m3__p1004__a1__spa3683eda\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m3__p1004__a1__spa3683eda\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m3__p1004__a1__spa3683eda\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m3__p1004__a1__spa3683eda\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 299.43,
+        "stage1_duration_sec": 122.04,
+        "stage2_duration_sec": 103.23,
+        "prompt_tokens": 4670,
+        "completion_tokens": 7224,
+        "total_tokens": 11894,
+        "cost_usd": 0.008316,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 76,
+        "preset_id": 1004,
+        "preset_name": "openrouter deepseek",
+        "preset_model": "deepseek/deepseek-v4-pro",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 1299,
+            "completion_tokens": 1817,
+            "total_tokens": 3116,
+            "duration_ms": 121735,
+            "cost_usd": 0.002146
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "deepseek/deepseek-v4-pro",
+            "prompt_tokens": 1988,
+            "completion_tokens": 3153,
+            "total_tokens": 5141,
+            "duration_ms": 102905,
+            "cost_usd": 0.003608
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1299,
+            "completion_tokens": 1817,
+            "total_tokens": 3116,
+            "duration_ms": 121735,
+            "cost_usd": 0.002146
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 1988,
+            "completion_tokens": 3153,
+            "total_tokens": 5141,
+            "duration_ms": 102905,
+            "cost_usd": 0.003608
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 1,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\postgres-to-file__m3__p1004__a1__spa3683eda\\run_summary.json"
+    }
+  },
+  "status_counts": {
+    "failed_import": 11,
+    "failed_generation": 8,
+    "needs_nifi_manual_test": 1
+  }
+}

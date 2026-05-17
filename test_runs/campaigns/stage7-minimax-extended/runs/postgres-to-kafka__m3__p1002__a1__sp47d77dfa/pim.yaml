@@ -1,0 +1,53 @@
+flow:
+  id: pending_transactions_to_kafka
+  name: Pending Transactions to Kafka
+  description: Read PENDING transactions from PostgreSQL, convert to JSON, publish
+    to Kafka topic
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 5 minutes
+sources:
+- id: source_postgres
+  name: Read Pending Transactions
+  type: PostgreSQL
+  location: public.transactions
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processing_elements:
+- id: process_filter
+  name: Filter Pending Records
+  operation: Filter
+  config:
+    condition: status = 'PENDING'
+- id: process_format
+  name: Convert to JSON
+  operation: Format
+  config:
+    output_format: json
+sinks:
+- id: sink_kafka
+  name: Publish to Kafka
+  type: Kafka
+  location: transactions.overdue
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: transactions_json
+  format: json
+links:
+- from_id: source_postgres
+  to_id: process_filter
+  data_ref: transactions_json
+- from_id: process_filter
+  to_id: process_format
+  data_ref: transactions_json
+- from_id: process_format
+  to_id: sink_kafka
+  data_ref: transactions_json

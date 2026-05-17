@@ -1,0 +1,47 @@
+flow:
+  id: transactions_overdue_pipeline
+  name: Publish Pending Transactions to Kafka
+  description: Read pending transactions from public.transactions, convert to JSON,
+    and publish to Kafka topic transactions.overdue
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: '{{SCHEDULE_CONDITION}}'
+sources:
+- id: source_db
+  name: Read Pending Transactions
+  type: PostgreSQL
+  location: public.transactions
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+      query: SELECT * FROM public.transactions WHERE status = 'PENDING'
+processing_elements:
+- id: process_convert
+  name: Convert to JSON
+  operation: Convert
+  config:
+    format: json
+sinks:
+- id: sink_kafka
+  name: Publish to Kafka
+  type: Kafka
+  location: transactions.overdue
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      topic: transactions.overdue
+processed_data:
+- id: transactions_json
+  format: json
+links:
+- from_id: source_db
+  to_id: process_convert
+  data_ref: transactions_json
+- from_id: process_convert
+  to_id: sink_kafka
+  data_ref: transactions_json

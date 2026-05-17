@@ -1,0 +1,3531 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-05-12T15:47:55.313802+00:00",
+  "updated_at": "2026-05-13T16:01:47.970294+00:00",
+  "campaign": {
+    "id": "stage2-extended-qwen36",
+    "title": "Этап 2 — расширенная серия на Qwen 3.6 Plus с уровнем 3",
+    "meta": {
+      "id": "stage2-extended-qwen36",
+      "title": "Этап 2 — расширенная серия на Qwen 3.6 Plus с уровнем 3",
+      "owner": "Дмитрий Макаров",
+      "objective": "Расширить пилотную базу: повторить 5 базовых кейсов + добавить TC-02 (file→file, чисто файловый — допускает полную функциональную проверку без внешней инфры) и TC-07 (routing уровня 3). Модель — Qwen 3.6 Plus (preset 1000) для прямой сопоставимости с stage1-pilot-qwen36; корректор — Gemini 2.5 Flash Lite (preset 1003).\n",
+      "tags": [
+        "thesis",
+        "stage2",
+        "extended",
+        "qwen36"
+      ]
+    },
+    "manifest_source": "F:\\Education\\Diplom\\FlowArchitect\\config\\campaigns\\stage2_rerun_gemini_flash.yaml"
+  },
+  "defaults": {
+    "presets": [
+      1000
+    ],
+    "modes": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "stage_presets": {
+      "pim": 1000,
+      "corrector": 1003
+    },
+    "repeat": 1,
+    "timeout_sec": 300,
+    "nifi_validate": true,
+    "manual_nifi_required": true,
+    "requires_user_input": false,
+    "stop_after_statuses": [
+      "needs_user_input",
+      "needs_nifi_manual_test"
+    ]
+  },
+  "run_order": [
+    "currency-http-to-file__m0__p1000__a1__sp329ea448",
+    "currency-http-to-file__m1__p1000__a1__sp329ea448",
+    "currency-http-to-file__m2__p1000__a1__sp329ea448",
+    "currency-http-to-file__m3__p1000__a1__sp329ea448",
+    "file-csv-filter__m0__p1000__a1__sp329ea448",
+    "file-csv-filter__m1__p1000__a1__sp329ea448",
+    "file-csv-filter__m2__p1000__a1__sp329ea448",
+    "file-csv-filter__m3__p1000__a1__sp329ea448",
+    "postgres-to-file__m0__p1000__a1__sp329ea448",
+    "postgres-to-file__m1__p1000__a1__sp329ea448",
+    "postgres-to-file__m2__p1000__a1__sp329ea448",
+    "postgres-to-file__m3__p1000__a1__sp329ea448",
+    "kafka-to-postgres__m0__p1000__a1__sp329ea448",
+    "kafka-to-postgres__m1__p1000__a1__sp329ea448",
+    "kafka-to-postgres__m2__p1000__a1__sp329ea448",
+    "kafka-to-postgres__m3__p1000__a1__sp329ea448",
+    "postgres-to-kafka__m0__p1000__a1__sp329ea448",
+    "postgres-to-kafka__m1__p1000__a1__sp329ea448",
+    "postgres-to-kafka__m2__p1000__a1__sp329ea448",
+    "postgres-to-kafka__m3__p1000__a1__sp329ea448",
+    "kafka-routing__m0__p1000__a1__sp329ea448",
+    "kafka-routing__m1__p1000__a1__sp329ea448",
+    "kafka-routing__m2__p1000__a1__sp329ea448",
+    "kafka-routing__m3__p1000__a1__sp329ea448",
+    "s3-to-postgres-enrich__m0__p1000__a1__sp329ea448",
+    "s3-to-postgres-enrich__m1__p1000__a1__sp329ea448",
+    "s3-to-postgres-enrich__m2__p1000__a1__sp329ea448",
+    "s3-to-postgres-enrich__m3__p1000__a1__sp329ea448"
+  ],
+  "runs": {
+    "currency-http-to-file__m0__p1000__a1__sp329ea448": {
+      "run_id": "currency-http-to-file__m0__p1000__a1__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 4,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.312803+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T15:49:56.422083+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T15:51:57.846109+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        },
+        {
+          "timestamp": "2026-05-12T18:49:55.543420+00:00",
+          "status": "queued",
+          "reason": "manual_status_change"
+        },
+        {
+          "timestamp": "2026-05-12T18:50:06.152463+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:52:35.071266+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:50:06.152463+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:52:35.066259+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 147.2,
+        "stage1_duration_sec": 112.94,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 159,
+        "completion_tokens": 7031,
+        "total_tokens": 7190,
+        "cost_usd": 0.009192,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 105,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 93,
+            "completion_tokens": 881,
+            "total_tokens": 974,
+            "duration_ms": 112280,
+            "cost_usd": 0.001176
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 93,
+            "completion_tokens": 881,
+            "total_tokens": 974,
+            "duration_ms": 112280,
+            "cost_usd": 0.001176
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m0__p1000__a1__sp329ea448\\run_summary.json",
+      "last_comment_at": "2026-05-12T18:57:24.732916+00:00",
+      "manual_nifi_pg_id": "1d8bbd86-019e-1000-f555-1d29a1d21576",
+      "manual_nifi_materialized_at": "2026-05-12T18:56:07.112171+00:00",
+      "manual_nifi_replace_existing": false,
+      "manual_nifi_enabled_controller_services": 0,
+      "manual_nifi_validation_errors": [],
+      "manual_nifi_validation_error_count": 0,
+      "manual_nifi_connection_info": "NiFi 2.7.2",
+      "manual_nifi_cleaned_at": "2026-05-12T18:57:24.732916+00:00"
+    },
+    "currency-http-to-file__m1__p1000__a1__sp329ea448": {
+      "run_id": "currency-http-to-file__m1__p1000__a1__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту."
+        ]
+      },
+      "status": "completed",
+      "comment_count": 5,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T15:51:57.883405+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T15:53:13.602278+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        },
+        {
+          "timestamp": "2026-05-12T18:49:55.842429+00:00",
+          "status": "queued",
+          "reason": "manual_status_change"
+        },
+        {
+          "timestamp": "2026-05-12T18:52:35.105336+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T19:00:35.472288+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "manual_status_change"
+        },
+        {
+          "timestamp": "2026-05-12T19:03:20.212876+00:00",
+          "status": "completed",
+          "reason": "manual_status_change"
+        }
+      ],
+      "started_at": "2026-05-12T18:52:35.105336+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T15:53:13.599277+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 55.01,
+        "stage1_duration_sec": 54.59,
+        "stage2_duration_sec": 0.1,
+        "prompt_tokens": 1336,
+        "completion_tokens": 2912,
+        "total_tokens": 4248,
+        "cost_usd": 0.00422,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 78,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 1336,
+            "completion_tokens": 2912,
+            "total_tokens": 4248,
+            "duration_ms": 54141,
+            "cost_usd": 0.00422
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1336,
+            "completion_tokens": 2912,
+            "total_tokens": 4248,
+            "duration_ms": 54141,
+            "cost_usd": 0.00422
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "NIFI_USER/NIFI_PASS env vars not set"
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\run_summary.json",
+      "last_comment_at": "2026-05-12T19:03:33.947578+00:00",
+      "manual_nifi_pg_id": "1d90285e-019e-1000-3edc-6c3fb1fabd68",
+      "manual_nifi_materialized_at": "2026-05-12T19:00:56.529035+00:00",
+      "manual_nifi_replace_existing": false,
+      "manual_nifi_enabled_controller_services": 0,
+      "manual_nifi_validation_errors": [],
+      "manual_nifi_validation_error_count": 0,
+      "manual_nifi_connection_info": "NiFi 2.7.2",
+      "manual_nifi_cleaned_at": "2026-05-12T19:03:33.947578+00:00"
+    },
+    "currency-http-to-file__m2__p1000__a1__sp329ea448": {
+      "run_id": "currency-http-to-file__m2__p1000__a1__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 1,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T15:53:13.605279+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:49:56.089293+00:00",
+          "status": "failed_generation",
+          "reason": "manual_status_change"
+        }
+      ],
+      "started_at": "2026-05-12T15:53:13.605279+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m2__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m2__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "last_comment_at": "2026-05-12T18:49:56.089293+00:00"
+    },
+    "currency-http-to-file__m3__p1000__a1__sp329ea448": {
+      "run_id": "currency-http-to-file__m3__p1000__a1__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 2,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T16:24:14.448308+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T16:26:11.801076+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T16:24:14.448308+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m3__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m3__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T16:26:11.761927+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m3__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m3__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m3__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m3__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 115.48,
+        "stage1_duration_sec": 56.71,
+        "stage2_duration_sec": 5.41,
+        "prompt_tokens": 4359,
+        "completion_tokens": 6346,
+        "total_tokens": 10705,
+        "cost_usd": 0.009666,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 80,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 1336,
+            "completion_tokens": 3011,
+            "total_tokens": 4347,
+            "duration_ms": 56217,
+            "cost_usd": 0.004348
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 93,
+            "completion_tokens": 1070,
+            "total_tokens": 1163,
+            "duration_ms": 5109,
+            "cost_usd": 0.000437
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1336,
+            "completion_tokens": 3011,
+            "total_tokens": 4347,
+            "duration_ms": 56217,
+            "cost_usd": 0.004348
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 93,
+            "completion_tokens": 1070,
+            "total_tokens": 1163,
+            "duration_ms": 5109,
+            "cost_usd": 0.000437
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 1,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\currency-http-to-file__m3__p1000__a1__sp329ea448\\run_summary.json",
+      "manual_nifi_pg_id": "1d896cd0-019e-1000-dc83-a7ff8b228b20",
+      "manual_nifi_materialized_at": "2026-05-12T18:53:42.911964+00:00",
+      "manual_nifi_replace_existing": false,
+      "manual_nifi_enabled_controller_services": 2,
+      "manual_nifi_validation_errors": [
+        {
+          "name": "Parse API Response",
+          "type": "org.apache.nifi.processors.standard.ConvertRecord",
+          "errors": [
+            "'target_field' validated against 'rates' is invalid because 'target_field' is not a supported property or has no Validator associated with it"
+          ]
+        }
+      ],
+      "manual_nifi_validation_error_count": 1,
+      "manual_nifi_connection_info": "NiFi 2.7.2",
+      "last_comment_at": "2026-05-12T18:54:47.140181+00:00",
+      "manual_nifi_cleaned_at": "2026-05-12T18:54:47.140181+00:00"
+    },
+    "file-csv-filter__m0__p1000__a1__sp329ea448": {
+      "run_id": "file-csv-filter__m0__p1000__a1__sp329ea448",
+      "case_id": "file-csv-filter",
+      "title": "File CSV Filter (TC-02)",
+      "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "file",
+          "filter",
+          "level-1"
+        ],
+        "expected_behavior": "Файлы из /data/input/orders/ фильтруются и попадают в /data/output/completed_orders.csv только со статусом COMPLETED.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Положить тестовый CSV в /data/input/orders/.",
+          "Запустить поток и проверить содержимое /data/output/completed_orders.csv."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T16:26:11.845365+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T16:30:38.500898+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T16:26:11.845365+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m0__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m0__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T16:30:38.488890+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m0__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m0__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m0__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m0__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 260.71,
+        "stage1_duration_sec": 244.51,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 154,
+        "completion_tokens": 13380,
+        "total_tokens": 13534,
+        "cost_usd": 0.017444,
+        "nifi_processor_count": 4,
+        "nifi_connection_count": 3,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 81,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 77,
+            "completion_tokens": 6207,
+            "total_tokens": 6284,
+            "duration_ms": 244141,
+            "cost_usd": 0.008094
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 77,
+            "completion_tokens": 6207,
+            "total_tokens": 6284,
+            "duration_ms": 244141,
+            "cost_usd": 0.008094
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details."
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m0__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "file-csv-filter__m1__p1000__a1__sp329ea448": {
+      "run_id": "file-csv-filter__m1__p1000__a1__sp329ea448",
+      "case_id": "file-csv-filter",
+      "title": "File CSV Filter (TC-02)",
+      "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "file",
+          "filter",
+          "level-1"
+        ],
+        "expected_behavior": "Файлы из /data/input/orders/ фильтруются и попадают в /data/output/completed_orders.csv только со статусом COMPLETED.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Положить тестовый CSV в /data/input/orders/.",
+          "Запустить поток и проверить содержимое /data/output/completed_orders.csv."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 2,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T16:30:38.508545+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T16:32:12.285278+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T16:30:38.508545+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T16:32:12.237112+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 91.87,
+        "stage1_duration_sec": 49.78,
+        "stage2_duration_sec": 0.13,
+        "prompt_tokens": 1451,
+        "completion_tokens": 3981,
+        "total_tokens": 5432,
+        "cost_usd": 0.005647,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 82,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 104,
+            "completion_tokens": 1394,
+            "total_tokens": 1498,
+            "duration_ms": 49389,
+            "cost_usd": 0.001846
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 104,
+            "completion_tokens": 1394,
+            "total_tokens": 1498,
+            "duration_ms": 49389,
+            "cost_usd": 0.001846
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m1__p1000__a1__sp329ea448\\run_summary.json",
+      "manual_nifi_pg_id": "1d8d899f-019e-1000-62c7-139bee2a9df6",
+      "manual_nifi_materialized_at": "2026-05-12T18:58:12.565046+00:00",
+      "manual_nifi_replace_existing": false,
+      "manual_nifi_enabled_controller_services": 2,
+      "manual_nifi_validation_errors": [
+        {
+          "name": "Filter Completed Orders",
+          "type": "org.apache.nifi.processors.standard.QueryRecord",
+          "errors": [
+            "'filtered' validated against 'SELECT * FROM FLOWFILE WHERE status == 'COMPLETED'' is invalid because Not a valid SQL Statement: Encountered \"= =\" at line 1, column 37.\r\nWas expecting one of:\r\n    <EOF> \r\n    \"EXCEPT\" ...\r\n    \"FETCH\" ...\r\n    \"GROUP\" ...\r\n    \"HAVING\" ...\r\n    \"INTERSECT\" ...\r\n    \"LIMIT\" ...\r\n    \"OFFSET\" ...\r\n    \"ORDER\" ...\r\n    \"QUALIFY\" ...\r\n    \"MINUS\" ...\r\n    \"UNION\" ...\r\n    \"WINDOW\" ...\r\n    \".\" ...\r\n    \"NOT\" ...\r\n    \"IN\" ...\r\n    \"<\" ...\r\n    \"<=\" ...\r\n    \">\" ...\r\n    \">=\" ...\r\n    \"=\" \"SOME\" ...\r\n    \"=\" \"ANY\" ...\r\n    \"=\" \"ALL\" ...\r\n    \"BETWEEN\" ...\r\n    \"LIKE\" ...\r\n    \"ILIKE\" ...\r\n    \"RLIKE\" ...\r\n    \"SIMILAR\" ...\r\n    \"=\" \"+\" ...\r\n    \"=\" \"-\" ...\r\n    \"=\" \"NOT\" ...\r\n    \"=\" \"EXISTS\" ...\r\n    \"=\" \"UNIQUE\" ...\r\n    \"=\" \"INTERVAL\" ...\r\n    \"=\" <UNSIGNED_INTEGER_LITERAL> ...\r\n    \"=\" <DECIMAL_NUMERIC_LITERAL> ...\r\n    \"=\" \"DECIMAL\" ...\r\n    \"=\" <APPROX_NUMERIC_LITERAL> ...\r\n    \"=\" <BINARY_STRING_LITERAL> ...\r\n    \"=\" <PREFIXED_STRING_LITERAL> ...\r\n    \"=\" <QUOTED_STRING> ...\r\n    \"=\" <UNICODE_STRING_LITERAL> ...\r\n    \"=\" <C_STYLE_ESCAPED_STRING_LITERAL> ...\r\n    \"=\" <BIG_QUERY_DOUBLE_QUOTED_STRING> ...\r\n    \"=\" <BIG_QUERY_QUOTED_STRING> ...\r\n    \"=\" \"TRUE\" ...\r\n    \"=\" \"FALSE\" ...\r\n    \"=\" \"UNKNOWN\" ...\r\n    \"=\" \"NULL\" ...\r\n    \"=\" <LBRACE_D> ...\r\n    \"=\" <LBRACE_T> ...\r\n    \"=\" <LBRACE_TS> ...\r\n    \"=\" \"DATE\" ...\r\n    \"=\" \"DATETIME\" ...\r\n    \"=\" \"TIME\" ...\r\n    \"=\" \"UUID\" ...\r\n    \"=\" \"TIMESTAMP\" ...\r\n    \"=\" \"?\" ...\r\n    \"=\" \"CAST\" ...\r\n    \"=\" \"SAFE_CAST\" ...\r\n    \"=\" \"TRY_CAST\" ...\r\n    \"=\" \"EXTRACT\" ...\r\n    \"=\" \"POSITION\" ...\r\n    \"=\" \"CONVERT\" ...\r\n    \"=\" \"TRANSLATE\" ...\r\n    \"=\" \"OVERLAY\" ...\r\n    \"=\" \"FLOOR\" ...\r\n    \"=\" \"CEIL\" ...\r\n    \"=\" \"CEILING\" ...\r\n    \"=\" \"SUBSTRING\" ...\r\n    \"=\" \"TRIM\" ...\r\n    \"=\" \"CLASSIFIER\" ...\r\n    \"=\" \"MATCH_NUMBER\" ...\r\n    \"=\" \"RUNNING\" ...\r\n    \"=\" \"PREV\" ...\r\n    \"=\" \"NEXT\" ...\r\n    \"=\" \"JSON_EXISTS\" ...\r\n    \"=\" \"JSON_VALUE\" ...\r\n    \"=\" \"JSON_QUERY\" ...\r\n    \"=\" \"JSON_OBJECT\" ...\r\n    \"=\" \"JSON_OBJECTAGG\" ...\r\n    \"=\" \"JSON_ARRAY\" ...\r\n    \"=\" \"JSON_ARRAYAGG\" ...\r\n    \"=\" <LBRACE_FN> ...\r\n    \"=\" \"MULTISET\" ...\r\n    \"=\" \"ARRAY\" ...\r\n    \"=\" \"PERIOD\" ...\r\n    \"=\" \"PERCENTILE_CONT\" ...\r\n    \"=\" \"PERCENTILE_DISC\" ...\r\n    \"=\" \"SPECIFIC\" ...\r\n    \"=\" <IDENTIFIER> ...\r\n    \"=\" <HYPHENATED_IDENTIFIER> ...\r\n    \"=\" <QUOTED_IDENTIFIER> ...\r\n    \"=\" <BACK_QUOTED_IDENTIFIER> ...\r\n    \"=\" <BIG_QUERY_BACK_QUOTED_IDENTIFIER> ...\r\n    \"=\" <BRACKET_QUOTED_IDENTIFIER> ...\r\n    \"=\" <UNICODE_QUOTED_IDENTIFIER> ...\r\n    \"=\" \"ABS\" ...\r\n    \"=\" \"AVG\" ...\r\n    \"=\" \"CARDINALITY\" ...\r\n    \"=\" \"CHAR\" ...\r\n    \"=\" \"CHAR_LENGTH\" ...\r\n    \"=\" \"CHARACTER_LENGTH\" ...\r\n    \"=\" \"COALESCE\" ...\r\n    \"=\" \"COLLECT\" ...\r\n    \"=\" \"COVAR_POP\" ...\r\n    \"=\" \"COVAR_SAMP\" ...\r\n    \"=\" \"CUME_DIST\" ...\r\n    \"=\" \"COUNT\" ...\r\n    \"=\" \"CURRENT_DATE\" ...\r\n    \"=\" \"CURRENT_TIME\" ...\r\n    \"=\" \"CURRENT_TIMESTAMP\" ...\r\n    \"=\" \"DENSE_RANK\" ...\r\n    \"=\" \"ELEMENT\" ...\r\n    \"=\" \"EVERY\" ...\r\n    \"=\" \"EXP\" ...\r\n    \"=\" \"FIRST_VALUE\" ...\r\n    \"=\" \"FUSION\" ...\r\n    \"=\" \"INTERSECTION\" ...\r\n    \"=\" \"GROUPING\" ...\r\n    \"=\" \"HOUR\" ...\r\n    \"=\" \"LAG\" ...\r\n    \"=\" \"LEAD\" ...\r\n    \"=\" \"LEFT\" ...\r\n    \"=\" \"LAST_VALUE\" ...\r\n    \"=\" \"LN\" ...\r\n    \"=\" \"LOCALTIME\" ...\r\n    \"=\" \"LOCALTIMESTAMP\" ...\r\n    \"=\" \"LOWER\" ...\r\n    \"=\" \"MAX\" ...\r\n    \"=\" \"MIN\" ...\r\n    \"=\" \"MINUTE\" ...\r\n    \"=\" \"MOD\" ...\r\n    \"=\" \"MONTH\" ...\r\n    \"=\" \"NTH_VALUE\" ...\r\n    \"=\" \"NTILE\" ...\r\n    \"=\" \"NULLIF\" ...\r\n    \"=\" \"OCTET_LENGTH\" ...\r\n    \"=\" \"PERCENT_RANK\" ...\r\n    \"=\" \"POWER\" ...\r\n    \"=\" \"RANK\" ...\r\n    \"=\" \"REGR_COUNT\" ...\r\n    \"=\" \"REGR_SXX\" ...\r\n    \"=\" \"REGR_SYY\" ...\r\n    \"=\" \"RIGHT\" ...\r\n    \"=\" \"ROW_NUMBER\" ...\r\n    \"=\" \"SECOND\" ...\r\n    \"=\" \"SQRT\" ...\r\n    \"=\" \"STDDEV_POP\" ...\r\n    \"=\" \"STDDEV_SAMP\" ...\r\n    \"=\" \"SUM\" ...\r\n    \"=\" \"UPPER\" ...\r\n    \"=\" \"TRUNCATE\" ...\r\n    \"=\" \"USER\" ...\r\n    \"=\" \"VAR_POP\" ...\r\n    \"=\" \"VAR_SAMP\" ...\r\n    \"=\" \"YEAR\" ...\r\n    \"=\" \"CURRENT_CATALOG\" ...\r\n    \"=\" \"CURRENT_DEFAULT_TRANSFORM_GROUP\" ...\r\n    \"=\" \"CURRENT_PATH\" ...\r\n    \"=\" \"CURRENT_ROLE\" ...\r\n    \"=\" \"CURRENT_SCHEMA\" ...\r\n    \"=\" \"CURRENT_USER\" ...\r\n    \"=\" \"SESSION_USER\" ...\r\n    \"=\" \"SYSTEM_USER\" ...\r\n    \"=\" \"NEW\" ...\r\n    \"=\" \"CASE\" ...\r\n    \"=\" \"CURRENT\" ...\r\n    \"=\" \"CURSOR\" ...\r\n    \"=\" \"ROW\" ...\r\n    \"=\" \"(\" ...\r\n    \"[\" ...\r\n    \"IS\" ...\r\n    \"FORMAT\" ...\r\n    \"(\" ...\r\n    "
+          ]
+        },
+        {
+          "name": "Write Output CSV",
+          "type": "org.apache.nifi.processors.standard.PutFile",
+          "errors": [
+            "'format' validated against 'csv' is invalid because 'format' is not a supported property or has no Validator associated with it"
+          ]
+        }
+      ],
+      "manual_nifi_validation_error_count": 2,
+      "manual_nifi_connection_info": "NiFi 2.7.2",
+      "last_comment_at": "2026-05-12T19:00:35.247546+00:00",
+      "manual_nifi_cleaned_at": "2026-05-12T19:00:35.247546+00:00"
+    },
+    "file-csv-filter__m2__p1000__a1__sp329ea448": {
+      "run_id": "file-csv-filter__m2__p1000__a1__sp329ea448",
+      "case_id": "file-csv-filter",
+      "title": "File CSV Filter (TC-02)",
+      "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "file",
+          "filter",
+          "level-1"
+        ],
+        "expected_behavior": "Файлы из /data/input/orders/ фильтруются и попадают в /data/output/completed_orders.csv только со статусом COMPLETED.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Положить тестовый CSV в /data/input/orders/.",
+          "Запустить поток и проверить содержимое /data/output/completed_orders.csv."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T16:32:12.323121+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T16:46:47.183178+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T16:32:12.323121+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m2__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m2__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T16:46:47.180657+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m2__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m2__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m2__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m2__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON",
+        "duration_sec": 339.79,
+        "stage1_duration_sec": 39.51,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m2__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "file-csv-filter__m3__p1000__a1__sp329ea448": {
+      "run_id": "file-csv-filter__m3__p1000__a1__sp329ea448",
+      "case_id": "file-csv-filter",
+      "title": "File CSV Filter (TC-02)",
+      "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "file",
+          "filter",
+          "level-1"
+        ],
+        "expected_behavior": "Файлы из /data/input/orders/ фильтруются и попадают в /data/output/completed_orders.csv только со статусом COMPLETED.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi.",
+          "Положить тестовый CSV в /data/input/orders/.",
+          "Запустить поток и проверить содержимое /data/output/completed_orders.csv."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T16:46:47.210971+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T16:48:11.264757+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T16:46:47.210971+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m3__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m3__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T16:48:11.195442+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m3__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m3__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m3__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m3__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 82.44,
+        "stage1_duration_sec": 23.28,
+        "stage2_duration_sec": 8.12,
+        "prompt_tokens": 4307,
+        "completion_tokens": 4929,
+        "total_tokens": 9236,
+        "cost_usd": 0.007807,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 84,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 1347,
+            "completion_tokens": 1150,
+            "total_tokens": 2497,
+            "duration_ms": 22921,
+            "cost_usd": 0.001933
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 104,
+            "completion_tokens": 1554,
+            "total_tokens": 1658,
+            "duration_ms": 7922,
+            "cost_usd": 0.000632
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1347,
+            "completion_tokens": 1150,
+            "total_tokens": 2497,
+            "duration_ms": 22921,
+            "cost_usd": 0.001933
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 104,
+            "completion_tokens": 1554,
+            "total_tokens": 1658,
+            "duration_ms": 7922,
+            "cost_usd": 0.000632
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\file-csv-filter__m3__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "postgres-to-file__m0__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-file__m0__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi, подставить JDBC параметры.",
+          "Запустить поток, проверить наличие orders_export.json."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T16:48:11.273460+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T16:53:18.002153+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T16:48:11.273460+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m0__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m0__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T16:53:17.985993+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m0__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m0__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m0__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m0__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 305.15,
+        "stage1_duration_sec": 262.34,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 234,
+        "completion_tokens": 14837,
+        "total_tokens": 15071,
+        "cost_usd": 0.019364,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 85,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 96,
+            "completion_tokens": 519,
+            "total_tokens": 615,
+            "duration_ms": 262030,
+            "cost_usd": 0.000706
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 96,
+            "completion_tokens": 519,
+            "total_tokens": 615,
+            "duration_ms": 262030,
+            "cost_usd": 0.000706
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m0__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "postgres-to-file__m1__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-file__m1__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi, подставить JDBC параметры.",
+          "Запустить поток, проверить наличие orders_export.json."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 2,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T16:54:00.856819+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T16:55:37.050246+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T16:54:00.856819+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T16:55:37.030032+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 94.7,
+        "stage1_duration_sec": 48.99,
+        "stage2_duration_sec": 0.1,
+        "prompt_tokens": 1435,
+        "completion_tokens": 3652,
+        "total_tokens": 5087,
+        "cost_usd": 0.005214,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 86,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 96,
+            "completion_tokens": 1051,
+            "total_tokens": 1147,
+            "duration_ms": 48610,
+            "cost_usd": 0.001398
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 96,
+            "completion_tokens": 1051,
+            "total_tokens": 1147,
+            "duration_ms": 48610,
+            "cost_usd": 0.001398
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\run_summary.json",
+      "manual_nifi_pg_id": "220e08f6-019e-1000-5343-454148465141",
+      "manual_nifi_materialized_at": "2026-05-13T15:57:37.501267+00:00",
+      "manual_nifi_replace_existing": false,
+      "manual_nifi_enabled_controller_services": 3,
+      "manual_nifi_validation_errors": [
+        {
+          "name": "Filter New Records",
+          "type": "org.apache.nifi.processors.standard.QueryRecord",
+          "errors": [
+            "'filtered' validated against 'SELECT * FROM FLOWFILE WHERE created_at > {{LAST_SYNC_TIMESTAMP}}' is invalid because Not a valid SQL Statement: Encountered \"> {\" at line 1, column 41.\r\nWas expecting one of:\r\n    <EOF> \r\n    \"EXCEPT\" ...\r\n    \"FETCH\" ...\r\n    \"GROUP\" ...\r\n    \"HAVING\" ...\r\n    \"INTERSECT\" ...\r\n    \"LIMIT\" ...\r\n    \"OFFSET\" ...\r\n    \"ORDER\" ...\r\n    \"QUALIFY\" ...\r\n    \"MINUS\" ...\r\n    \"UNION\" ...\r\n    \"WINDOW\" ...\r\n    \".\" ...\r\n    \"NOT\" ...\r\n    \"IN\" ...\r\n    \"<\" ...\r\n    \"<=\" ...\r\n    \">\" \"SOME\" ...\r\n    \">\" \"ANY\" ...\r\n    \">\" \"ALL\" ...\r\n    \"BETWEEN\" ...\r\n    \"LIKE\" ...\r\n    \"ILIKE\" ...\r\n    \"RLIKE\" ...\r\n    \"SIMILAR\" ...\r\n    \"=\" ...\r\n    \"<<\" ...\r\n    \">\" \"+\" ...\r\n    \">\" \"-\" ...\r\n    \">\" \"NOT\" ...\r\n    \">\" \"EXISTS\" ...\r\n    \">\" \"UNIQUE\" ...\r\n    \">\" \"INTERVAL\" ...\r\n    \">\" <UNSIGNED_INTEGER_LITERAL> ...\r\n    \">\" <DECIMAL_NUMERIC_LITERAL> ...\r\n    \">\" \"DECIMAL\" ...\r\n    \">\" <APPROX_NUMERIC_LITERAL> ...\r\n    \">\" <BINARY_STRING_LITERAL> ...\r\n    \">\" <PREFIXED_STRING_LITERAL> ...\r\n    \">\" <QUOTED_STRING> ...\r\n    \">\" <UNICODE_STRING_LITERAL> ...\r\n    \">\" <C_STYLE_ESCAPED_STRING_LITERAL> ...\r\n    \">\" <BIG_QUERY_DOUBLE_QUOTED_STRING> ...\r\n    \">\" <BIG_QUERY_QUOTED_STRING> ...\r\n    \">\" \"TRUE\" ...\r\n    \">\" \"FALSE\" ...\r\n    \">\" \"UNKNOWN\" ...\r\n    \">\" \"NULL\" ...\r\n    \">\" <LBRACE_D> ...\r\n    \">\" <LBRACE_T> ...\r\n    \">\" <LBRACE_TS> ...\r\n    \">\" \"DATE\" ...\r\n    \">\" \"DATETIME\" ...\r\n    \">\" \"TIME\" ...\r\n    \">\" \"UUID\" ...\r\n    \">\" \"TIMESTAMP\" ...\r\n    \">\" \"?\" ...\r\n    \">\" \"CAST\" ...\r\n    \">\" \"SAFE_CAST\" ...\r\n    \">\" \"TRY_CAST\" ...\r\n    \">\" \"EXTRACT\" ...\r\n    \">\" \"POSITION\" ...\r\n    \">\" \"CONVERT\" ...\r\n    \">\" \"TRANSLATE\" ...\r\n    \">\" \"OVERLAY\" ...\r\n    \">\" \"FLOOR\" ...\r\n    \">\" \"CEIL\" ...\r\n    \">\" \"CEILING\" ...\r\n    \">\" \"SUBSTRING\" ...\r\n    \">\" \"TRIM\" ...\r\n    \">\" \"CLASSIFIER\" ...\r\n    \">\" \"MATCH_NUMBER\" ...\r\n    \">\" \"RUNNING\" ...\r\n    \">\" \"PREV\" ...\r\n    \">\" \"NEXT\" ...\r\n    \">\" \"JSON_EXISTS\" ...\r\n    \">\" \"JSON_VALUE\" ...\r\n    \">\" \"JSON_QUERY\" ...\r\n    \">\" \"JSON_OBJECT\" ...\r\n    \">\" \"JSON_OBJECTAGG\" ...\r\n    \">\" \"JSON_ARRAY\" ...\r\n    \">\" \"JSON_ARRAYAGG\" ...\r\n    \">\" <LBRACE_FN> ...\r\n    \">\" \"MULTISET\" ...\r\n    \">\" \"ARRAY\" ...\r\n    \">\" \"PERIOD\" ...\r\n    \">\" \"PERCENTILE_CONT\" ...\r\n    \">\" \"PERCENTILE_DISC\" ...\r\n    \">\" \"SPECIFIC\" ...\r\n    \">\" <IDENTIFIER> ...\r\n    \">\" <HYPHENATED_IDENTIFIER> ...\r\n    \">\" <QUOTED_IDENTIFIER> ...\r\n    \">\" <BACK_QUOTED_IDENTIFIER> ...\r\n    \">\" <BIG_QUERY_BACK_QUOTED_IDENTIFIER> ...\r\n    \">\" <BRACKET_QUOTED_IDENTIFIER> ...\r\n    \">\" <UNICODE_QUOTED_IDENTIFIER> ...\r\n    \">\" \"ABS\" ...\r\n    \">\" \"AVG\" ...\r\n    \">\" \"CARDINALITY\" ...\r\n    \">\" \"CHAR\" ...\r\n    \">\" \"CHAR_LENGTH\" ...\r\n    \">\" \"CHARACTER_LENGTH\" ...\r\n    \">\" \"COALESCE\" ...\r\n    \">\" \"COLLECT\" ...\r\n    \">\" \"COVAR_POP\" ...\r\n    \">\" \"COVAR_SAMP\" ...\r\n    \">\" \"CUME_DIST\" ...\r\n    \">\" \"COUNT\" ...\r\n    \">\" \"CURRENT_DATE\" ...\r\n    \">\" \"CURRENT_TIME\" ...\r\n    \">\" \"CURRENT_TIMESTAMP\" ...\r\n    \">\" \"DENSE_RANK\" ...\r\n    \">\" \"ELEMENT\" ...\r\n    \">\" \"EVERY\" ...\r\n    \">\" \"EXP\" ...\r\n    \">\" \"FIRST_VALUE\" ...\r\n    \">\" \"FUSION\" ...\r\n    \">\" \"INTERSECTION\" ...\r\n    \">\" \"GROUPING\" ...\r\n    \">\" \"HOUR\" ...\r\n    \">\" \"LAG\" ...\r\n    \">\" \"LEAD\" ...\r\n    \">\" \"LEFT\" ...\r\n    \">\" \"LAST_VALUE\" ...\r\n    \">\" \"LN\" ...\r\n    \">\" \"LOCALTIME\" ...\r\n    \">\" \"LOCALTIMESTAMP\" ...\r\n    \">\" \"LOWER\" ...\r\n    \">\" \"MAX\" ...\r\n    \">\" \"MIN\" ...\r\n    \">\" \"MINUTE\" ...\r\n    \">\" \"MOD\" ...\r\n    \">\" \"MONTH\" ...\r\n    \">\" \"NTH_VALUE\" ...\r\n    \">\" \"NTILE\" ...\r\n    \">\" \"NULLIF\" ...\r\n    \">\" \"OCTET_LENGTH\" ...\r\n    \">\" \"PERCENT_RANK\" ...\r\n    \">\" \"POWER\" ...\r\n    \">\" \"RANK\" ...\r\n    \">\" \"REGR_COUNT\" ...\r\n    \">\" \"REGR_SXX\" ...\r\n    \">\" \"REGR_SYY\" ...\r\n    \">\" \"RIGHT\" ...\r\n    \">\" \"ROW_NUMBER\" ...\r\n    \">\" \"SECOND\" ...\r\n    \">\" \"SQRT\" ...\r\n    \">\" \"STDDEV_POP\" ...\r\n    \">\" \"STDDEV_SAMP\" ...\r\n    \">\" \"SUM\" ...\r\n    \">\" \"UPPER\" ...\r\n    \">\" \"TRUNCATE\" ...\r\n    \">\" \"USER\" ...\r\n    \">\" \"VAR_POP\" ...\r\n    \">\" \"VAR_SAMP\" ...\r\n    \">\" \"YEAR\" ...\r\n    \">\" \"CURRENT_CATALOG\" ...\r\n    \">\" \"CURRENT_DEFAULT_TRANSFORM_GROUP\" ...\r\n    \">\" \"CURRENT_PATH\" ...\r\n    \">\" \"CURRENT_ROLE\" ...\r\n    \">\" \"CURRENT_SCHEMA\" ...\r\n    \">\" \"CURRENT_USER\" ...\r\n    \">\" \"SESSION_USER\" ...\r\n    \">\" \"SYSTEM_USER\" ...\r\n    \">\" \"NEW\" ...\r\n    \">\" \"CASE\" ...\r\n    \">\" \"CURRENT\" ...\r\n    \">\" \"CURSOR\" ...\r\n    \">\" \"ROW\" ...\r\n    \">\" \"(\" ...\r\n    \"[\" ...\r\n    \"IS\" ...\r\n    \"FORMAT\" ...\r\n    \"(\" ...\r\n    "
+          ]
+        },
+        {
+          "name": "Read PostgreSQL Orders",
+          "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+          "errors": [
+            "'Database Connection Pooling Service' validated against '1c8e8a11-2fbc-3f6f-5032-04e00781f6cc' is invalid because Controller Service [Database Connection Pooling Service] Identifier [1c8e8a11-2fbc-3f6f-5032-04e00781f6cc] state is Enabling"
+          ]
+        }
+      ],
+      "manual_nifi_validation_error_count": 2,
+      "manual_nifi_connection_info": "NiFi 2.7.2",
+      "last_comment_at": "2026-05-13T16:01:47.968690+00:00",
+      "manual_nifi_cleaned_at": "2026-05-13T16:01:47.968690+00:00"
+    },
+    "postgres-to-file__m2__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-file__m2__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi, подставить JDBC параметры.",
+          "Запустить поток, проверить наличие orders_export.json."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T16:55:37.060836+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T17:11:37.122979+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T16:55:37.060836+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m2__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m2__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T17:11:37.119429+00:00",
+      "exit_code": -1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m2__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m2__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m2__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m2__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON",
+        "duration_sec": 352.33,
+        "stage1_duration_sec": 52.04,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m2__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "postgres-to-file__m3__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-file__m3__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json в NiFi, подставить JDBC параметры.",
+          "Запустить поток, проверить наличие orders_export.json."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T17:11:37.133522+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T17:13:56.673119+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T17:11:37.133522+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m3__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m3__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T17:13:56.649383+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m3__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m3__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m3__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m3__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 137.57,
+        "stage1_duration_sec": 48.13,
+        "stage2_duration_sec": 5.84,
+        "prompt_tokens": 4397,
+        "completion_tokens": 6008,
+        "total_tokens": 10405,
+        "cost_usd": 0.009239,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 88,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 1339,
+            "completion_tokens": 2560,
+            "total_tokens": 3899,
+            "duration_ms": 47781,
+            "cost_usd": 0.003763
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 96,
+            "completion_tokens": 930,
+            "total_tokens": 1026,
+            "duration_ms": 5655,
+            "cost_usd": 0.000382
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1339,
+            "completion_tokens": 2560,
+            "total_tokens": 3899,
+            "duration_ms": 47781,
+            "cost_usd": 0.003763
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 96,
+            "completion_tokens": 930,
+            "total_tokens": 1026,
+            "duration_ms": 5655,
+            "cost_usd": 0.000382
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 6,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-file__m3__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "kafka-to-postgres__m0__p1000__a1__sp329ea448": {
+      "run_id": "kafka-to-postgres__m0__p1000__a1__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Прокинуть тестовое сообщение через rpk topic produce.",
+          "Проверить SELECT FROM public.orders."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T17:13:56.682571+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T17:20:35.698166+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T17:13:56.682571+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m0__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m0__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T17:20:35.695166+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m0__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m0__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m0__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m0__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON (direct mode)",
+        "duration_sec": 300.17,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m0__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "kafka-to-postgres__m1__p1000__a1__sp329ea448": {
+      "run_id": "kafka-to-postgres__m1__p1000__a1__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Прокинуть тестовое сообщение через rpk topic produce.",
+          "Проверить SELECT FROM public.orders."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T17:20:35.713463+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T17:22:10.375606+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T17:20:35.713463+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T17:22:10.369912+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 93.07,
+        "stage1_duration_sec": 46.94,
+        "stage2_duration_sec": 0.08,
+        "prompt_tokens": 1459,
+        "completion_tokens": 3689,
+        "total_tokens": 5148,
+        "cost_usd": 0.00527,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 90,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 108,
+            "completion_tokens": 1181,
+            "total_tokens": 1289,
+            "duration_ms": 46531,
+            "cost_usd": 0.00157
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 108,
+            "completion_tokens": 1181,
+            "total_tokens": 1289,
+            "duration_ms": 46531,
+            "cost_usd": 0.00157
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "kafka-to-postgres__m2__p1000__a1__sp329ea448": {
+      "run_id": "kafka-to-postgres__m2__p1000__a1__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Прокинуть тестовое сообщение через rpk topic produce.",
+          "Проверить SELECT FROM public.orders."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T17:22:10.380613+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T17:38:10.409308+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T17:22:10.380613+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m2__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m2__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T17:38:10.404229+00:00",
+      "exit_code": -1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m2__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m2__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m2__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m2__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON",
+        "duration_sec": 353.28,
+        "stage1_duration_sec": 53.05,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m2__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "kafka-to-postgres__m3__p1000__a1__sp329ea448": {
+      "run_id": "kafka-to-postgres__m3__p1000__a1__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Прокинуть тестовое сообщение через rpk topic produce.",
+          "Проверить SELECT FROM public.orders."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T17:38:10.459532+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T17:39:41.997831+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T17:38:10.459532+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T17:39:41.992778+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 89.59,
+        "stage1_duration_sec": 37.25,
+        "stage2_duration_sec": 6.39,
+        "prompt_tokens": 5103,
+        "completion_tokens": 6146,
+        "total_tokens": 11249,
+        "cost_usd": 0.009648,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 92,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 1351,
+            "completion_tokens": 1935,
+            "total_tokens": 3286,
+            "duration_ms": 36936,
+            "cost_usd": 0.002955
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 108,
+            "completion_tokens": 1259,
+            "total_tokens": 1367,
+            "duration_ms": 6172,
+            "cost_usd": 0.000514
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1351,
+            "completion_tokens": 1935,
+            "total_tokens": 3286,
+            "duration_ms": 36936,
+            "cost_usd": 0.002955
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 108,
+            "completion_tokens": 1259,
+            "total_tokens": 1367,
+            "duration_ms": 6172,
+            "cost_usd": 0.000514
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-to-postgres__m3__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "postgres-to-kafka__m0__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-kafka__m0__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "level-2"
+        ],
+        "expected_behavior": "PENDING-записи публикуются в transactions.overdue.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Запустить поток.",
+          "Проверить сообщения через rpk topic consume transactions.overdue."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T17:39:42.009432+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T17:41:48.647596+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T17:39:42.009432+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m0__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m0__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T17:41:48.627435+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m0__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m0__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m0__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m0__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 124.81,
+        "stage1_duration_sec": 90.5,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 171,
+        "completion_tokens": 6368,
+        "total_tokens": 6539,
+        "cost_usd": 0.008334,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 93,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 99,
+            "completion_tokens": 1441,
+            "total_tokens": 1540,
+            "duration_ms": 90140,
+            "cost_usd": 0.001905
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 99,
+            "completion_tokens": 1441,
+            "total_tokens": 1540,
+            "duration_ms": 90140,
+            "cost_usd": 0.001905
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m0__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "postgres-to-kafka__m1__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-kafka__m1__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "level-2"
+        ],
+        "expected_behavior": "PENDING-записи публикуются в transactions.overdue.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Запустить поток.",
+          "Проверить сообщения через rpk topic consume transactions.overdue."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T17:42:24.537734+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T17:44:51.753148+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T17:42:24.537734+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T17:44:51.720809+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 145.11,
+        "stage1_duration_sec": 108.03,
+        "stage2_duration_sec": 0.08,
+        "prompt_tokens": 2783,
+        "completion_tokens": 7673,
+        "total_tokens": 10456,
+        "cost_usd": 0.010879,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 94,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 99,
+            "completion_tokens": 1939,
+            "total_tokens": 2038,
+            "duration_ms": 107592,
+            "cost_usd": 0.002553
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 99,
+            "completion_tokens": 1939,
+            "total_tokens": 2038,
+            "duration_ms": 107592,
+            "cost_usd": 0.002553
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m1__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "postgres-to-kafka__m2__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-kafka__m2__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "level-2"
+        ],
+        "expected_behavior": "PENDING-записи публикуются в transactions.overdue.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Запустить поток.",
+          "Проверить сообщения через rpk topic consume transactions.overdue."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T17:44:51.759184+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:00:51.786529+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T17:44:51.759184+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m2__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m2__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:00:51.782512+00:00",
+      "exit_code": -1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m2__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m2__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m2__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m2__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON",
+        "duration_sec": 352.03,
+        "stage1_duration_sec": 51.76,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m2__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "postgres-to-kafka__m3__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-kafka__m3__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "level-2"
+        ],
+        "expected_behavior": "PENDING-записи публикуются в transactions.overdue.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Запустить поток.",
+          "Проверить сообщения через rpk topic consume transactions.overdue."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T18:00:51.849908+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:02:21.776826+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:00:51.849908+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m3__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m3__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:02:21.770824+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m3__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m3__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m3__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m3__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 88.03,
+        "stage1_duration_sec": 43.69,
+        "stage2_duration_sec": 7.51,
+        "prompt_tokens": 5710,
+        "completion_tokens": 7322,
+        "total_tokens": 13032,
+        "cost_usd": 0.011374,
+        "nifi_processor_count": 4,
+        "nifi_connection_count": 3,
+        "pim_source_count": 1,
+        "pim_step_count": 2,
+        "pim_sink_count": 1,
+        "session_id": 96,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 1342,
+            "completion_tokens": 2323,
+            "total_tokens": 3665,
+            "duration_ms": 43297,
+            "cost_usd": 0.003456
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 99,
+            "completion_tokens": 1492,
+            "total_tokens": 1591,
+            "duration_ms": 7313,
+            "cost_usd": 0.000607
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1342,
+            "completion_tokens": 2323,
+            "total_tokens": 3665,
+            "duration_ms": 43297,
+            "cost_usd": 0.003456
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 99,
+            "completion_tokens": 1492,
+            "total_tokens": 1591,
+            "duration_ms": 7313,
+            "cost_usd": 0.000607
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\postgres-to-kafka__m3__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "kafka-routing__m0__p1000__a1__sp329ea448": {
+      "run_id": "kafka-routing__m0__p1000__a1__sp329ea448",
+      "case_id": "kafka-routing",
+      "title": "Kafka Content-Based Routing (TC-07)",
+      "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "routing",
+          "level-3"
+        ],
+        "expected_behavior": "Сообщения корректно маршрутизируются по полю type.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Опубликовать в events.all сообщения с type=purchase, refund, other.",
+          "Проверить заполнение purchases/refunds таблиц и топика events.unknown."
+        ]
+      },
+      "status": "needs_nifi_manual_test",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T18:02:21.790976+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:04:56.762131+00:00",
+          "status": "needs_nifi_manual_test",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:02:21.790976+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m0__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m0__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:04:56.739816+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m0__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m0__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m0__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m0__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 152.59,
+        "stage1_duration_sec": 118.29,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 207,
+        "completion_tokens": 8241,
+        "total_tokens": 8448,
+        "cost_usd": 0.010781,
+        "nifi_processor_count": 0,
+        "nifi_connection_count": 0,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 97,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 117,
+            "completion_tokens": 1772,
+            "total_tokens": 1889,
+            "duration_ms": 117983,
+            "cost_usd": 0.002342
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 117,
+            "completion_tokens": 1772,
+            "total_tokens": 1889,
+            "duration_ms": 117983,
+            "cost_usd": 0.002342
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m0__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "kafka-routing__m1__p1000__a1__sp329ea448": {
+      "run_id": "kafka-routing__m1__p1000__a1__sp329ea448",
+      "case_id": "kafka-routing",
+      "title": "Kafka Content-Based Routing (TC-07)",
+      "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "routing",
+          "level-3"
+        ],
+        "expected_behavior": "Сообщения корректно маршрутизируются по полю type.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Опубликовать в events.all сообщения с type=purchase, refund, other.",
+          "Проверить заполнение purchases/refunds таблиц и топика events.unknown."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T18:04:56.794086+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:11:04.344640+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:04:56.794086+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:11:04.342639+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for YAML PIM",
+        "duration_sec": 300.23,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m1__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "kafka-routing__m2__p1000__a1__sp329ea448": {
+      "run_id": "kafka-routing__m2__p1000__a1__sp329ea448",
+      "case_id": "kafka-routing",
+      "title": "Kafka Content-Based Routing (TC-07)",
+      "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "routing",
+          "level-3"
+        ],
+        "expected_behavior": "Сообщения корректно маршрутизируются по полю type.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Опубликовать в events.all сообщения с type=purchase, refund, other.",
+          "Проверить заполнение purchases/refunds таблиц и топика events.unknown."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T18:11:04.358397+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:17:21.344973+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:11:04.358397+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m2__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m2__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:17:21.342972+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m2__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m2__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m2__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m2__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for YAML PIM",
+        "duration_sec": 300.25,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m2__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "kafka-routing__m3__p1000__a1__sp329ea448": {
+      "run_id": "kafka-routing__m3__p1000__a1__sp329ea448",
+      "case_id": "kafka-routing",
+      "title": "Kafka Content-Based Routing (TC-07)",
+      "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "routing",
+          "level-3"
+        ],
+        "expected_behavior": "Сообщения корректно маршрутизируются по полю type.",
+        "manual_test_checklist": [
+          "Импортировать nifi.json.",
+          "Опубликовать в events.all сообщения с type=purchase, refund, other.",
+          "Проверить заполнение purchases/refunds таблиц и топика events.unknown."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T18:17:21.373026+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:23:36.381786+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:17:21.373026+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m3__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m3__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:23:36.380785+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m3__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m3__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m3__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m3__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for YAML PIM",
+        "duration_sec": 300.23,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m3__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "s3-to-postgres-enrich__m0__p1000__a1__sp329ea448": {
+      "run_id": "s3-to-postgres-enrich__m0__p1000__a1__sp329ea448",
+      "case_id": "s3-to-postgres-enrich",
+      "title": "S3 to PostgreSQL with enrichment (TC-08)",
+      "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "postgres",
+          "enrichment",
+          "level-3"
+        ],
+        "expected_behavior": "JSON из raw-logs появляется в public.event_log с processed_at.",
+        "manual_test_checklist": [
+          "Создать таблицу public.event_log заранее.",
+          "Импортировать nifi.json, подставить S3 endpoint и credentials.",
+          "Запустить поток, проверить вставку записей с processed_at."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T18:23:36.401949+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:30:33.607156+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:23:36.401949+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m0__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m0__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:30:33.580021+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m0__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m0__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m0__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m0__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON (direct mode)",
+        "duration_sec": 300.29,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m0__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "s3-to-postgres-enrich__m1__p1000__a1__sp329ea448": {
+      "run_id": "s3-to-postgres-enrich__m1__p1000__a1__sp329ea448",
+      "case_id": "s3-to-postgres-enrich",
+      "title": "S3 to PostgreSQL with enrichment (TC-08)",
+      "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "postgres",
+          "enrichment",
+          "level-3"
+        ],
+        "expected_behavior": "JSON из raw-logs появляется в public.event_log с processed_at.",
+        "manual_test_checklist": [
+          "Создать таблицу public.event_log заранее.",
+          "Импортировать nifi.json, подставить S3 endpoint и credentials.",
+          "Запустить поток, проверить вставку записей с processed_at."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T18:30:33.622179+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:31:51.163195+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:30:33.622179+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:31:51.155637+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 75.37,
+        "stage1_duration_sec": 38.28,
+        "stage2_duration_sec": 0.13,
+        "prompt_tokens": 1471,
+        "completion_tokens": 3452,
+        "total_tokens": 4923,
+        "cost_usd": 0.004966,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 102,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 114,
+            "completion_tokens": 1441,
+            "total_tokens": 1555,
+            "duration_ms": 37843,
+            "cost_usd": 0.00191
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 114,
+            "completion_tokens": 1441,
+            "total_tokens": 1555,
+            "duration_ms": 37843,
+            "cost_usd": 0.00191
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 10,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m1__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "s3-to-postgres-enrich__m2__p1000__a1__sp329ea448": {
+      "run_id": "s3-to-postgres-enrich__m2__p1000__a1__sp329ea448",
+      "case_id": "s3-to-postgres-enrich",
+      "title": "S3 to PostgreSQL with enrichment (TC-08)",
+      "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "postgres",
+          "enrichment",
+          "level-3"
+        ],
+        "expected_behavior": "JSON из raw-logs появляется в public.event_log с processed_at.",
+        "manual_test_checklist": [
+          "Создать таблицу public.event_log заранее.",
+          "Импортировать nifi.json, подставить S3 endpoint и credentials.",
+          "Запустить поток, проверить вставку записей с processed_at."
+        ]
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T18:31:51.177149+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:46:20.587764+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:31:51.177149+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m2__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m2__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:46:20.482952+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m2__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m2__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m2__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m2__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for NiFi JSON",
+        "duration_sec": 346.49,
+        "stage1_duration_sec": 46.23,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m2__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "s3-to-postgres-enrich__m3__p1000__a1__sp329ea448": {
+      "run_id": "s3-to-postgres-enrich__m3__p1000__a1__sp329ea448",
+      "case_id": "s3-to-postgres-enrich",
+      "title": "S3 to PostgreSQL with enrichment (TC-08)",
+      "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "postgres",
+          "enrichment",
+          "level-3"
+        ],
+        "expected_behavior": "JSON из raw-logs появляется в public.event_log с processed_at.",
+        "manual_test_checklist": [
+          "Создать таблицу public.event_log заранее.",
+          "Импортировать nifi.json, подставить S3 endpoint и credentials.",
+          "Запустить поток, проверить вставку записей с processed_at."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-12T15:47:55.313802+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-12T18:46:20.628923+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-12T18:49:06.759835+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-12T18:46:20.628923+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m3__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m3__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-12T18:49:06.692790+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m3__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m3__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m3__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m3__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 104.78,
+        "stage1_duration_sec": 51.96,
+        "stage2_duration_sec": 6.73,
+        "prompt_tokens": 4886,
+        "completion_tokens": 7353,
+        "total_tokens": 12239,
+        "cost_usd": 0.011147,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 104,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 1357,
+            "completion_tokens": 2644,
+            "total_tokens": 4001,
+            "duration_ms": 49733,
+            "cost_usd": 0.003878
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 114,
+            "completion_tokens": 2061,
+            "total_tokens": 2175,
+            "duration_ms": 5594,
+            "cost_usd": 0.000836
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1357,
+            "completion_tokens": 2644,
+            "total_tokens": 4001,
+            "duration_ms": 49733,
+            "cost_usd": 0.003878
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 114,
+            "completion_tokens": 2061,
+            "total_tokens": 2175,
+            "duration_ms": 5594,
+            "cost_usd": 0.000836
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 9,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\s3-to-postgres-enrich__m3__p1000__a1__sp329ea448\\run_summary.json"
+    }
+  },
+  "status_counts": {
+    "failed_generation": 11,
+    "needs_nifi_manual_test": 4,
+    "completed": 1,
+    "failed_import": 12
+  }
+}

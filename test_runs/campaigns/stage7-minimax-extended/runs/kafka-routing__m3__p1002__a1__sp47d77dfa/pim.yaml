@@ -1,0 +1,87 @@
+flow:
+  id: events_router
+  name: Events Router by Type
+  description: Read events from Kafka, route to PostgreSQL or Kafka based on type
+    field
+triggers:
+- id: trigger_main
+  type: schedule
+  condition: continuous
+sources:
+- id: source_kafka
+  name: Read Events
+  type: Kafka
+  location: events.all
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: events_router_group
+      auto_offset_reset: latest
+processing_elements:
+- id: process_purchase
+  name: Filter Purchases
+  operation: Filter
+  config:
+    condition: type == 'purchase'
+- id: process_refund
+  name: Filter Refunds
+  operation: Filter
+  config:
+    condition: type == 'refund'
+- id: process_unknown
+  name: Filter Unknown Types
+  operation: Filter
+  config:
+    condition: type != 'purchase' AND type != 'refund'
+sinks:
+- id: sink_purchases
+  name: Write Purchases
+  type: PostgreSQL
+  location: purchases
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_refunds
+  name: Write Refunds
+  type: PostgreSQL
+  location: refunds
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_unknown
+  name: Write Unknown Events
+  type: Kafka
+  location: events.unknown
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: event_data
+  format: json
+links:
+- from_id: source_kafka
+  to_id: process_purchase
+  data_ref: event_data
+- from_id: source_kafka
+  to_id: process_refund
+  data_ref: event_data
+- from_id: source_kafka
+  to_id: process_unknown
+  data_ref: event_data
+- from_id: process_purchase
+  to_id: sink_purchases
+  data_ref: event_data
+- from_id: process_refund
+  to_id: sink_refunds
+  data_ref: event_data
+- from_id: process_unknown
+  to_id: sink_unknown
+  data_ref: event_data

@@ -1,0 +1,28 @@
+{
+  "success": false,
+  "error": {
+    "error": "manual_trigger_warning",
+    "details": "Trigger(s) ['trigger_main'] have type 'manual'.\nThe flow will NOT start automatically in NiFi — someone must press Run in the NiFi UI.\nChange trigger type to 'schedule' or 'event' for production use."
+  },
+  "duration_sec": 14.7,
+  "stage1_duration_sec": 14.67,
+  "stage2_duration_sec": 0.03,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "cost_usd": null,
+  "nifi_processor_count": null,
+  "nifi_connection_count": null,
+  "pim_source_count": 1,
+  "pim_step_count": 0,
+  "pim_sink_count": 1,
+  "session_id": null,
+  "preset_id": 1002,
+  "preset_name": "openrouter minimax/minimax-m2.7",
+  "preset_model": "minimax/minimax-m2.7",
+  "llm_calls": [],
+  "llm_usage_by_purpose": {},
+  "nifi_import_success": null,
+  "nifi_error_count": null,
+  "nifi_import_error": null
+}

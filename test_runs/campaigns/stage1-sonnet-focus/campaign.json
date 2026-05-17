@@ -1,0 +1,863 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-05-11T17:00:44.039004+00:00",
+  "updated_at": "2026-05-11T17:24:32.913660+00:00",
+  "campaign": {
+    "id": "stage1-sonnet-focus",
+    "title": "Этап 1 — фокусная проверка Sonnet 4.6",
+    "meta": {
+      "id": "stage1-sonnet-focus",
+      "title": "Этап 1 — фокусная проверка Sonnet 4.6",
+      "owner": "Дмитрий Макаров",
+      "objective": "Сравнить Sonnet 4.6 на двух наиболее показательных correction-sensitive кейсах, чтобы понять, улучшает ли более сильная модель staged generation и semantic correction по сравнению с Qwen и DeepSeek без запуска полной 20-run серии.\n",
+      "tags": [
+        "thesis",
+        "stage1",
+        "sonnet",
+        "focused"
+      ]
+    },
+    "manifest_source": "F:\\Education\\Diplom\\FlowArchitect\\config\\campaigns\\stage1_sonnet_focus.yaml"
+  },
+  "defaults": {
+    "presets": [
+      1005
+    ],
+    "modes": [
+      1,
+      3
+    ],
+    "stage_presets": {
+      "pim": 1005,
+      "corrector": 1005
+    },
+    "repeat": 1,
+    "timeout_sec": 300,
+    "nifi_validate": true,
+    "manual_nifi_required": true,
+    "requires_user_input": false,
+    "stop_after_statuses": [
+      "needs_user_input",
+      "needs_nifi_manual_test"
+    ]
+  },
+  "run_order": [
+    "kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e",
+    "kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e",
+    "postgres-to-file__m1__p1005__a1__sp2d3b9a8e",
+    "postgres-to-file__m3__p1005__a1__sp2d3b9a8e",
+    "postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e",
+    "postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e"
+  ],
+  "runs": {
+    "postgres-to-file__m1__p1005__a1__sp2d3b9a8e": {
+      "run_id": "postgres-to-file__m1__p1005__a1__sp2d3b9a8e",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1005,
+      "stage_presets": {
+        "pim": 1005,
+        "corrector": 1005
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "functional",
+          "correction-sensitive"
+        ],
+        "expected_behavior": "Записи из PostgreSQL public.orders экспортируются в JSON-файл.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что source корректно читает public.orders из PostgreSQL.",
+          "Проверить, что flow сохраняет результат в файл по явному пути."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T17:00:44.039004+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:00:57.931648+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:02:49.831001+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:00:57.931648+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m1__p1005__a1__sp2d3b9a8e\\query.txt",
+        "--preset",
+        "1005",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m1__p1005__a1__sp2d3b9a8e\\raw_report.json",
+        "--pim-preset",
+        "1005",
+        "--corrector-preset",
+        "1005",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:02:49.824486+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m1__p1005__a1__sp2d3b9a8e\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m1__p1005__a1__sp2d3b9a8e\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m1__p1005__a1__sp2d3b9a8e\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m1__p1005__a1__sp2d3b9a8e\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 110.0,
+        "stage1_duration_sec": 24.06,
+        "stage2_duration_sec": 0.18,
+        "prompt_tokens": 1519,
+        "completion_tokens": 741,
+        "total_tokens": 2260,
+        "cost_usd": 0.015672,
+        "nifi_processor_count": 4,
+        "nifi_connection_count": 3,
+        "pim_source_count": 1,
+        "pim_step_count": 2,
+        "pim_sink_count": 1,
+        "session_id": 58,
+        "preset_id": 1005,
+        "preset_name": "openrouter sonnet 4.6",
+        "preset_model": "anthropic/claude-sonnet-4.6",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "anthropic/claude-sonnet-4.6",
+            "prompt_tokens": 98,
+            "completion_tokens": 9,
+            "total_tokens": 107,
+            "duration_ms": 23750,
+            "cost_usd": 0.000429
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 98,
+            "completion_tokens": 9,
+            "total_tokens": 107,
+            "duration_ms": 23750,
+            "cost_usd": 0.000429
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m1__p1005__a1__sp2d3b9a8e\\run_summary.json"
+    },
+    "postgres-to-file__m3__p1005__a1__sp2d3b9a8e": {
+      "run_id": "postgres-to-file__m3__p1005__a1__sp2d3b9a8e",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1005,
+      "stage_presets": {
+        "pim": 1005,
+        "corrector": 1005
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "file",
+          "functional",
+          "correction-sensitive"
+        ],
+        "expected_behavior": "Записи из PostgreSQL public.orders экспортируются в JSON-файл.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить, что source корректно читает public.orders из PostgreSQL.",
+          "Проверить, что flow сохраняет результат в файл по явному пути."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 1,
+      "history": [
+        {
+          "timestamp": "2026-05-11T17:00:44.039004+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:02:49.930625+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:05:09.825524+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:02:49.930625+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m3__p1005__a1__sp2d3b9a8e\\query.txt",
+        "--preset",
+        "1005",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m3__p1005__a1__sp2d3b9a8e\\raw_report.json",
+        "--pim-preset",
+        "1005",
+        "--corrector-preset",
+        "1005",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:05:09.817521+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m3__p1005__a1__sp2d3b9a8e\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m3__p1005__a1__sp2d3b9a8e\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m3__p1005__a1__sp2d3b9a8e\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m3__p1005__a1__sp2d3b9a8e\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 138.19,
+        "stage1_duration_sec": 8.64,
+        "stage2_duration_sec": 43.68,
+        "prompt_tokens": 5665,
+        "completion_tokens": 4605,
+        "total_tokens": 10270,
+        "cost_usd": 0.08607,
+        "nifi_processor_count": 4,
+        "nifi_connection_count": 3,
+        "pim_source_count": 1,
+        "pim_step_count": 2,
+        "pim_sink_count": 1,
+        "session_id": 59,
+        "preset_id": 1005,
+        "preset_name": "openrouter sonnet 4.6",
+        "preset_model": "anthropic/claude-sonnet-4.6",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "anthropic/claude-sonnet-4.6",
+            "prompt_tokens": 1421,
+            "completion_tokens": 721,
+            "total_tokens": 2142,
+            "duration_ms": 8188,
+            "cost_usd": 0.015078
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "anthropic/claude-sonnet-4.6",
+            "prompt_tokens": 4146,
+            "completion_tokens": 3875,
+            "total_tokens": 8021,
+            "duration_ms": 43515,
+            "cost_usd": 0.070563
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1421,
+            "completion_tokens": 721,
+            "total_tokens": 2142,
+            "duration_ms": 8188,
+            "cost_usd": 0.015078
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 4146,
+            "completion_tokens": 3875,
+            "total_tokens": 8021,
+            "duration_ms": 43515,
+            "cost_usd": 0.070563
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 3,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-file__m3__p1005__a1__sp2d3b9a8e\\run_summary.json",
+      "last_comment_at": "2026-05-11T17:21:27.774530+00:00"
+    },
+    "postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e": {
+      "run_id": "postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1005,
+      "stage_presets": {
+        "pim": 1005,
+        "corrector": 1005
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "batch",
+          "correction-sensitive"
+        ],
+        "expected_behavior": "Новые записи из PostgreSQL публикуются в Kafka topic analytics.events.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие корректного источника чтения из PostgreSQL.",
+          "Проверить наличие корректной публикации в Kafka в формате JSON."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T17:00:44.039004+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:05:09.830524+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:05:58.659857+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:05:09.830524+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e\\query.txt",
+        "--preset",
+        "1005",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e\\raw_report.json",
+        "--pim-preset",
+        "1005",
+        "--corrector-preset",
+        "1005",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:05:58.653857+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 47.23,
+        "stage1_duration_sec": 9.9,
+        "stage2_duration_sec": 0.1,
+        "prompt_tokens": 1513,
+        "completion_tokens": 796,
+        "total_tokens": 2309,
+        "cost_usd": 0.016479,
+        "nifi_processor_count": 4,
+        "nifi_connection_count": 3,
+        "pim_source_count": 1,
+        "pim_step_count": 2,
+        "pim_sink_count": 1,
+        "session_id": 60,
+        "preset_id": 1005,
+        "preset_name": "openrouter sonnet 4.6",
+        "preset_model": "anthropic/claude-sonnet-4.6",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "anthropic/claude-sonnet-4.6",
+            "prompt_tokens": 95,
+            "completion_tokens": 10,
+            "total_tokens": 105,
+            "duration_ms": 9594,
+            "cost_usd": 0.000435
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 95,
+            "completion_tokens": 10,
+            "total_tokens": 105,
+            "duration_ms": 9594,
+            "cost_usd": 0.000435
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 9,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m1__p1005__a1__sp2d3b9a8e\\run_summary.json"
+    },
+    "postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e": {
+      "run_id": "postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL to Kafka",
+      "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1005,
+      "stage_presets": {
+        "pim": 1005,
+        "corrector": 1005
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "batch",
+          "correction-sensitive"
+        ],
+        "expected_behavior": "Новые записи из PostgreSQL публикуются в Kafka topic analytics.events.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие корректного источника чтения из PostgreSQL.",
+          "Проверить наличие корректной публикации в Kafka в формате JSON."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 1,
+      "history": [
+        {
+          "timestamp": "2026-05-11T17:00:44.039004+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:05:58.666411+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:07:41.493592+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:05:58.666411+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e\\query.txt",
+        "--preset",
+        "1005",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e\\raw_report.json",
+        "--pim-preset",
+        "1005",
+        "--corrector-preset",
+        "1005",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:07:41.486567+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 101.09,
+        "stage1_duration_sec": 9.78,
+        "stage2_duration_sec": 45.28,
+        "prompt_tokens": 5978,
+        "completion_tokens": 4701,
+        "total_tokens": 10679,
+        "cost_usd": 0.088449,
+        "nifi_processor_count": 4,
+        "nifi_connection_count": 3,
+        "pim_source_count": 1,
+        "pim_step_count": 2,
+        "pim_sink_count": 1,
+        "session_id": 61,
+        "preset_id": 1005,
+        "preset_name": "openrouter sonnet 4.6",
+        "preset_model": "anthropic/claude-sonnet-4.6",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "anthropic/claude-sonnet-4.6",
+            "prompt_tokens": 1418,
+            "completion_tokens": 777,
+            "total_tokens": 2195,
+            "duration_ms": 9484,
+            "cost_usd": 0.015909
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "anthropic/claude-sonnet-4.6",
+            "prompt_tokens": 4465,
+            "completion_tokens": 3914,
+            "total_tokens": 8379,
+            "duration_ms": 45094,
+            "cost_usd": 0.072105
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1418,
+            "completion_tokens": 777,
+            "total_tokens": 2195,
+            "duration_ms": 9484,
+            "cost_usd": 0.015909
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 4465,
+            "completion_tokens": 3914,
+            "total_tokens": 8379,
+            "duration_ms": 45094,
+            "cost_usd": 0.072105
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e\\run_summary.json",
+      "last_comment_at": "2026-05-11T17:21:27.810113+00:00"
+    },
+    "kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e": {
+      "run_id": "kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1005,
+      "stage_presets": {
+        "pim": 1005,
+        "corrector": 1005
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "streaming",
+          "correction-sensitive"
+        ],
+        "expected_behavior": "Сообщения из Kafka появляются в таблице PostgreSQL после преобразования.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие всех обязательных процессоров и соединений.",
+          "Проверить, что схема потока соответствует задаче Kafka -> PostgreSQL."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T17:21:42.221459+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:21:51.211722+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:22:41.018322+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:21:51.211722+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e\\query.txt",
+        "--preset",
+        "1005",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e\\raw_report.json",
+        "--pim-preset",
+        "1005",
+        "--corrector-preset",
+        "1005",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:22:40.985301+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 48.11,
+        "stage1_duration_sec": 11.01,
+        "stage2_duration_sec": 0.08,
+        "prompt_tokens": 1519,
+        "completion_tokens": 802,
+        "total_tokens": 2321,
+        "cost_usd": 0.016587,
+        "nifi_processor_count": 4,
+        "nifi_connection_count": 3,
+        "pim_source_count": 1,
+        "pim_step_count": 2,
+        "pim_sink_count": 1,
+        "session_id": 66,
+        "preset_id": 1005,
+        "preset_name": "openrouter sonnet 4.6",
+        "preset_model": "anthropic/claude-sonnet-4.6",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "anthropic/claude-sonnet-4.6",
+            "prompt_tokens": 98,
+            "completion_tokens": 10,
+            "total_tokens": 108,
+            "duration_ms": 10750,
+            "cost_usd": 0.000444
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 98,
+            "completion_tokens": 10,
+            "total_tokens": 108,
+            "duration_ms": 10750,
+            "cost_usd": 0.000444
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 5,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m1__p1005__a1__sp2d3b9a8e\\run_summary.json"
+    },
+    "kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e": {
+      "run_id": "kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1005,
+      "stage_presets": {
+        "pim": 1005,
+        "corrector": 1005
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "streaming",
+          "correction-sensitive"
+        ],
+        "expected_behavior": "Сообщения из Kafka появляются в таблице PostgreSQL после преобразования.",
+        "manual_test_checklist": [
+          "Импортировать полученный nifi.json в тестовый NiFi.",
+          "Проверить наличие всех обязательных процессоров и соединений.",
+          "Проверить, что схема потока соответствует задаче Kafka -> PostgreSQL."
+        ]
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-11T17:21:42.221459+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-11T17:22:47.963910+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-11T17:24:32.913660+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-11T17:22:47.963910+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e\\query.txt",
+        "--preset",
+        "1005",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e\\raw_report.json",
+        "--pim-preset",
+        "1005",
+        "--corrector-preset",
+        "1005",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-11T17:24:32.907663+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 103.49,
+        "stage1_duration_sec": 11.29,
+        "stage2_duration_sec": 46.29,
+        "prompt_tokens": 6096,
+        "completion_tokens": 4825,
+        "total_tokens": 10921,
+        "cost_usd": 0.090663,
+        "nifi_processor_count": 4,
+        "nifi_connection_count": 3,
+        "pim_source_count": 1,
+        "pim_step_count": 2,
+        "pim_sink_count": 1,
+        "session_id": 67,
+        "preset_id": 1005,
+        "preset_name": "openrouter sonnet 4.6",
+        "preset_model": "anthropic/claude-sonnet-4.6",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "anthropic/claude-sonnet-4.6",
+            "prompt_tokens": 1421,
+            "completion_tokens": 816,
+            "total_tokens": 2237,
+            "duration_ms": 11062,
+            "cost_usd": 0.016503
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "anthropic/claude-sonnet-4.6",
+            "prompt_tokens": 4577,
+            "completion_tokens": 3999,
+            "total_tokens": 8576,
+            "duration_ms": 46139,
+            "cost_usd": 0.073716
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1421,
+            "completion_tokens": 816,
+            "total_tokens": 2237,
+            "duration_ms": 11062,
+            "cost_usd": 0.016503
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 4577,
+            "completion_tokens": 3999,
+            "total_tokens": 8576,
+            "duration_ms": 46139,
+            "cost_usd": 0.073716
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 4,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-sonnet-focus\\runs\\kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e\\run_summary.json"
+    }
+  },
+  "status_counts": {
+    "failed_import": 6
+  }
+}

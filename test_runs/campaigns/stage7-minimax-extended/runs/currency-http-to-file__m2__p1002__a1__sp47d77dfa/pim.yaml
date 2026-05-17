@@ -1,0 +1,34 @@
+flow:
+  id: currency_rates_fetch
+  name: Currency Exchange Rates Fetch
+  description: Fetch exchange rates from API and save to JSON file
+triggers:
+- id: trigger_main
+  type: manual
+  condition: on demand
+sources:
+- id: source_exchange_rates
+  name: Exchange Rate API
+  type: REST API
+  location: https://api.exchangerate.host/latest
+  connection:
+    properties:
+      method: GET
+      headers: {}
+processing_elements: []
+sinks:
+- id: sink_file
+  name: Save to JSON File
+  type: File
+  location: /data/output/rates.json
+  connection:
+    properties:
+      format: json
+      directory: /data/output
+processed_data:
+- id: rates_data
+  format: json
+links:
+- from_id: source_exchange_rates
+  to_id: sink_file
+  data_ref: rates_data

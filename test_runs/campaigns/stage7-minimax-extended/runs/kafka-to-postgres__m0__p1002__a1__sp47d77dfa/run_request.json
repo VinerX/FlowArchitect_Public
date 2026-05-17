@@ -1,0 +1,61 @@
+{
+  "run_id": "kafka-to-postgres__m0__p1002__a1__sp47d77dfa",
+  "case_id": "kafka-to-postgres",
+  "title": "Kafka to PostgreSQL",
+  "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 0,
+  "preset_id": 1002,
+  "stage_presets": {
+    "pim": 1002,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": false,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "kafka",
+      "postgres",
+      "level-2"
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-13T16:06:44.505129+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-13T19:52:26.089713+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-13T19:52:26.089713+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage7-minimax-extended\\runs\\kafka-to-postgres__m0__p1002__a1__sp47d77dfa\\query.txt",
+    "--preset",
+    "1002",
+    "--mode",
+    "0",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage7-minimax-extended\\runs\\kafka-to-postgres__m0__p1002__a1__sp47d77dfa\\raw_report.json",
+    "--pim-preset",
+    "1002",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

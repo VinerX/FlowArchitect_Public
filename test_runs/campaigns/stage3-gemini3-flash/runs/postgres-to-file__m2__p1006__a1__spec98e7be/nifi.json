@@ -1,0 +1,143 @@
+{
+  "identifier": "7e38b3a0-1234-4a5b-8c9d-0123456789ab",
+  "name": "PostgreSQL to JSON Export Flow",
+  "componentType": "PROCESS_GROUP",
+  "contents": {
+    "processors": [
+      {
+        "identifier": "src_postgres_orders",
+        "name": "PostgreSQL Orders Table",
+        "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 300,
+          "y": 100
+        },
+        "properties": {
+          "Database Connection Pool": "db-connection-pool-service",
+          "db-fetch-db-type": "PostgreSQL",
+          "table-name": "public.orders",
+          "record-writer": "json-record-writer-service",
+          "maximum-value-columns": "{{INCREMENTAL_COL_ID}}"
+        },
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "3600 sec"
+      },
+      {
+        "identifier": "proc_format_json",
+        "name": "Format to JSON",
+        "type": "org.apache.nifi.processors.standard.ConvertRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 300,
+          "y": 350
+        },
+        "properties": {
+          "record-reader": "json-tree-reader-service",
+          "record-writer": "json-record-writer-service"
+        }
+      },
+      {
+        "identifier": "sink_json_file",
+        "name": "Local JSON File",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 300,
+          "y": 600
+        },
+        "properties": {
+          "Directory": "/data/output",
+          "Conflict Strategy": "append"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "link-1",
+        "name": "order_record",
+        "source": {
+          "id": "src_postgres_orders",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "proc_format_json",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      },
+      {
+        "identifier": "link-2",
+        "name": "order_record",
+        "source": {
+          "id": "proc_format_json",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "sink_json_file",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      }
+    ],
+    "controllerServices": [
+      {
+        "identifier": "db-connection-pool-service",
+        "name": "DBCPConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-dbcp-service-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database Driver Location(s)": "{{POSTGRES_DRIVER_PATH}}",
+          "Database User": "{{DB_USERNAME}}",
+          "Password": "{{DB_PASSWORD}}"
+        }
+      },
+      {
+        "identifier": "json-record-writer-service",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "1.23.2"
+        },
+        "properties": {
+          "output-grouping": "output-array"
+        }
+      },
+      {
+        "identifier": "json-tree-reader-service",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "1.23.2"
+        },
+        "properties": {}
+      }
+    ]
+  }
+}

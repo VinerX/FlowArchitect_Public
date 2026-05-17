@@ -1,0 +1,306 @@
+{
+  "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T20:41:40.537777+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flowController": {
+          "name": "PostgreSQL PENDING Transactions to Kafka",
+          "comment": "Reads PENDING records from public.transactions, converts to JSON, publishes to Kafka topic transactions.overdue"
+        },
+        "controllerServices": [
+          {
+            "identifier": "db-connection-pool",
+            "name": "PostgreSQL Connection Pool",
+            "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+            "properties": {
+              "Database Connection URL": "jdbc:postgresql://localhost:5432/your_database",
+              "Database Driver Class Name": "org.postgresql.Driver",
+              "database-driver-locations": "/opt/nifi/drivers/postgresql-42.6.0.jar",
+              "Database User": "your_db_user",
+              "Password": "your_db_password",
+              "Max Wait Time": "500 millis",
+              "Max Total Connections": "8",
+              "Validation-query": "SELECT 1"
+            }
+          },
+          {
+            "identifier": "json-record-set-writer",
+            "name": "JSON Record Set Writer",
+            "type": "org.apache.nifi.json.JsonRecordSetWriter",
+            "properties": {
+              "Schema Write Strategy": "No Schema",
+              "Pretty Print JSON": "false",
+              "Suppress Null Values": "Never Suppress",
+              "Output Grouping": "One Line Per Object"
+            }
+          },
+          {
+            "identifier": "json-reader",
+            "name": "JSON Reader",
+            "type": "org.apache.nifi.json.JsonTreeReader",
+            "properties": {
+              "Schema Access Strategy": "Infer Schema",
+              "Date Format": "yyyy-MM-dd",
+              "Time Format": "HH:mm:ss",
+              "Timestamp Format": "yyyy-MM-dd HH:mm:ss"
+            }
+          }
+        ],
+        "processors": [
+          {
+            "identifier": "query-db-table",
+            "name": "QueryDatabaseTable - Read PENDING Transactions",
+            "type": "org.apache.nifi.processors.standard.QueryDatabaseTable",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "60 sec",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "properties": {
+              "Database Connection Pooling Service": "db-connection-pool",
+              "db-fetch-db-type": "PostgreSQL",
+              "Table Name": "public.transactions",
+              "Columns to Return": "*",
+              "Additional WHERE clause": "status = 'PENDING'",
+              "Max Rows Per Flow File": "1000",
+              "Output Batch Size": "0",
+              "Fetch Size": "0",
+              "Maximum-value Columns": "id",
+              "db-fetch-initial-max-value": "",
+              "db-fetch-normalize": "true",
+              "record-writer": "json-record-set-writer"
+            },
+            "autoTerminatedRelationships": []
+          },
+          {
+            "identifier": "split-json",
+            "name": "SplitRecord - One Record Per FlowFile",
+            "type": "org.apache.nifi.processors.standard.SplitRecord",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "properties": {
+              "Record Reader": "json-reader",
+              "Record Writer": "json-record-set-writer",
+              "Records Per Split": "1"
+            },
+            "autoTerminatedRelationships": [
+              "original"
+            ]
+          },
+          {
+            "identifier": "update-attributes",
+            "name": "UpdateAttribute - Set Kafka Attributes",
+            "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "properties": {
+              "kafka.topic": "transactions.overdue",
+              "mime.type": "application/json",
+              "kafka.key": "${field.value('id')}",
+              "source.table": "public.transactions",
+              "source.status.filter": "PENDING"
+            },
+            "autoTerminatedRelationships": []
+          },
+          {
+            "identifier": "publish-kafka",
+            "name": "PublishKafkaRecord_2_6 - Publish to transactions.overdue",
+            "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord_2_6",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "properties": {
+              "bootstrap.servers": "localhost:9092",
+              "topic": "transactions.overdue",
+              "record-reader": "json-reader",
+              "record-writer": "json-record-set-writer",
+              "use-transactions": "true",
+              "transactional-id-prefix": "nifi-transactions-overdue-",
+              "acks": "all",
+              "compression.type": "none",
+              "max.request.size": "1048576",
+              "message-demarcator": "",
+              "kafka-key": "${field.value('id')}",
+              "key-attribute-encoding": "UTF-8",
+              "delivery.timeout.ms": "120000",
+              "request.timeout.ms": "30000",
+              "retries": "3",
+              "retry.backoff.ms": "1000",
+              "batch.size": "16384",
+              "linger.ms": "0",
+              "buffer.memory": "33554432",
+              "security.protocol": "PLAINTEXT"
+            },
+            "autoTerminatedRelationships": [
+              "success"
+            ]
+          },
+          {
+            "identifier": "log-failure",
+            "name": "LogAttribute - Log Failures",
+            "type": "org.apache.nifi.processors.standard.LogAttribute",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "properties": {
+              "Log Level": "ERROR",
+              "Log Payload": "true",
+              "Attributes to Log": ".*",
+              "Log prefix": "[KAFKA-PUBLISH-FAILURE]"
+            },
+            "autoTerminatedRelationships": [
+              "success"
+            ]
+          }
+        ],
+        "connections": [
+          {
+            "identifier": "conn-query-to-split",
+            "name": "QueryDB -> SplitRecord",
+            "source": {
+              "id": "query-db-table",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "split-json",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB",
+            "flowFileExpiration": "0 sec",
+            "prioritizers": [
+              "org.apache.nifi.prioritizer.FirstInFirstOutPrioritizer"
+            ]
+          },
+          {
+            "identifier": "conn-split-to-update",
+            "name": "SplitRecord -> UpdateAttribute",
+            "source": {
+              "id": "split-json",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "update-attributes",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "splits"
+            ],
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB",
+            "flowFileExpiration": "0 sec",
+            "prioritizers": [
+              "org.apache.nifi.prioritizer.FirstInFirstOutPrioritizer"
+            ]
+          },
+          {
+            "identifier": "conn-update-to-kafka",
+            "name": "UpdateAttribute -> PublishKafka",
+            "source": {
+              "id": "update-attributes",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "publish-kafka",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB",
+            "flowFileExpiration": "0 sec",
+            "prioritizers": [
+              "org.apache.nifi.prioritizer.FirstInFirstOutPrioritizer"
+            ]
+          },
+          {
+            "identifier": "conn-kafka-failure-to-log",
+            "name": "PublishKafka failure -> LogAttribute",
+            "source": {
+              "id": "publish-kafka",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "log-failure",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "failure"
+            ],
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB",
+            "flowFileExpiration": "0 sec",
+            "prioritizers": [
+              "org.apache.nifi.prioritizer.FirstInFirstOutPrioritizer"
+            ]
+          }
+        ]
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details.",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 55.64,
+      "stage1_duration_sec": 30.46,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 180,
+      "completion_tokens": 2445,
+      "total_tokens": 2625,
+      "cost_usd": 0.037215,
+      "nifi_processor_count": 5,
+      "nifi_connection_count": 4,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 223,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 105,
+          "completion_tokens": 10,
+          "total_tokens": 115,
+          "duration_ms": 30077,
+          "cost_usd": 0.000465
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 105,
+          "completion_tokens": 10,
+          "total_tokens": 115,
+          "duration_ms": 30077,
+          "cost_usd": 0.000465
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

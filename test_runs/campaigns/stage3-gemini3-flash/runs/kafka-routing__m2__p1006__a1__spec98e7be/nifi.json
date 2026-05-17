@@ -1,0 +1,185 @@
+{
+  "identifier": "89876543-2109-8765-4321-098765432109",
+  "name": "Kafka Event Routing Pipeline",
+  "componentType": "PROCESS_GROUP",
+  "contents": {
+    "processors": [
+      {
+        "identifier": "11111111-1111-1111-1111-111111111111",
+        "name": "Kafka Events Source",
+        "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafka_2_6",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-2-6-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "properties": {
+          "bootstrap.servers": "{{KAFKA_BROKERS}}",
+          "topic": "events.all",
+          "group.id": "{{KAFKA_GROUP_ID}}",
+          "honor-transactions": "true",
+          "record-reader": "22222222-2222-2222-2222-222222222222",
+          "record-writer": "33333333-3333-3333-3333-333333333333"
+        }
+      },
+      {
+        "identifier": "44444444-4444-4444-4444-444444444444",
+        "name": "Type Router",
+        "type": "org.apache.nifi.processors.standard.RouteOnAttribute",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 0,
+          "y": 250
+        },
+        "properties": {
+          "Routing Strategy": "Route to Property name",
+          "purchase": "${type:equals('purchase')}",
+          "refund": "${type:equals('refund')}"
+        }
+      },
+      {
+        "identifier": "55555555-5555-5555-5555-555555555555",
+        "name": "Postgres Purchases Table",
+        "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": -400,
+          "y": 500
+        },
+        "properties": {
+          "Database Connection Pool": "88888888-8888-8888-8888-888888888888",
+          "db-type": "PostgreSQL",
+          "statement-type": "INSERT",
+          "table-name": "purchases",
+          "record-reader": "22222222-2222-2222-2222-222222222222"
+        }
+      },
+      {
+        "identifier": "66666666-6666-6666-6666-666666666666",
+        "name": "Postgres Refunds Table",
+        "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 0,
+          "y": 500
+        },
+        "properties": {
+          "Database Connection Pool": "88888888-8888-8888-8888-888888888888",
+          "db-type": "PostgreSQL",
+          "statement-type": "INSERT",
+          "table-name": "refunds",
+          "record-reader": "22222222-2222-2222-2222-222222222222"
+        }
+      },
+      {
+        "identifier": "77777777-7777-7777-7777-777777777777",
+        "name": "Kafka Unknown Topic",
+        "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-2-6-nar",
+          "version": "1.23.2"
+        },
+        "position": {
+          "x": 400,
+          "y": 500
+        },
+        "properties": {
+          "bootstrap.servers": "{{KAFKA_BROKERS}}",
+          "topic": "events.unknown",
+          "record-reader": "22222222-2222-2222-2222-222222222222",
+          "record-writer": "33333333-3333-3333-3333-333333333333"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "c1",
+        "source": {
+          "id": "11111111-1111-1111-1111-111111111111"
+        },
+        "destination": {
+          "id": "44444444-4444-4444-4444-444444444444"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      },
+      {
+        "identifier": "c2",
+        "source": {
+          "id": "44444444-4444-4444-4444-444444444444"
+        },
+        "destination": {
+          "id": "55555555-5555-5555-5555-555555555555"
+        },
+        "selectedRelationships": [
+          "purchase"
+        ]
+      },
+      {
+        "identifier": "c3",
+        "source": {
+          "id": "44444444-4444-4444-4444-444444444444"
+        },
+        "destination": {
+          "id": "66666666-6666-6666-6666-666666666666"
+        },
+        "selectedRelationships": [
+          "refund"
+        ]
+      },
+      {
+        "identifier": "c4",
+        "source": {
+          "id": "44444444-4444-4444-4444-444444444444"
+        },
+        "destination": {
+          "id": "77777777-7777-7777-7777-777777777777"
+        },
+        "selectedRelationships": [
+          "unmatched"
+        ]
+      }
+    ],
+    "controllerServices": [
+      {
+        "identifier": "22222222-2222-2222-2222-222222222222",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader"
+      },
+      {
+        "identifier": "33333333-3333-3333-3333-333333333333",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter"
+      },
+      {
+        "identifier": "88888888-8888-8888-8888-888888888888",
+        "name": "DBCPConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:5432/{{DB_NAME}}",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database User": "{{DB_USER}}",
+          "Password": "{{DB_PASSWORD}}"
+        }
+      }
+    ]
+  }
+}

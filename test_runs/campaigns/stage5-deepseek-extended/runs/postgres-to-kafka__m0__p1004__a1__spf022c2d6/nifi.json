@@ -1,0 +1,180 @@
+{
+  "flowContents": {
+    "identifier": "publish-pending-transactions-flow",
+    "name": "Publish Pending Transactions to Kafka",
+    "processors": [
+      {
+        "identifier": "proc-execsql",
+        "name": "Query pending transactions",
+        "type": "org.apache.nifi.processors.standard.ExecuteSQL",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "properties": {
+          "database-connection-pooling-service": {
+            "id": "service-dbcp"
+          },
+          "sql-select-query": "SELECT * FROM public.transactions WHERE status = 'PENDING'",
+          "Max Rows Per Flow File": "0",
+          "Output Batch Size": "10000",
+          "dbf-normalize": "false",
+          "compression-format": "NONE",
+          "Query Timeout": "0 sec"
+        },
+        "autoTerminatedRelationships": [],
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "60 sec",
+        "executionNode": "PRIMARY"
+      },
+      {
+        "identifier": "proc-convert",
+        "name": "Convert Avro to JSON lines",
+        "type": "org.apache.nifi.processors.standard.ConvertRecord",
+        "position": {
+          "x": 400,
+          "y": 0
+        },
+        "properties": {
+          "record-reader": {
+            "id": "service-avro-reader"
+          },
+          "record-writer": {
+            "id": "service-json-writer"
+          },
+          "include-zero-record-flowfiles": "false"
+        },
+        "autoTerminatedRelationships": [],
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL"
+      },
+      {
+        "identifier": "proc-kafka-publish",
+        "name": "Publish to Kafka (transactions.overdue)",
+        "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord_2_6",
+        "position": {
+          "x": 800,
+          "y": 0
+        },
+        "properties": {
+          "bootstrap.servers": "localhost:9092",
+          "topic": "transactions.overdue",
+          "record-reader": {
+            "id": "service-json-tree-reader"
+          },
+          "record-writer": {
+            "id": "service-json-writer"
+          },
+          "use-transactions": "false",
+          "max.request.size": "1 MB",
+          "acks": "1",
+          "delivery-guarantee": "AT_LEAST_ONCE",
+          "compression.type": "none",
+          "max.block.ms": "5000"
+        },
+        "autoTerminatedRelationships": [],
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL"
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "conn-1",
+        "name": "ExecuteSQL -> ConvertRecord",
+        "source": {
+          "id": "proc-execsql",
+          "type": "PROCESSOR",
+          "group": "flow-1"
+        },
+        "destination": {
+          "id": "proc-convert",
+          "type": "PROCESSOR",
+          "group": "flow-1"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "flowFileExpiration": "0",
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": "10000"
+      },
+      {
+        "identifier": "conn-2",
+        "name": "ConvertRecord -> PublishKafka",
+        "source": {
+          "id": "proc-convert",
+          "type": "PROCESSOR",
+          "group": "flow-1"
+        },
+        "destination": {
+          "id": "proc-kafka-publish",
+          "type": "PROCESSOR",
+          "group": "flow-1"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "flowFileExpiration": "0",
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": "10000"
+      }
+    ],
+    "controllerServices": [
+      {
+        "identifier": "service-dbcp",
+        "name": "PostgreSQL Connection Pool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://localhost:5432/your_database",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database Driver Location(s)": "/path/to/postgresql-42.2.23.jar",
+          "Database User": "your_user",
+          "Password": "your_password",
+          "Max Wait Time": "5000 millis",
+          "Max Total Connections": "8",
+          "Validation-query": "SELECT 1"
+        }
+      },
+      {
+        "identifier": "service-avro-reader",
+        "name": "Avro Reader with inferred schema",
+        "type": "org.apache.nifi.avro.AvroReader",
+        "properties": {
+          "schema-access-strategy": "infer-avro-schema",
+          "avro-schema": "${avro.schema}",
+          "schema-branch": "",
+          "schema-text": "${avro.schema}"
+        }
+      },
+      {
+        "identifier": "service-json-writer",
+        "name": "JSON Record Set Writer",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "properties": {
+          "Schema Write Strategy": "no-schema",
+          "Pretty Print JSON": "false",
+          "suppress-nulls": "never",
+          "output-grouping": "output-oneline",
+          "compression-format": "NONE",
+          "character-set": "UTF-8"
+        }
+      },
+      {
+        "identifier": "service-json-tree-reader",
+        "name": "JSON Tree Reader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "properties": {
+          "schema-access-strategy": "infer-schema",
+          "date-format": "yyyy-MM-dd",
+          "time-format": "HH:mm:ss",
+          "timestamp-format": "yyyy-MM-dd HH:mm:ss"
+        }
+      }
+    ],
+    "variables": {},
+    "processGroups": [],
+    "remoteProcessGroups": []
+  }
+}

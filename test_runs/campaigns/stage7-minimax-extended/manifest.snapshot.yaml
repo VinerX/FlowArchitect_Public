@@ -1,0 +1,93 @@
+campaign:
+  id: stage7-minimax-extended
+  title: Этап 7 — MiniMax M2.7 на расширенном наборе кейсов (7×4)
+  owner: Дмитрий Макаров
+  objective: 'Прогон того же 7-кейсового манифеста на MiniMax M2.7 (preset 1002).
+    Цель — закрыть пятую модель в сравнительной матрице. Corrector — Gemini Flash
+    Lite (1003).
+
+    '
+  tags:
+  - thesis
+  - stage7
+  - minimax
+  - extended
+defaults:
+  presets:
+  - 1002
+  modes:
+  - 0
+  - 1
+  - 2
+  - 3
+  stage_presets:
+    pim: 1002
+    corrector: 1003
+  repeat: 1
+  timeout_sec: 300
+  nifi_validate: true
+  manual_nifi_required: false
+  requires_user_input: false
+  stop_after_statuses:
+  - cancelled
+cases:
+- id: currency-http-to-file
+  title: Currency HTTP to File
+  query: Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат
+    в файл /data/output/rates.json.
+  tags:
+  - http
+  - file
+  - baseline
+  - level-1
+- id: file-csv-filter
+  title: File CSV Filter
+  query: Читай CSV-файлы из директории /data/input/orders/, оставляй только строки
+    где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.
+  tags:
+  - file
+  - filter
+  - level-1
+- id: postgres-to-file
+  title: PostgreSQL to File
+  query: Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй
+    их в JSON-файл /data/output/orders_export.json.
+  tags:
+  - postgres
+  - file
+  - level-1
+- id: kafka-to-postgres
+  title: Kafka to PostgreSQL
+  query: Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля
+    order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders
+    в PostgreSQL.
+  tags:
+  - kafka
+  - postgres
+  - level-2
+- id: postgres-to-kafka
+  title: PostgreSQL to Kafka
+  query: Читай из таблицы public.transactions записи со статусом PENDING, конвертируй
+    в JSON, публикуй в Kafka-топик transactions.overdue.
+  tags:
+  - postgres
+  - kafka
+  - level-2
+- id: kafka-routing
+  title: Kafka Routing TC-07
+  query: Читай сообщения из Kafka-топика events.all. Если поле type равно purchase
+    — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу
+    refunds. Всё остальное — в Kafka-топик events.unknown.
+  tags:
+  - kafka
+  - routing
+  - level-3
+- id: s3-to-postgres-enrich
+  title: S3 to PG enrichment TC-08
+  query: Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй
+    поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.
+  tags:
+  - s3
+  - postgres
+  - enrichment
+  - level-3

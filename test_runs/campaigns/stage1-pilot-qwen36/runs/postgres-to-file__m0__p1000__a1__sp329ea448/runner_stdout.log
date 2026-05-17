@@ -1,0 +1,34 @@
+
+================================================================
+Query  : ������������ ������� ����� ������ �� PostgreSQL public.orders � ��������...
+Mode   : 0 � Direct (NL->JSON)
+Presets: [1000]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1000, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1000: openrouter qwen/qwen3.6-plus  [qwen/qwen3.6-plus] ---
+  [1/2] USER_QUERY  mode=0  preset=1000
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (40s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (50s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (60s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (70s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (80s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (90s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (0 proc, 0 conn, Nones)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 159 in / 6206 out / 6365 total  |  cost: $0.008119
+  Result : [OK]  (131.89s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage1-pilot-qwen36\runs\postgres-to-file__m0__p1000__a1__sp329ea448\raw_report.json

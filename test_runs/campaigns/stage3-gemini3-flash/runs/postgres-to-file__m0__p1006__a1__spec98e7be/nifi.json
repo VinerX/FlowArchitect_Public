@@ -1,0 +1,73 @@
+{
+  "revision": {
+    "version": 0
+  },
+  "component": {
+    "contents": {
+      "processors": [
+        {
+          "name": "QueryDatabaseTable",
+          "type": "org.apache.nifi.processors.standard.QueryDatabaseTable",
+          "config": {
+            "schedulingPeriod": "60 sec",
+            "properties": {
+              "db-fetch-db-type": "PostgreSQL",
+              "Database Connection Pool": "PostgreSQL_Pool",
+              "Table Name": "orders",
+              "Columns to Return": "*",
+              "Maximum-value Columns": "id",
+              "Output Format": "JSON"
+            }
+          }
+        },
+        {
+          "name": "PutFile",
+          "type": "org.apache.nifi.processors.standard.PutFile",
+          "config": {
+            "properties": {
+              "Directory": "/data/output",
+              "Conflict Resolution Strategy": "append"
+            }
+          }
+        },
+        {
+          "name": "UpdateAttribute",
+          "type": "org.apache.nifi.processors.standard.UpdateAttribute",
+          "config": {
+            "properties": {
+              "filename": "orders_export.json"
+            }
+          }
+        }
+      ],
+      "connections": [
+        {
+          "source": {
+            "id": "QueryDatabaseTable",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "UpdateAttribute",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "success"
+          ]
+        },
+        {
+          "source": {
+            "id": "UpdateAttribute",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "PutFile",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "success"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "flow": {
+    "name": "PostgreSQL Orders Export to JSON",
+    "description": "Периодически выбирает новые записи из PostgreSQL public.orders и сохраняет в JSON",
+    "processors": [
+      {
+        "id": "generate-trigger",
+        "type": "GenerateFlowFile",
+        "properties": {
+          "Batch Size": "1",
+          "Data Format": "Text",
+          "File Size": "0B",
+          "Unique FlowFiles": "true"
+        },
+        "scheduling": {
+          "type": "CRON",
+          "value": "0 */5 * * * *"
+        }
+      },
+      {
+        "id": "fetch-new-orders",
+        "type": "ExecuteSQL",
+        "properties": {
+          "Database Connection Pooling Service": "postgres-pool",
+          "SQL Pre-Query": "CREATE TABLE IF NOT EXISTS public.orders_exported (id BIGINT PRIMARY KEY, exported_at TIMESTAMP DEFAULT NOW())",
+          "SQL Select Query": "SELECT o.* FROM public.orders o LEFT JOIN public.orders_exported e ON o.id = e.id WHERE e.id IS NULL",
+          "Max Wait Time": "60 seconds",
+          "Fetch Size": "1000"
+        }
+      },
+      {
+        "id": "convert-to-json",
+        "type": "ConvertRecord",
+        "properties": {
+          "Record Reader": "postgres-reader",
+          "Record Writer": "json-writer"
+        }
+      },
+      {
+        "id": "write-to-file",
+        "type": "PutFile",
+        "properties": {
+          "Directory": "/data/output",
+          "File Name": "orders_export.json",
+          "Conflict Resolution Strategy": "replace"
+        }
+      },
+      {
+        "id": "mark-exported",
+        "type": "ExecuteSQL",
+        "properties": {
+          "Database Connection Pooling Service": "postgres-pool",
+          "SQL Pre-Query": "INSERT INTO public.orders_exported (id) ${sql:literal(${partial.id})}"
+        }
+      }
+    ],
+    "controllerServices": [
+      {
+        "id": "postgres-pool",
+        "type": "DBCPConnectionPool",
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://localhost:5432/mydb",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database Driver Location": "/opt/nifi/postgresql.jar",
+          "Database User": "nifi",
+          "Password": "********"
+        }
+      },
+      {
+        "id": "postgres-reader",
+        "type": "JsonPathReader",
+        "properties": {
+          "JsonPath Expression Cache": "1000",
+          "Schema Access Strategy": "infer-schema"
+        }
+      },
+      {
+        "id": "json-writer",
+        "type": "JsonRecordSetWriter",
+        "properties": {
+          "Schema Write Strategy": "do-not-write-schema",
+          "Output Format": "array"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": "generate-trigger",
+        "to": "fetch-new-orders",
+        "name": "Trigger to Query"
+      },
+      {
+        "from": "fetch-new-orders",
+        "to": "convert-to-json",
+        "name": "Query to Convert"
+      },
+      {
+        "from": "convert-to-json",
+        "to": "write-to-file",
+        "name": "Convert to File"
+      },
+      {
+        "from": "write-to-file",
+        "to": "mark-exported",
+        "name": "File to Mark"
+      }
+    ]
+  }
+}

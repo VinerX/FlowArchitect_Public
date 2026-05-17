@@ -1,0 +1,41 @@
+{
+  "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:02:08.472201+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: csv_order_processing\n  name: Process Completed Orders\n  description: Reads CSV files, filters by status COMPLETED, and saves to a new CSV\n    file.\ntriggers:\n- id: trigger_manual\n  type: manual\n  condition: on demand\nsources:\n- id: source_csv_orders\n  name: Read CSV Orders\n  type: FileSystem\n  location: /data/input/orders/\n  connection:\n    properties:\n      format: csv\n      recursive: 'false'\nprocessing_elements:\n- id: filter_completed\n  name: Filter Completed Status\n  operation: Filter\n  config:\n    condition: status == 'COMPLETED'\nsinks:\n- id: sink_csv_output\n  name: Write Completed Orders\n  type: FileSystem\n  location: /data/output/completed_orders.csv\n  connection:\n    properties:\n      format: csv\n      mode: overwrite\nprocessed_data:\n- id: order_data\n  format: csv\nlinks:\n- from_id: source_csv_orders\n  to_id: filter_completed\n  data_ref: order_data\n- from_id: filter_completed\n  to_id: sink_csv_output\n  data_ref: order_data",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": {
+        "error": "manual_trigger_warning",
+        "details": "Trigger(s) ['trigger_manual'] have type 'manual'.\nThe flow will NOT start automatically in NiFi — someone must press Run in the NiFi UI.\nChange trigger type to 'schedule' or 'event' for production use."
+      },
+      "duration_sec": 4.78,
+      "stage1_duration_sec": 4.7,
+      "stage2_duration_sec": 0.07,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

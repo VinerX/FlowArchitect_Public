@@ -1,0 +1,145 @@
+campaign:
+  id: stage2-extended-qwen36
+  title: Этап 2 — расширенная серия на Qwen 3.6 Plus с уровнем 3
+  owner: Дмитрий Макаров
+  objective: 'Расширить пилотную базу: повторить 5 базовых кейсов + добавить TC-02
+    (file→file, чисто файловый — допускает полную функциональную проверку без внешней
+    инфры) и TC-07 (routing уровня 3). Модель — Qwen 3.6 Plus (preset 1000) для прямой
+    сопоставимости с stage1-pilot-qwen36; корректор — Gemini 2.5 Flash Lite (preset
+    1003).
+
+    '
+  tags:
+  - thesis
+  - stage2
+  - extended
+  - qwen36
+defaults:
+  presets:
+  - 1000
+  modes:
+  - 0
+  - 1
+  - 2
+  - 3
+  stage_presets:
+    pim: 1000
+    corrector: 1003
+  repeat: 1
+  timeout_sec: 300
+  nifi_validate: true
+  manual_nifi_required: true
+  requires_user_input: false
+  stop_after_statuses:
+  - needs_user_input
+  - needs_nifi_manual_test
+cases:
+- id: currency-http-to-file
+  title: Currency HTTP to File
+  query: 'Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат
+    в файл /data/output/rates.json.
+
+    '
+  tags:
+  - http
+  - file
+  - baseline
+  - level-1
+  expected_behavior: По расписанию /data/output/rates.json обновляется актуальными
+    курсами.
+  manual_test_checklist:
+  - Импортировать nifi.json в NiFi.
+  - Запустить поток, дождаться записи /data/output/rates.json и проверить непустоту.
+- id: file-csv-filter
+  title: File CSV Filter (TC-02)
+  query: 'Читай CSV-файлы из директории /data/input/orders/, оставляй только строки
+    где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.
+
+    '
+  tags:
+  - file
+  - filter
+  - level-1
+  expected_behavior: Файлы из /data/input/orders/ фильтруются и попадают в /data/output/completed_orders.csv
+    только со статусом COMPLETED.
+  manual_test_checklist:
+  - Импортировать nifi.json в NiFi.
+  - Положить тестовый CSV в /data/input/orders/.
+  - Запустить поток и проверить содержимое /data/output/completed_orders.csv.
+- id: postgres-to-file
+  title: PostgreSQL to File
+  query: 'Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй
+    их в JSON-файл /data/output/orders_export.json.
+
+    '
+  tags:
+  - postgres
+  - file
+  - level-1
+  expected_behavior: Записи из public.orders экспортируются в /data/output/orders_export.json.
+  manual_test_checklist:
+  - Импортировать nifi.json в NiFi, подставить JDBC параметры.
+  - Запустить поток, проверить наличие orders_export.json.
+- id: kafka-to-postgres
+  title: Kafka to PostgreSQL
+  query: 'Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля
+    order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders
+    в PostgreSQL.
+
+    '
+  tags:
+  - kafka
+  - postgres
+  - level-2
+  expected_behavior: Сообщения из orders.created попадают в таблицу public.orders.
+  manual_test_checklist:
+  - Импортировать nifi.json.
+  - Прокинуть тестовое сообщение через rpk topic produce.
+  - Проверить SELECT FROM public.orders.
+- id: postgres-to-kafka
+  title: PostgreSQL to Kafka
+  query: 'Читай из таблицы public.transactions записи со статусом PENDING, конвертируй
+    в JSON, публикуй в Kafka-топик transactions.overdue.
+
+    '
+  tags:
+  - postgres
+  - kafka
+  - level-2
+  expected_behavior: PENDING-записи публикуются в transactions.overdue.
+  manual_test_checklist:
+  - Импортировать nifi.json.
+  - Запустить поток.
+  - Проверить сообщения через rpk topic consume transactions.overdue.
+- id: kafka-routing
+  title: Kafka Content-Based Routing (TC-07)
+  query: 'Читай сообщения из Kafka-топика events.all. Если поле type равно purchase
+    — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу
+    refunds. Всё остальное — в Kafka-топик events.unknown.
+
+    '
+  tags:
+  - kafka
+  - routing
+  - level-3
+  expected_behavior: Сообщения корректно маршрутизируются по полю type.
+  manual_test_checklist:
+  - Импортировать nifi.json.
+  - Опубликовать в events.all сообщения с type=purchase, refund, other.
+  - Проверить заполнение purchases/refunds таблиц и топика events.unknown.
+- id: s3-to-postgres-enrich
+  title: S3 to PostgreSQL with enrichment (TC-08)
+  query: 'Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй
+    поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.
+
+    '
+  tags:
+  - s3
+  - postgres
+  - enrichment
+  - level-3
+  expected_behavior: JSON из raw-logs появляется в public.event_log с processed_at.
+  manual_test_checklist:
+  - Создать таблицу public.event_log заранее.
+  - Импортировать nifi.json, подставить S3 endpoint и credentials.
+  - Запустить поток, проверить вставку записей с processed_at.

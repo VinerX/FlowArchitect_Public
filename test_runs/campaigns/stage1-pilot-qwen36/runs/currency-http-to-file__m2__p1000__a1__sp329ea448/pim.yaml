@@ -1,0 +1,33 @@
+flow:
+  id: currency_rates_pipeline
+  name: Currency Rates Fetcher
+  description: Fetches latest exchange rates from exchangerate.host and saves to rates.json
+triggers:
+- id: trigger_daily
+  type: schedule
+  condition: every 24 hours
+sources:
+- id: source_http_api
+  name: Fetch Exchange Rates
+  type: HTTP
+  location: https://api.exchangerate.host/latest
+  connection:
+    properties:
+      method: GET
+      accept: application/json
+processing_elements: []
+sinks:
+- id: sink_file
+  name: Save to JSON File
+  type: File
+  location: rates.json
+  connection:
+    properties:
+      base_directory: '{{OUTPUT_DIRECTORY}}'
+processed_data:
+- id: rates_json
+  format: json
+links:
+- from_id: source_http_api
+  to_id: sink_file
+  data_ref: rates_json

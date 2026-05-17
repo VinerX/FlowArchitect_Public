@@ -1,0 +1,244 @@
+{
+  "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:09:17.522903+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: kafka_to_postgres_orders\n  name: Kafka Orders to PostgreSQL Pipeline\n  description: Ingests order creation events from Kafka, extracts specific fields\n    from JSON, and persists them into a PostgreSQL table.\ntriggers:\n- id: trigger_event_stream\n  type: event\n  condition: on_message_received\nsources:\n- id: src_kafka_orders\n  name: Kafka Orders Topic\n  type: Kafka\n  location: orders.created\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      group_id: '{{KAFKA_GROUP_ID}}'\n      offset_reset: earliest\nprocessing_elements:\n- id: proc_parse_json\n  name: Parse JSON and Extract Fields\n  operation: Transform\n  config:\n    fields: order_id, user_id, amount, created_at\n    format: json\nsinks:\n- id: sink_pg_orders\n  name: PostgreSQL Orders Table\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DB_NAME}}'\n      username: '{{DB_USER}}'\n      password: '{{DB_PASSWORD}}'\nprocessed_data:\n- id: data_order_record\n  format: structured_row\nlinks:\n- from_id: src_kafka_orders\n  to_id: proc_parse_json\n  data_ref: data_order_record\n- from_id: proc_parse_json\n  to_id: sink_pg_orders\n  data_ref: data_order_record",
+      "nifi_json": {
+        "identifier": "88a74e54-0001-1000-0000-000000000000",
+        "name": "Kafka Orders to PostgreSQL Pipeline",
+        "componentType": "PROCESS_GROUP",
+        "contents": {
+          "processors": [
+            {
+              "identifier": "src_kafka_orders",
+              "name": "Kafka Orders Topic",
+              "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafkaRecord_2_6",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-2-6-nar",
+                "version": "1.23.2"
+              },
+              "position": {
+                "x": 300.0,
+                "y": 100.0
+              },
+              "properties": {
+                "bootstrap.servers": "{{KAFKA_BROKERS}}",
+                "topic": "orders.created",
+                "group.id": "{{KAFKA_GROUP_ID}}",
+                "auto.offset.reset": "earliest",
+                "record-reader": "json-reader",
+                "record-writer": "json-writer"
+              },
+              "relationships": [
+                {
+                  "name": "success",
+                  "autoTerminate": false
+                }
+              ]
+            },
+            {
+              "identifier": "proc_parse_json",
+              "name": "Parse JSON and Extract Fields",
+              "type": "org.apache.nifi.processors.standard.QueryRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "1.23.2"
+              },
+              "position": {
+                "x": 300.0,
+                "y": 350.0
+              },
+              "properties": {
+                "record-reader": "json-reader",
+                "record-writer": "json-writer",
+                "include-zero-record-flowfiles": "false",
+                "sql": "SELECT order_id, user_id, amount, created_at FROM FLOWFILE"
+              },
+              "relationships": [
+                {
+                  "name": "success",
+                  "autoTerminate": false
+                }
+              ]
+            },
+            {
+              "identifier": "sink_pg_orders",
+              "name": "PostgreSQL Orders Table",
+              "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "1.23.2"
+              },
+              "position": {
+                "x": 300.0,
+                "y": 600.0
+              },
+              "properties": {
+                "record-reader": "json-reader",
+                "db-type": "PostgreSQL",
+                "statement-type": "INSERT",
+                "table-name": "public.orders",
+                "dbcp-service": "db-connection-pool"
+              }
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "link-1",
+              "name": "data_order_record",
+              "source": {
+                "id": "src_kafka_orders",
+                "type": "PROCESSOR",
+                "groupId": "88a74e54-0001-1000-0000-000000000000"
+              },
+              "destination": {
+                "id": "proc_parse_json",
+                "type": "PROCESSOR",
+                "groupId": "88a74e54-0001-1000-0000-000000000000"
+              },
+              "selectedRelationships": [
+                "success"
+              ]
+            },
+            {
+              "identifier": "link-2",
+              "name": "data_order_record",
+              "source": {
+                "id": "proc_parse_json",
+                "type": "PROCESSOR",
+                "groupId": "88a74e54-0001-1000-0000-000000000000"
+              },
+              "destination": {
+                "id": "sink_pg_orders",
+                "type": "PROCESSOR",
+                "groupId": "88a74e54-0001-1000-0000-000000000000"
+              },
+              "selectedRelationships": [
+                "success"
+              ]
+            }
+          ],
+          "controllerServices": [
+            {
+              "identifier": "json-reader",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "1.23.2"
+              },
+              "properties": {}
+            },
+            {
+              "identifier": "json-writer",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "1.23.2"
+              },
+              "properties": {
+                "output-grouping": "output-array"
+              }
+            },
+            {
+              "identifier": "db-connection-pool",
+              "name": "DBCPConnectionPool",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-dbcp-service-nar",
+                "version": "1.23.2"
+              },
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database User": "{{DB_USER}}",
+                "Password": "{{DB_PASSWORD}}"
+              }
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "2107703b-019e-1000-3c8d-dcc0885cbdb4",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 56.96,
+      "stage1_duration_sec": 5.0,
+      "stage2_duration_sec": 8.84,
+      "prompt_tokens": 2325,
+      "completion_tokens": 2195,
+      "total_tokens": 4520,
+      "cost_usd": 0.007748,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 121,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 1383,
+          "completion_tokens": 608,
+          "total_tokens": 1991,
+          "duration_ms": 4687,
+          "cost_usd": 0.002515
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 849,
+          "completion_tokens": 1581,
+          "total_tokens": 2430,
+          "duration_ms": 8657,
+          "cost_usd": 0.005168
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1383,
+          "completion_tokens": 608,
+          "total_tokens": 1991,
+          "duration_ms": 4687,
+          "cost_usd": 0.002515
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 849,
+          "completion_tokens": 1581,
+          "total_tokens": 2430,
+          "duration_ms": 8657,
+          "cost_usd": 0.005168
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

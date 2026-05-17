@@ -1,0 +1,176 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-12T18:52:36.747695+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: currency_rates_pipeline\n  name: Currency Rates Fetcher\n  description: Fetch latest exchange rates from API and save to a local JSON file\ntriggers:\n- id: trigger_daily\n  type: schedule\n  condition: every 24 hours\nsources:\n- id: source_exchange_rate_api\n  name: Fetch Exchange Rates\n  type: HTTP\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\nprocessing_elements: []\nsinks:\n- id: sink_local_file\n  name: Save to JSON File\n  type: File\n  location: /data/output/rates.json\nprocessed_data:\n- id: rates_json\n  format: json\nlinks:\n- from_id: source_exchange_rate_api\n  to_id: sink_local_file\n  data_ref: rates_json",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "8452cd57-d745-47ee-af0b-e077dd980bed",
+          "name": "Currency Rates Fetcher",
+          "comments": "Fetch latest exchange rates from API and save to a local JSON file",
+          "processors": [
+            {
+              "identifier": "291e5040-c8d7-4425-a4bd-a9e643b3d725",
+              "name": "Fetch Exchange Rates",
+              "comments": "Generated from PIM source 'source_exchange_rate_api' (HTTP)",
+              "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "HTTP URL": "https://api.exchangerate.host/latest",
+                "HTTP Method": "GET",
+                "method": "GET"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "Original",
+                "Retry",
+                "No Retry",
+                "Failure"
+              ]
+            },
+            {
+              "identifier": "a39f87d2-426e-4da8-bc82-d0b5321c1d13",
+              "name": "Save to JSON File",
+              "comments": "Generated from PIM sink 'sink_local_file' (File)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/output"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "3beb39e5-b7d7-4a54-9a27-a25992bec20b",
+              "name": "Fetch Exchange Rates -> Save to JSON File",
+              "comments": "rates_json",
+              "source": {
+                "id": "291e5040-c8d7-4425-a4bd-a9e643b3d725",
+                "groupId": "8452cd57-d745-47ee-af0b-e077dd980bed",
+                "type": "PROCESSOR",
+                "name": "Fetch Exchange Rates"
+              },
+              "destination": {
+                "id": "a39f87d2-426e-4da8-bc82-d0b5321c1d13",
+                "groupId": "8452cd57-d745-47ee-af0b-e077dd980bed",
+                "type": "PROCESSOR",
+                "name": "Save to JSON File"
+              },
+              "selectedRelationships": [
+                "Response"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": []
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "1d894a92-019e-1000-f808-01f912581682",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 59.0,
+      "stage1_duration_sec": 24.69,
+      "stage2_duration_sec": 0.16,
+      "prompt_tokens": 1429,
+      "completion_tokens": 2149,
+      "total_tokens": 3578,
+      "cost_usd": 0.003258,
+      "nifi_processor_count": 2,
+      "nifi_connection_count": 1,
+      "pim_source_count": 1,
+      "pim_step_count": 0,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 106,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 93,
+          "completion_tokens": 906,
+          "total_tokens": 999,
+          "duration_ms": 23952,
+          "cost_usd": 0.001208
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 93,
+          "completion_tokens": 906,
+          "total_tokens": 999,
+          "duration_ms": 23952,
+          "cost_usd": 0.001208
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

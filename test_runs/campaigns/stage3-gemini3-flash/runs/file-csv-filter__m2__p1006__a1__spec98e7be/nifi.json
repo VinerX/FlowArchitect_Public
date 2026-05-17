@@ -1,0 +1,136 @@
+{
+  "revision": {
+    "version": 0
+  },
+  "component": {
+    "id": "8777179b-0001-1000-0000-000000000001",
+    "name": "CSV Order Status Filter",
+    "contents": {
+      "processors": [
+        {
+          "id": "8777179b-0001-1000-0000-000000000002",
+          "name": "Read Orders CSV",
+          "type": "org.apache.nifi.processors.standard.GetFile",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "config": {
+            "properties": {
+              "Input Directory": "/data/input/orders/",
+              "Keep Source File": "false",
+              "Recurse Subdirectories": "false",
+              "File Filter": "[^\\.].*"
+            },
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "1 min"
+          }
+        },
+        {
+          "id": "8777179b-0001-1000-0000-000000000003",
+          "name": "Filter Completed Orders",
+          "type": "org.apache.nifi.processors.standard.QueryRecord",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 0.0,
+            "y": 250.0
+          },
+          "config": {
+            "properties": {
+              "record-reader": "8777179b-0001-1000-0000-000000000006",
+              "record-writer": "8777179b-0001-1000-0000-000000000007",
+              "completed": "SELECT * FROM FLOWFILE WHERE status = 'COMPLETED'"
+            }
+          }
+        },
+        {
+          "id": "8777179b-0001-1000-0000-000000000004",
+          "name": "Write Completed Orders",
+          "type": "org.apache.nifi.processors.standard.PutFile",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 0.0,
+            "y": 500.0
+          },
+          "config": {
+            "properties": {
+              "Directory": "/data/output/",
+              "Conflict Strategy": "replace"
+            }
+          }
+        }
+      ],
+      "connections": [
+        {
+          "id": "8777179b-0001-1000-0000-000000000008",
+          "source": {
+            "id": "8777179b-0001-1000-0000-000000000002",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "8777179b-0001-1000-0000-000000000003",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "success"
+          ]
+        },
+        {
+          "id": "8777179b-0001-1000-0000-000000000009",
+          "source": {
+            "id": "8777179b-0001-1000-0000-000000000003",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "8777179b-0001-1000-0000-000000000004",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "completed"
+          ]
+        }
+      ],
+      "controllerServices": [
+        {
+          "id": "8777179b-0001-1000-0000-000000000006",
+          "name": "CSVReader",
+          "type": "org.apache.nifi.csv.CSVReader",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-record-serialization-services-nar",
+            "version": "1.23.2"
+          },
+          "properties": {
+            "schema-access-strategy": "infer-schema"
+          }
+        },
+        {
+          "id": "8777179b-0001-1000-0000-000000000007",
+          "name": "CSVRecordSetWriter",
+          "type": "org.apache.nifi.csv.CSVRecordSetWriter",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-record-serialization-services-nar",
+            "version": "1.23.2"
+          },
+          "properties": {
+            "schema-access-strategy": "inherit-record-schema"
+          }
+        }
+      ]
+    }
+  }
+}

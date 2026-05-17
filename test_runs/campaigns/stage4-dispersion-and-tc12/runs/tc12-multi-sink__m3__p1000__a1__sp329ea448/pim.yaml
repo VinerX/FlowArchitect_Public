@@ -1,0 +1,63 @@
+flow:
+  id: bank_transactions_pipeline
+  name: High-Value Transactions ETL
+  description: Fetch transactions from REST API every 30s, filter >100k RUB, enrich
+    with client data from PostgreSQL, output to Kafka and S3
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 30 seconds
+sources:
+- id: source_rest_api
+  name: Fetch Bank Transactions
+  type: REST API
+  location: https://api.bank.example.com/transactions
+  connection:
+    properties:
+      auth_token: '{{REST_API_AUTH_TOKEN}}'
+processing_elements:
+- id: process_filter
+  name: Filter High Value
+  operation: Filter
+  config:
+    condition: amount > 100000
+- id: process_enrich
+  name: Enrich Client Data
+  operation: Join
+  config:
+    lookup_table: public.clients
+    join_key: client_id
+    join_type: left
+sinks:
+- id: sink_kafka
+  name: Publish to Kafka
+  type: Kafka
+  location: high_value_transactions
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+- id: sink_s3
+  name: Archive to S3
+  type: S3
+  location: compliance-archive
+  connection:
+    properties:
+      region: '{{AWS_REGION}}'
+      access_key_id: '{{AWS_ACCESS_KEY_ID}}'
+      secret_access_key: '{{AWS_SECRET_ACCESS_KEY}}'
+processed_data:
+- id: enriched_transactions_json
+  format: json
+links:
+- from_id: source_rest_api
+  to_id: process_filter
+  data_ref: enriched_transactions_json
+- from_id: process_filter
+  to_id: process_enrich
+  data_ref: enriched_transactions_json
+- from_id: process_enrich
+  to_id: sink_kafka
+  data_ref: enriched_transactions_json
+- from_id: process_enrich
+  to_id: sink_s3
+  data_ref: enriched_transactions_json

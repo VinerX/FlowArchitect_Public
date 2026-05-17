@@ -1,0 +1,81 @@
+flow:
+  id: kafka_orders_to_postgres
+  name: Kafka Orders to PostgreSQL
+  description: Считывает сообщения из Kafka topic orders.created, парсит JSON, извлекает
+    поля order_id, user_id, amount, created_at и вставляет строки в таблицу public.orders
+    в PostgreSQL
+triggers:
+- id: trigger_main
+  type: event
+  condition: New message in Kafka topic orders.created
+sources:
+- id: source_kafka_orders
+  name: Kafka Topic orders.created
+  type: Kafka
+  location: orders.created
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_CONSUMER_GROUP_ID}}'
+      auto_offset_reset: earliest
+      security_protocol: '{{KAFKA_SECURITY_PROTOCOL}}'
+processing_elements:
+- id: process_parse_json
+  name: Parse JSON Message
+  operation: JsonParse
+  config:
+    input_format: json
+    root: $
+- id: process_extract_fields
+  name: Extract Fields
+  operation: FieldExtraction
+  config:
+    fields:
+    - order_id
+    - user_id
+    - amount
+    - created_at
+    drop_unmapped: true
+- id: process_validate
+  name: Validate Required Fields
+  operation: Validation
+  config:
+    not_null:
+    - order_id
+    - user_id
+    - amount
+    - created_at
+    on_failure: skip_and_log
+sinks:
+- id: sink_postgres_orders
+  name: Write to PostgreSQL public.orders
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+      ssl_mode: '{{DB_SSL_MODE}}'
+processed_data:
+- id: raw_kafka_message
+  format: json
+- id: parsed_order_record
+  format: json
+- id: validated_order_record
+  format: structured_record
+links:
+- from_id: source_kafka_orders
+  to_id: process_parse_json
+  data_ref: raw_kafka_message
+- from_id: process_parse_json
+  to_id: process_extract_fields
+  data_ref: parsed_order_record
+- from_id: process_extract_fields
+  to_id: process_validate
+  data_ref: parsed_order_record
+- from_id: process_validate
+  to_id: sink_postgres_orders
+  data_ref: validated_order_record

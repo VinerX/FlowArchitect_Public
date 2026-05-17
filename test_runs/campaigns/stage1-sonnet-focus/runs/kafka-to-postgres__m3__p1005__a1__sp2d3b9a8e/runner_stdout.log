@@ -1,0 +1,32 @@
+
+================================================================
+Query  : �������� ��������� �� Kafka topic orders, ���������� JSON � ������ �����...
+Mode   : 3 � Adapter+LLM (NL->YAML->Adapter->LLM->JSON)
+Presets: [1005]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1005, 'error_corrector': 1005, 'nifi_corrector': 1005}
+Backend ready.
+
+--- Preset 1005: openrouter sonnet 4.6  [anthropic/claude-sonnet-4.6] ---
+  [1/2] USER_QUERY  mode=3  preset=1005
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  [1/2] PIM ready  (1716 chars, 11.29s)
+  [2/2] REQUEST_CONVERSION  mode=3  preset=1005
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (40s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (4 proc, 3 conn, 46.29s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 6096 in / 4825 out / 10921 total  |  cost: $0.090663
+  Result : [OK]  (103.49s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage1-sonnet-focus\runs\kafka-to-postgres__m3__p1005__a1__sp2d3b9a8e\raw_report.json

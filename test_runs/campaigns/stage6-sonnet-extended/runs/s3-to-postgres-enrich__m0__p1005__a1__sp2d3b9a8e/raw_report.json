@@ -1,0 +1,441 @@
+{
+  "query": "Каждый час забирай JSON-файлы из S3-бакета raw-logs, для каждой записи добавляй поле processed_at с текущим временем, загружай в таблицу public.event_log в PostgreSQL.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-14T18:18:55.998576+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flowController": {
+          "name": "S3 to PostgreSQL ETL - Hourly JSON Processing",
+          "comment": "Hourly ETL: fetch JSON files from S3 raw-logs, add processed_at field, load to PostgreSQL public.event_log"
+        },
+        "processors": [
+          {
+            "id": "proc-001",
+            "name": "ListS3_RawLogs",
+            "type": "org.apache.nifi.processors.aws.s3.ListS3",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "1 hour",
+            "autoTerminatedRelationships": [],
+            "properties": {
+              "Bucket": "raw-logs",
+              "Region": "us-east-1",
+              "Access Key ID": "",
+              "Secret Access Key": "",
+              "Prefix": "",
+              "Delimiter": "",
+              "Use Versions": "false",
+              "Minimum Object Age": "0 sec",
+              "Write Object Tags": "false",
+              "Requester Pays": "false"
+            }
+          },
+          {
+            "id": "proc-002",
+            "name": "FetchS3Object_RawLogs",
+            "type": "org.apache.nifi.processors.aws.s3.FetchS3Object",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "autoTerminatedRelationships": [
+              "failure"
+            ],
+            "properties": {
+              "Bucket": "${s3.bucket}",
+              "Object Key": "${filename}",
+              "Region": "us-east-1",
+              "Access Key ID": "",
+              "Secret Access Key": "",
+              "Requester Pays": "false"
+            }
+          },
+          {
+            "id": "proc-003",
+            "name": "SplitJson_Records",
+            "type": "org.apache.nifi.processors.standard.SplitJson",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "autoTerminatedRelationships": [
+              "failure",
+              "original"
+            ],
+            "properties": {
+              "JsonPath Expression": "$.*",
+              "Null Value Representation": "empty string"
+            }
+          },
+          {
+            "id": "proc-004",
+            "name": "UpdateRecord_AddProcessedAt",
+            "type": "org.apache.nifi.processors.standard.UpdateRecord",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "autoTerminatedRelationships": [
+              "failure"
+            ],
+            "properties": {
+              "Record Reader": "JsonTreeReader",
+              "Record Writer": "JsonRecordSetWriter",
+              "/processed_at": "${now():format('yyyy-MM-dd\\'T\\'HH:mm:ss.SSS\\'Z\\'', 'UTC')}"
+            }
+          },
+          {
+            "id": "proc-005",
+            "name": "MergeRecord_Batch",
+            "type": "org.apache.nifi.processors.standard.MergeRecord",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "autoTerminatedRelationships": [
+              "failure"
+            ],
+            "properties": {
+              "Record Reader": "JsonTreeReader",
+              "Record Writer": "JsonRecordSetWriter",
+              "Merge Strategy": "Bin-Packing Algorithm",
+              "Minimum Number of Records": "1",
+              "Maximum Number of Records": "1000",
+              "Max Bin Age": "10 sec"
+            }
+          },
+          {
+            "id": "proc-006",
+            "name": "PutDatabaseRecord_PostgreSQL",
+            "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "autoTerminatedRelationships": [
+              "failure"
+            ],
+            "properties": {
+              "Record Reader": "JsonTreeReader",
+              "Database Connection Pooling Service": "PostgreSQLConnectionPool",
+              "Statement Type": "INSERT",
+              "Schema Name": "public",
+              "Table Name": "event_log",
+              "Translate Field Names": "true",
+              "Unmatched Field Behavior": "Ignore Unmatched Fields",
+              "Unmatched Column Behavior": "Fail on Unmatched Columns",
+              "Update Keys": "",
+              "Field Containing SQL": "",
+              "Quoted Identifiers": "false",
+              "Max Wait Time": "0 seconds",
+              "Rollback On Failure": "false"
+            }
+          },
+          {
+            "id": "proc-007",
+            "name": "LogAttribute_Success",
+            "type": "org.apache.nifi.processors.standard.LogAttribute",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "autoTerminatedRelationships": [
+              "success"
+            ],
+            "properties": {
+              "Log Level": "INFO",
+              "Attributes to Log": "",
+              "Attributes to Ignore": "",
+              "Log Payload": "false",
+              "Log prefix": "[ETL SUCCESS] "
+            }
+          },
+          {
+            "id": "proc-008",
+            "name": "LogAttribute_Failure",
+            "type": "org.apache.nifi.processors.standard.LogAttribute",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "autoTerminatedRelationships": [
+              "success"
+            ],
+            "properties": {
+              "Log Level": "ERROR",
+              "Attributes to Log": "",
+              "Attributes to Ignore": "",
+              "Log Payload": "true",
+              "Log prefix": "[ETL FAILURE] "
+            }
+          }
+        ],
+        "connections": [
+          {
+            "id": "conn-001",
+            "name": "ListS3 -> FetchS3Object",
+            "source": {
+              "id": "proc-001",
+              "relationship": "success"
+            },
+            "destination": {
+              "id": "proc-002"
+            },
+            "flowFileExpiration": "1 hour",
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB"
+          },
+          {
+            "id": "conn-002",
+            "name": "FetchS3Object -> SplitJson",
+            "source": {
+              "id": "proc-002",
+              "relationship": "success"
+            },
+            "destination": {
+              "id": "proc-003"
+            },
+            "flowFileExpiration": "1 hour",
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB"
+          },
+          {
+            "id": "conn-003",
+            "name": "SplitJson -> UpdateRecord",
+            "source": {
+              "id": "proc-003",
+              "relationship": "split"
+            },
+            "destination": {
+              "id": "proc-004"
+            },
+            "flowFileExpiration": "1 hour",
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB"
+          },
+          {
+            "id": "conn-004",
+            "name": "UpdateRecord -> MergeRecord",
+            "source": {
+              "id": "proc-004",
+              "relationship": "success"
+            },
+            "destination": {
+              "id": "proc-005"
+            },
+            "flowFileExpiration": "1 hour",
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB"
+          },
+          {
+            "id": "conn-005",
+            "name": "MergeRecord -> PutDatabaseRecord",
+            "source": {
+              "id": "proc-005",
+              "relationship": "merged"
+            },
+            "destination": {
+              "id": "proc-006"
+            },
+            "flowFileExpiration": "1 hour",
+            "backPressureObjectThreshold": "1000",
+            "backPressureDataSizeThreshold": "1 GB"
+          },
+          {
+            "id": "conn-006",
+            "name": "PutDatabaseRecord -> LogSuccess",
+            "source": {
+              "id": "proc-006",
+              "relationship": "success"
+            },
+            "destination": {
+              "id": "proc-007"
+            },
+            "flowFileExpiration": "30 min",
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB"
+          },
+          {
+            "id": "conn-007",
+            "name": "PutDatabaseRecord -> LogFailure",
+            "source": {
+              "id": "proc-006",
+              "relationship": "failure"
+            },
+            "destination": {
+              "id": "proc-008"
+            },
+            "flowFileExpiration": "1 hour",
+            "backPressureObjectThreshold": "10000",
+            "backPressureDataSizeThreshold": "1 GB"
+          }
+        ],
+        "controllerServices": [
+          {
+            "id": "cs-001",
+            "name": "JsonTreeReader",
+            "type": "org.apache.nifi.json.JsonTreeReader",
+            "properties": {
+              "Schema Access Strategy": "Infer Schema",
+              "Date Format": "yyyy-MM-dd",
+              "Time Format": "HH:mm:ss",
+              "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+            }
+          },
+          {
+            "id": "cs-002",
+            "name": "JsonRecordSetWriter",
+            "type": "org.apache.nifi.json.JsonRecordSetWriter",
+            "properties": {
+              "Schema Access Strategy": "Inherit Record Schema",
+              "Output Grouping": "One Line Per Object",
+              "Suppress Null Values": "Never Suppress",
+              "Pretty Print JSON": "false",
+              "Date Format": "yyyy-MM-dd",
+              "Time Format": "HH:mm:ss",
+              "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+            }
+          },
+          {
+            "id": "cs-003",
+            "name": "PostgreSQLConnectionPool",
+            "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+            "properties": {
+              "Database Connection URL": "jdbc:postgresql://localhost:5432/your_database",
+              "Database Driver Class Name": "org.postgresql.Driver",
+              "database-driver-locations": "/opt/nifi/extra-lib/postgresql-42.6.0.jar",
+              "Database User": "your_pg_user",
+              "Password": "your_pg_password",
+              "Max Wait Time": "500 millis",
+              "Max Total Connections": "10",
+              "Min Idle Connections": "1",
+              "Max Idle Connections": "5",
+              "Max Connection Lifetime": "-1",
+              "Validation Query": "SELECT 1"
+            }
+          }
+        ],
+        "parameterContexts": [
+          {
+            "id": "param-ctx-001",
+            "name": "ETL Parameters",
+            "parameters": [
+              {
+                "name": "s3.bucket.name",
+                "value": "raw-logs",
+                "sensitive": false,
+                "description": "Source S3 bucket name"
+              },
+              {
+                "name": "s3.region",
+                "value": "us-east-1",
+                "sensitive": false,
+                "description": "AWS region for S3 bucket"
+              },
+              {
+                "name": "pg.host",
+                "value": "localhost",
+                "sensitive": false,
+                "description": "PostgreSQL host"
+              },
+              {
+                "name": "pg.port",
+                "value": "5432",
+                "sensitive": false,
+                "description": "PostgreSQL port"
+              },
+              {
+                "name": "pg.database",
+                "value": "your_database",
+                "sensitive": false,
+                "description": "Target PostgreSQL database"
+              },
+              {
+                "name": "pg.user",
+                "value": "your_pg_user",
+                "sensitive": false,
+                "description": "PostgreSQL user"
+              },
+              {
+                "name": "pg.password",
+                "value": "",
+                "sensitive": true,
+                "description": "PostgreSQL password"
+              },
+              {
+                "name": "pg.target.table",
+                "value": "event_log",
+                "sensitive": false,
+                "description": "Target table in public schema"
+              },
+              {
+                "name": "batch.size",
+                "value": "1000",
+                "sensitive": false,
+                "description": "Max records per batch insert"
+              }
+            ]
+          }
+        ],
+        "comments": {
+          "prerequisites": [
+            "PostgreSQL JDBC driver must be placed at /opt/nifi/extra-lib/postgresql-42.6.0.jar",
+            "AWS credentials must be configured via IAM Role, ~/.aws/credentials or processor properties",
+            "Target table public.event_log must exist in PostgreSQL with appropriate schema",
+            "NiFi user must have S3 ListBucket and GetObject permissions on raw-logs bucket"
+          ],
+          "sql_ddl": "CREATE TABLE IF NOT EXISTS public.event_log (id BIGSERIAL PRIMARY KEY, processed_at TIMESTAMP WITH TIME ZONE NOT NULL, event_data JSONB, created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW());",
+          "flow_description": [
+            "1. ListS3 triggers every hour and lists all objects in s3://raw-logs/",
+            "2. FetchS3Object downloads each JSON file content",
+            "3. SplitJson splits JSON array into individual records (one FlowFile per record)",
+            "4. UpdateRecord adds processed_at field with current UTC timestamp to each record",
+            "5. MergeRecord batches up to 1000 records for efficient bulk insert",
+            "6. PutDatabaseRecord inserts batched records into public.event_log via JDBC",
+            "7. Success/Failure paths log results for monitoring"
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "NiFi unreachable: Cannot connect to https://localhost:8443",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 42.09,
+      "stage1_duration_sec": 37.7,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 220,
+      "completion_tokens": 3623,
+      "total_tokens": 3843,
+      "cost_usd": 0.055005,
+      "nifi_processor_count": 8,
+      "nifi_connection_count": 7,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 232,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 125,
+          "completion_tokens": 12,
+          "total_tokens": 137,
+          "duration_ms": 37342,
+          "cost_usd": 0.000555
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 125,
+          "completion_tokens": 12,
+          "total_tokens": 137,
+          "duration_ms": 37342,
+          "cost_usd": 0.000555
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

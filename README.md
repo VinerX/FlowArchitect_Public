@@ -1,91 +1,72 @@
 # FlowArchitect
 
-**Выпускная квалификационная работа** · ВШЭ, факультет информатики, математики и компьютерных наук, 2026  
+**Выпускная квалификационная работа** · НИУ ВШЭ, факультет информатики, математики и компьютерных наук, 2026  
 **Автор:** Макаров Дмитрий · **Научный руководитель:** Бабкин Эдуард Александрович
 
----
+FlowArchitect — desktop-приложение на PyQt6 для генерации ETL-потоков Apache NiFi из описания на естественном языке. Основной сценарий работы проходит через GUI: пользователь формулирует задачу в чате, получает промежуточную YAML-модель, редактирует ее при необходимости и затем конвертирует в NiFi JSON.
 
-## Обзор
-
-FlowArchitect автоматизирует создание конфигураций ETL-пайплайнов [Apache NiFi](https://nifi.apache.org/) из описаний на естественном языке с помощью LLM и модельно-ориентированной разработки (MDE).
-
-**Исследовательская гипотеза:** Двухэтапный подход (NL → YAML → NiFi JSON) даёт меньше галлюцинаций и лучшую структурную целостность по сравнению с прямой генерацией (NL → JSON), так как промежуточный YAML (платформо-независимая модель) разделяет семантическое рассуждение и структурную сложность.
+Исследовательская гипотеза проекта: двухэтапная схема `NL → YAML → NiFi JSON` снижает число галлюцинаций LLM и повышает структурную корректность по сравнению с прямой генерацией `NL → JSON`.
 
 ---
 
-## MDA-пайплайн
+## Что делает приложение
 
-Реализовано и оценивается три режима генерации:
+- принимает текстовое описание ETL-задачи в чат-интерфейсе;
+- строит PIM-модель в YAML как промежуточное представление;
+- конвертирует YAML в NiFi JSON несколькими режимами;
+- позволяет просматривать, редактировать, сохранять и импортировать результат в NiFi;
+- хранит историю сессий и базовую статистику по генерациям.
 
-| Режим | Путь | Описание |
-|-------|------|----------|
-| **0 — Прямой** | NL → LLM → NiFi JSON | Один вызов LLM; наибольший риск галлюцинаций |
-| **1 — Адаптер** | NL → LLM → YAML → Адаптер → NiFi JSON | Режим по умолчанию; детерминированное преобразование PIM→PSM |
-| **2 — LLM-to-LLM** | NL → LLM → YAML → LLM → NiFi JSON | Два вызова LLM; наибольшая гибкость |
+## GUI-first workflow
 
-**PIM (Platform-Independent Model):** YAML с абстрактным описанием пайплайна — источники, шаги обработки, приёмники, связи.  
-**PSM (Platform-Specific Model):** NiFi JSON — процессоры, соединения, UUID, группы процессов.
+1. Пользователь описывает поток в чате.
+2. LLM строит PIM-модель, которая открывается в редакторе YAML.
+3. Пользователь при необходимости правит YAML и заполняет плейсхолдеры.
+4. Приложение генерирует NiFi JSON через адаптер или LLM-режим.
+5. JSON можно сохранить или отправить в NiFi напрямую из интерфейса.
+
+## Режимы генерации
+
+| Режим | Путь | Назначение |
+|------|------|------------|
+| `0 — Direct` | `NL → LLM → NiFi JSON` | прямой вызов LLM, самый рискованный по галлюцинациям |
+| `1 — Adapter` | `NL → LLM → YAML → Adapter → NiFi JSON` | основной режим, детерминированное PIM→PSM-преобразование |
+| `2 — LLM×2` | `NL → LLM → YAML → LLM → NiFi JSON` | гибкий двухшаговый режим |
+| `3 — Adapter+LLM` | `NL → LLM → YAML → Adapter → LLM corrector` | адаптер с последующей LLM-коррекцией JSON |
+
+**PIM (Platform-Independent Model)** — YAML с абстрактным описанием источников, шагов и приемников.  
+**PSM (Platform-Specific Model)** — NiFi JSON с процессорами, связями, UUID и группами процессов.
 
 ---
+
+## Интерфейс приложения
+
+- **Chat panel** — основной ввод задач и получение сервисных сообщений.
+- **Code editor** — вкладки `PIM — YAML` и `PSM — NiFi JSON` с подсветкой синтаксиса.
+- **History panel** — список сессий, переименование, удаление и простая аналитика.
+- **Placeholder panel** — контроль `{{PLACEHOLDER}}` перед импортом в NiFi.
+- **Settings / Stage Providers** — настройка провайдеров LLM по этапам и параметров подключения.
 
 ## Архитектура
 
+```text
+Пользовательский запрос в чате
+  → ChatController
+  → EventBus
+  → Orchestrator
+  → LLM: NL → PIM
+  → YAML в редакторе
+
+Команда генерации NiFi Flow
+  → EventBus
+  → Orchestrator
+  → валидация YAML через Pydantic
+  → Adapter или LLM
+  → NiFi JSON в редакторе
+  → опционально импорт в NiFi
 ```
-Ввод пользователя (чат)
-  → ChatController → EventBus → Orchestrator
-      → LLM (этап 1): NL → PIM (структурированный JSON/YAML)
-      → Отображение YAML в редакторе
 
-Пользователь нажимает "Сгенерировать NiFi Flow"
-  → EventBus → Orchestrator
-      → Парсинг и валидация YAML через Pydantic
-      → NiFiAdapter.convert(Flow) → NiFi JSON   [Режим 1]
-      → (или) вызов LLM → NiFi JSON             [Режим 2]
-      → Отображение JSON в редакторе
-```
-
-Все компоненты общаются через потокобезопасный `EventBus` (паттерн слабых ссылок на подписчиков). Контроллеры никогда не вызывают сервисы напрямую.
-
----
-
-## Структура проекта
-
-```
-FlowArchitect/
-├── src/
-│   ├── main.py                     # Точка входа
-│   ├── adapters/
-│   │   └── nifi_adapter.py         # PIM → NiFi JSON (правила + авторасстановка)
-│   ├── controllers/                # MVC: обработчики UI-событий
-│   ├── core/
-│   │   ├── events.py               # Потокобезопасный EventBus
-│   │   └── event_defines.py        # Константы имён событий
-│   ├── domain/
-│   │   ├── pim_model.py            # Pydantic-схема PIM (Flow, Resource, Step, Link)
-│   │   └── nifi_schema.py          # Pydantic-схема NiFi
-│   ├── handlers/
-│   │   └── llm_engine.py           # Оркестрация LLM + маршрутизация провайдеров
-│   ├── services/
-│   │   └── orchestrator.py         # Основной MDA-пайплайн
-│   └── ui/                         # Desktop GUI на PyQt6
-├── config/
-│   ├── api_presets.json.example    # Шаблон конфига провайдеров (скопируй и заполни ключи)
-│   ├── settings.json               # Настройки среды выполнения (тема, активный пресет)
-│   ├── PIM_structure.yaml          # Эталонный пример схемы PIM
-│   └── prompts/                    # Шаблоны промптов для LLM
-│       ├── system_architect.txt    # Промпт: NL → PIM
-│       └── psm_nifi.txt            # Промпт: YAML → NiFi (Режим 2)
-├── tests/
-│   ├── unit/                       # Юнит-тесты адаптера (без API и NiFi)
-│   ├── integration/                # E2E-тесты (нужны Gemini API + NiFi)
-│   └── fixtures/                   # PIM JSON-фикстуры для 4 ETL-сценариев
-├── scripts/
-│   ├── run_adapter.py              # PIM → NiFi JSON (без LLM)
-│   ├── run_nl_test.py              # Полный тест NL → NiFi
-│   ├── import_and_report.py        # Импорт в NiFi + захват ошибок валидации
-│   └── full_pipeline.py            # PIM → адаптер → импорт → отчёт (одна команда)
-└── requirements.txt
-```
+Компоненты связаны через потокобезопасный `EventBus`, а не через прямые вызовы контроллеров и сервисов.
 
 ---
 
@@ -94,115 +75,139 @@ FlowArchitect/
 ### Требования
 
 - Python 3.11+
-- Экземпляр Apache NiFi 1.x или 2.x (только для интеграционных тестов)
-- Хотя бы один API-ключ LLM (Gemini, OpenAI, Groq или любой OpenAI-совместимый эндпоинт)
+- хотя бы один API-ключ LLM-провайдера;
+- Apache NiFi нужен только для импорта и интеграционных тестов.
 
 ### Установка
 
-```bash
+```powershell
 git clone <repo-url>
 cd FlowArchitect
 
 python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# Linux/Mac:
-source .venv/bin/activate
-
+.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
 ### Настройка
 
-```bash
-# Скопируй шаблон конфига и заполни API-ключи
-cp config/api_presets.json.example config/api_presets.json
-# Отредактируй config/api_presets.json — вставь свои ключи
+Файл `config/api_presets.json` уже находится в репозитории. Если нужен чистый шаблон, можно взять `config/api_presets.json.example` и заполнить свои ключи и модели.
+
+Также проверь `config/settings.json`, если нужно заранее задать тему, активный пресет или параметры NiFi.
+
+### Запуск GUI
+
+```powershell
+python -m src.main
 ```
 
-### Запуск приложения
+После запуска основной рабочий сценарий такой:
 
-```bash
-cd src
-python main.py
-```
+1. Выбрать провайдера в кнопке `Provider` или через `Settings`.
+2. Ввести задачу в чат.
+3. Проверить YAML во вкладке `PIM`.
+4. Нажать нужный режим генерации JSON.
+5. При необходимости сохранить результат или отправить его в NiFi кнопкой `→ NiFi`.
 
 ---
 
-## CLI-инструменты (без GUI)
+## Структура проекта
 
-```bash
-# PIM YAML/JSON → NiFi JSON  (без LLM и без NiFi)
+```text
+src/
+  main.py                  # точка входа GUI
+  controllers/             # обработчики UI-событий
+  services/orchestrator.py # основной MDA pipeline
+  adapters/nifi_adapter.py # rule-based PIM → NiFi JSON
+  domain/                  # Pydantic-модели PIM и NiFi
+  handlers/llm_engine.py   # вызовы LLM и маршрутизация провайдеров
+  ui/                      # PyQt6-интерфейс
+
+config/
+  api_presets.json         # пресеты провайдеров
+  settings.json            # runtime-настройки
+  prompts/                 # шаблоны prompt'ов
+  PIM_structure.yaml       # пример промежуточной модели
+
+tests/
+  unit/                    # unit-тесты адаптера
+  integration/             # e2e и NiFi-интеграция
+  fixtures/                # готовые PIM-сценарии
+
+scripts/
+  run_adapter.py
+  run_llm_fixture.py
+  import_and_report.py
+  full_pipeline.py
+```
+
+## Куда смотреть в коде
+
+- `src/services/orchestrator.py` — вся цепочка NL → PIM → PSM.
+- `src/adapters/nifi_adapter.py` — детерминированная генерация NiFi JSON.
+- `src/domain/pim_model.py` — схема промежуточной модели.
+- `src/ui/main_window.py` — компоновка основного окна.
+- `src/ui/code_editor.py` — режимы генерации, вкладки YAML/JSON и импорт в NiFi.
+
+---
+
+## CLI-скрипты
+
+CLI в этом проекте вспомогательный. Он нужен для отладки адаптера, воспроизведения экспериментов и интеграционных прогонов без GUI.
+
+```powershell
+# PIM JSON/YAML → NiFi JSON без LLM
 python scripts/run_adapter.py tests/fixtures/kafka_to_postgres.json
 
-# Полный автоматический тест: NL-описание → импорт в NiFi
-python scripts/run_nl_test.py --preset "Google" --case kafka-to-postgres
+# Повторный прогон по сохраненному ответу LLM
+python scripts/run_llm_fixture.py --llm-response saved_llm_output.json --out result.json
 
-# Импорт NiFi JSON в работающий NiFi, захват ошибок валидации
+# Импорт JSON в NiFi и сохранение отчета об ошибках
 python scripts/import_and_report.py result.json --report errors.json
 
-# Полный цикл: PIM-фикстура → адаптер → импорт в NiFi → отчёт об ошибках
+# Полный цикл fixture → adapter → import → report
 python scripts/full_pipeline.py tests/fixtures/kafka_to_postgres.json --report errors.json
 ```
 
-Учётные данные NiFi читаются только из переменных окружения:
+Подробный CLI workflow вынесен в `docs/cli_testing.md`.
 
-```bash
-export NIFI_URL=https://localhost:8443
-export NIFI_USER=admin
-export NIFI_PASS=password
-```
+## Тесты
 
----
+```powershell
+# unit-тесты без токенов и без NiFi
+pytest tests/unit/test_adapter_unit.py -v
 
-## Запуск тестов
-
-```bash
-# Юнит-тесты — без токенов и без NiFi
-pytest tests/unit/ -v
-
-# Все тесты
+# весь набор
 pytest tests/ -v
 
-# E2E-интеграция (нужны живой Gemini API + работающий NiFi)
-set GEMINI_MODEL=gemini-2.0-flash    # Windows
+# интеграционные тесты
+$env:GEMINI_MODEL = "gemini-2.0-flash"
 pytest tests/integration/ -v -s
 ```
 
-**Тестовые сценарии:**
+Основные сценарии: `currency-http-to-file`, `kafka-to-postgres`, `postgres-to-kafka`, `s3-to-hdfs`.
 
-| Сценарий | Описание |
-|----------|----------|
-| `currency-http-to-file` | REST API → файл |
-| `kafka-to-postgres` | Kafka → PostgreSQL |
-| `postgres-to-kafka` | PostgreSQL → Kafka |
-| `s3-to-hdfs` | S3 → HDFS |
+## Технологии
 
-Интеграционные тесты автоматически пропускаются, если NiFi или LLM API недоступны.
+- Python 3.12
+- PyQt6
+- Pydantic 2
+- PyYAML
+- requests / openai SDK
+- pytest
 
----
+Поддерживаются Google Gemini, OpenAI, Groq и OpenAI-совместимые endpoint'ы.
 
-## Метрики оценки
+## Исследовательский контекст
 
-| Метрика | Описание |
-|---------|----------|
-| **PCT** (Platform Conformance Test) | Импортируется ли сгенерированный JSON в NiFi без ошибок? |
-| **Функциональная корректность** | Выполняет ли импортированный поток ETL-задачу корректно? |
-| **Снижение трудозатрат** | Время развёртывания с генератором vs. ручная настройка |
+Проект оформляет и проверяет MDE-подход к генерации конфигураций Apache NiFi. Ключевая идея — вынести семантическое описание потока в более компактный и редактируемый YAML-слой, а структурную сложность NiFi JSON обрабатывать отдельно.
 
----
+Оцениваемые метрики:
 
-## Стек технологий
-
-- **Python 3**, **PyQt6** — desktop GUI
-- **Pydantic** — строгая валидация схем PIM и NiFi
-- **PyYAML** — сериализация PIM
-- **requests / openai SDK** — вызовы LLM API (без тяжёлых фреймворков — требование прозрачности для ВКР)
-- **pytest** — юнит- и интеграционные тесты
-- Поддерживаемые LLM-провайдеры: Google Gemini, OpenAI, Groq, Mistral, любой OpenAI-совместимый эндпоинт
-
----
+- `PCT` — импортируется ли JSON в NiFi без ошибок;
+- функциональная корректность потока;
+- снижение трудозатрат по сравнению с ручной настройкой.
 
 ## Лицензия
 
-Академический проект — ВКР ВШЭ, 2026. Коммерческое использование не предусмотрено.
+Академический проект в рамках ВКР НИУ ВШЭ. Коммерческое использование не предполагается.

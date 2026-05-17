@@ -1,0 +1,117 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T19:25:11.569075+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flow": {
+          "name": "ExchangeRatesFetcher",
+          "description": "Fetches currency exchange rates and saves to file",
+          "processors": [
+            {
+              "id": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+              "name": "InvokeHTTP_GetExchangeRates",
+              "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+              "properties": {
+                "HTTP Method": "GET",
+                "URL": "https://api.exchangerate.host/latest",
+                "Connect Timeout": "5 secs",
+                "Read Timeout": "15 secs",
+                "Idle Timeout": "5 mins"
+              },
+              "schedulingPeriod": "0 0 0 * * ?",
+              "auto-terminatedRelationships": [
+                "failure",
+                "retry"
+              ],
+              "propertiesAttributes": {}
+            },
+            {
+              "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "name": "PutFile_SaveRates",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "properties": {
+                "Directory": "/data/output",
+                "File Name": "rates.json",
+                "Conflict Resolution Strategy": "replace",
+                "Create Missing Directories": "true"
+              },
+              "schedulingPeriod": "0 0 0 * * ?",
+              "auto-terminatedRelationships": [
+                "failure"
+              ],
+              "propertiesAttributes": {}
+            }
+          ],
+          "connections": [
+            {
+              "id": "conn1-1234-5678-abcd-ef1234567890",
+              "name": "FlowFiles_To_File",
+              "sourceProcessorId": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+              "targetProcessorId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+              "relationship": "success"
+            }
+          ],
+          "controllerServices": [],
+          "variables": {}
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22cdb5f5-019e-1000-ad0f-f81ace4042d8",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 73.78,
+      "stage1_duration_sec": 40.2,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 159,
+      "completion_tokens": 459,
+      "total_tokens": 618,
+      "cost_usd": 0.000598,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 179,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 93,
+          "completion_tokens": 6,
+          "total_tokens": 99,
+          "duration_ms": 39860,
+          "cost_usd": 3.5e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 93,
+          "completion_tokens": 6,
+          "total_tokens": 99,
+          "duration_ms": 39860,
+          "cost_usd": 3.5e-05
+        }
+      },
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

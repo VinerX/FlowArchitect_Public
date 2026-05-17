@@ -1,0 +1,113 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T10:58:48.817200+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "encodingVersion": "1.0",
+        "snippet": {
+          "processors": [
+            {
+              "identifier": "get-exchange-rates",
+              "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+              "name": "InvokeHTTP - Get Exchange Rates",
+              "properties": {
+                "HTTP Method": "GET",
+                "Remote URL": "https://api.exchangerate.host/latest",
+                "Connection Timeout": "5 secs",
+                "Read Timeout": "15 secs"
+              },
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "1 hour"
+            },
+            {
+              "identifier": "save-to-file",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "name": "PutFile - Save Rates",
+              "properties": {
+                "Directory": "/data/output",
+                "Conflict Resolution Strategy": "replace",
+                "Create Missing Directories": "true"
+              }
+            },
+            {
+              "identifier": "rename-file",
+              "type": "org.apache.nifi.processors.standard.UpdateAttribute",
+              "name": "UpdateAttribute - Set Filename",
+              "properties": {
+                "filename": "rates.json"
+              }
+            }
+          ],
+          "connections": [
+            {
+              "sourceIdentifier": "get-exchange-rates",
+              "sourceRelationship": "Response",
+              "destinationIdentifier": "rename-file"
+            },
+            {
+              "sourceIdentifier": "rename-file",
+              "sourceRelationship": "success",
+              "destinationIdentifier": "save-to-file"
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "NiFi unreachable: HTTPSConnectionPool(host='localhost', port=8443): Read timed out. (read timeout=15)",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 21.67,
+      "stage1_duration_sec": 4.19,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 139,
+      "completion_tokens": 413,
+      "total_tokens": 552,
+      "cost_usd": 0.001308,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 107,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 82,
+          "completion_tokens": 6,
+          "total_tokens": 88,
+          "duration_ms": 3733,
+          "cost_usd": 5.9e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 82,
+          "completion_tokens": 6,
+          "total_tokens": 88,
+          "duration_ms": 3733,
+          "cost_usd": 5.9e-05
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

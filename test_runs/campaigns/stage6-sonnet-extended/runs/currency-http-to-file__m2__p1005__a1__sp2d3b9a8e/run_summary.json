@@ -1,0 +1,63 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 85.54,
+  "stage1_duration_sec": 8.9,
+  "stage2_duration_sec": 34.2,
+  "prompt_tokens": 2468,
+  "completion_tokens": 4164,
+  "total_tokens": 6632,
+  "cost_usd": 0.069864,
+  "nifi_processor_count": 0,
+  "nifi_connection_count": 0,
+  "pim_source_count": 1,
+  "pim_step_count": 2,
+  "pim_sink_count": 1,
+  "session_id": 209,
+  "preset_id": 1005,
+  "preset_name": "openrouter sonnet 4.6",
+  "preset_model": "anthropic/claude-sonnet-4.6",
+  "llm_calls": [
+    {
+      "purpose": "pim_generation",
+      "provider": "common",
+      "model": "anthropic/claude-sonnet-4.6",
+      "prompt_tokens": 1424,
+      "completion_tokens": 672,
+      "total_tokens": 2096,
+      "duration_ms": 8594,
+      "cost_usd": 0.014352
+    },
+    {
+      "purpose": "psm_conversion",
+      "provider": "common",
+      "model": "anthropic/claude-sonnet-4.6",
+      "prompt_tokens": 943,
+      "completion_tokens": 3482,
+      "total_tokens": 4425,
+      "duration_ms": 34062,
+      "cost_usd": 0.055059
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "pim_generation": {
+      "calls": 1,
+      "prompt_tokens": 1424,
+      "completion_tokens": 672,
+      "total_tokens": 2096,
+      "duration_ms": 8594,
+      "cost_usd": 0.014352
+    },
+    "psm_conversion": {
+      "calls": 1,
+      "prompt_tokens": 943,
+      "completion_tokens": 3482,
+      "total_tokens": 4425,
+      "duration_ms": 34062,
+      "cost_usd": 0.055059
+    }
+  },
+  "nifi_import_success": true,
+  "nifi_error_count": 0,
+  "nifi_import_error": null
+}

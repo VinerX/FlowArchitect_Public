@@ -1,0 +1,1637 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-05-13T15:22:47.530289+00:00",
+  "updated_at": "2026-05-13T16:00:23.496750+00:00",
+  "campaign": {
+    "id": "stage4-dispersion-and-tc12",
+    "title": "Этап 4 — дисперсия на лучших кейсах + TC-12 multi-sink (верхняя граница)",
+    "meta": {
+      "id": "stage4-dispersion-and-tc12",
+      "title": "Этап 4 — дисперсия на лучших кейсах + TC-12 multi-sink (верхняя граница)",
+      "owner": "Дмитрий Макаров",
+      "objective": "Две цели в одной кампании: (1) replicate-серия: 3 best-кейса × mode 1 × repeat 3 = 9 запусков для\n    статистической оценки дисперсии в режиме адаптера.\n(2) TC-12 multi-sink × 4 режима × 1 = 4 запуска как boundary-case для\n    демонстрации верхней границы применимости метода.\nМодель — Qwen 3.6 Plus (preset 1000), corrector — Gemini Flash Lite (1003) для прямой сопоставимости с stage2.\n",
+      "tags": [
+        "thesis",
+        "stage4",
+        "dispersion",
+        "tc12"
+      ]
+    },
+    "manifest_source": "F:\\Education\\Diplom\\FlowArchitect\\config\\campaigns\\stage4_dispersion_and_tc12.yaml"
+  },
+  "defaults": {
+    "presets": [
+      1000
+    ],
+    "modes": [
+      1
+    ],
+    "stage_presets": {
+      "pim": 1000,
+      "corrector": 1003
+    },
+    "repeat": 1,
+    "timeout_sec": 300,
+    "nifi_validate": true,
+    "manual_nifi_required": false,
+    "requires_user_input": false,
+    "stop_after_statuses": [
+      "cancelled"
+    ]
+  },
+  "run_order": [
+    "currency-http-to-file__m1__p1000__a1__sp329ea448",
+    "currency-http-to-file__m1__p1000__a2__sp329ea448",
+    "currency-http-to-file__m1__p1000__a3__sp329ea448",
+    "postgres-to-file__m1__p1000__a1__sp329ea448",
+    "postgres-to-file__m1__p1000__a2__sp329ea448",
+    "postgres-to-file__m1__p1000__a3__sp329ea448",
+    "kafka-to-postgres__m1__p1000__a1__sp329ea448",
+    "kafka-to-postgres__m1__p1000__a2__sp329ea448",
+    "kafka-to-postgres__m1__p1000__a3__sp329ea448",
+    "tc12-multi-sink__m0__p1000__a1__sp329ea448",
+    "tc12-multi-sink__m1__p1000__a1__sp329ea448",
+    "tc12-multi-sink__m2__p1000__a1__sp329ea448",
+    "tc12-multi-sink__m3__p1000__a1__sp329ea448"
+  ],
+  "runs": {
+    "currency-http-to-file__m1__p1000__a1__sp329ea448": {
+      "run_id": "currency-http-to-file__m1__p1000__a1__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File (replicate)",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "replicate",
+          "dispersion",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.\n"
+      },
+      "status": "completed",
+      "comment_count": 1,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:22:58.539763+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:24:25.465902+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        },
+        {
+          "timestamp": "2026-05-13T15:56:14.370379+00:00",
+          "status": "queued",
+          "reason": "manual_status_change"
+        },
+        {
+          "timestamp": "2026-05-13T15:56:25.210694+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:57:47.670399+00:00",
+          "status": "completed",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:56:25.210694+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:57:47.667398+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 80.84,
+        "stage1_duration_sec": 46.85,
+        "stage2_duration_sec": 0.11,
+        "prompt_tokens": 1429,
+        "completion_tokens": 3407,
+        "total_tokens": 4836,
+        "cost_usd": 0.004894,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 148,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 93,
+            "completion_tokens": 983,
+            "total_tokens": 1076,
+            "duration_ms": 46452,
+            "cost_usd": 0.001308
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 93,
+            "completion_tokens": 983,
+            "total_tokens": 1076,
+            "duration_ms": 46452,
+            "cost_usd": 0.001308
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a1__sp329ea448\\run_summary.json",
+      "last_comment_at": "2026-05-13T15:56:14.370379+00:00"
+    },
+    "currency-http-to-file__m1__p1000__a2__sp329ea448": {
+      "run_id": "currency-http-to-file__m1__p1000__a2__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File (replicate)",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 2,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "replicate",
+          "dispersion",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.\n"
+      },
+      "status": "completed",
+      "comment_count": 1,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:24:25.465902+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:25:39.006756+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        },
+        {
+          "timestamp": "2026-05-13T15:56:14.520138+00:00",
+          "status": "queued",
+          "reason": "manual_status_change"
+        },
+        {
+          "timestamp": "2026-05-13T15:57:47.676407+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:59:04.747244+00:00",
+          "status": "completed",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:57:47.675407+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a2__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a2__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:59:04.744705+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a2__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a2__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a2__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a2__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 75.22,
+        "stage1_duration_sec": 41.15,
+        "stage2_duration_sec": 0.11,
+        "prompt_tokens": 1429,
+        "completion_tokens": 3015,
+        "total_tokens": 4444,
+        "cost_usd": 0.004384,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 149,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 93,
+            "completion_tokens": 855,
+            "total_tokens": 948,
+            "duration_ms": 40719,
+            "cost_usd": 0.001142
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 93,
+            "completion_tokens": 855,
+            "total_tokens": 948,
+            "duration_ms": 40719,
+            "cost_usd": 0.001142
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 0,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a2__sp329ea448\\run_summary.json",
+      "last_comment_at": "2026-05-13T15:56:14.520138+00:00"
+    },
+    "currency-http-to-file__m1__p1000__a3__sp329ea448": {
+      "run_id": "currency-http-to-file__m1__p1000__a3__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Currency HTTP to File (replicate)",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+      "query_file": null,
+      "attempt": 3,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "replicate",
+          "dispersion",
+          "level-1"
+        ],
+        "expected_behavior": "По расписанию /data/output/rates.json обновляется актуальными курсами.\n"
+      },
+      "status": "failed_import",
+      "comment_count": 1,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:25:39.013761+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:26:50.354424+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        },
+        {
+          "timestamp": "2026-05-13T15:56:14.722858+00:00",
+          "status": "queued",
+          "reason": "manual_status_change"
+        },
+        {
+          "timestamp": "2026-05-13T15:59:04.751245+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T16:00:23.496750+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:59:04.751245+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T16:00:23.492749+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 77.3,
+        "stage1_duration_sec": 43.28,
+        "stage2_duration_sec": 0.08,
+        "prompt_tokens": 1429,
+        "completion_tokens": 3063,
+        "total_tokens": 4492,
+        "cost_usd": 0.004446,
+        "nifi_processor_count": 2,
+        "nifi_connection_count": 1,
+        "pim_source_count": 1,
+        "pim_step_count": 0,
+        "pim_sink_count": 1,
+        "session_id": 150,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 93,
+            "completion_tokens": 789,
+            "total_tokens": 882,
+            "duration_ms": 42938,
+            "cost_usd": 0.001056
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 93,
+            "completion_tokens": 789,
+            "total_tokens": 882,
+            "duration_ms": 42938,
+            "cost_usd": 0.001056
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 1,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\currency-http-to-file__m1__p1000__a3__sp329ea448\\run_summary.json",
+      "last_comment_at": "2026-05-13T15:56:14.722858+00:00"
+    },
+    "postgres-to-file__m1__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-file__m1__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File (replicate)",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "replicate",
+          "dispersion",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.\n"
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:26:50.358425+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:27:55.034793+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:26:50.358425+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:27:55.032793+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 61.7,
+        "stage1_duration_sec": 44.22,
+        "stage2_duration_sec": 0.09,
+        "prompt_tokens": 1339,
+        "completion_tokens": 2361,
+        "total_tokens": 3700,
+        "cost_usd": 0.003504,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 138,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 1339,
+            "completion_tokens": 2361,
+            "total_tokens": 3700,
+            "duration_ms": 43843,
+            "cost_usd": 0.003504
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1339,
+            "completion_tokens": 2361,
+            "total_tokens": 3700,
+            "duration_ms": 43843,
+            "cost_usd": 0.003504
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "NiFi unreachable: HTTPSConnectionPool(host='localhost', port=8443): Read timed out. (read timeout=15)"
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "postgres-to-file__m1__p1000__a2__sp329ea448": {
+      "run_id": "postgres-to-file__m1__p1000__a2__sp329ea448",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File (replicate)",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 2,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "replicate",
+          "dispersion",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.\n"
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:27:55.038794+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:29:30.338304+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:27:55.038794+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a2__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a2__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:29:30.332302+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a2__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a2__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a2__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a2__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 93.64,
+        "stage1_duration_sec": 47.13,
+        "stage2_duration_sec": 0.11,
+        "prompt_tokens": 1435,
+        "completion_tokens": 3437,
+        "total_tokens": 4872,
+        "cost_usd": 0.004934,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 139,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 96,
+            "completion_tokens": 987,
+            "total_tokens": 1083,
+            "duration_ms": 46734,
+            "cost_usd": 0.001314
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 96,
+            "completion_tokens": 987,
+            "total_tokens": 1083,
+            "duration_ms": 46734,
+            "cost_usd": 0.001314
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 4,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a2__sp329ea448\\run_summary.json"
+    },
+    "postgres-to-file__m1__p1000__a3__sp329ea448": {
+      "run_id": "postgres-to-file__m1__p1000__a3__sp329ea448",
+      "case_id": "postgres-to-file",
+      "title": "PostgreSQL to File (replicate)",
+      "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+      "query_file": null,
+      "attempt": 3,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "replicate",
+          "dispersion",
+          "level-1"
+        ],
+        "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.\n"
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:29:30.345305+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:31:42.471988+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:29:30.345305+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a3__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a3__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:31:42.445975+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a3__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a3__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a3__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a3__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 130.66,
+        "stage1_duration_sec": 45.45,
+        "stage2_duration_sec": 0.11,
+        "prompt_tokens": 1435,
+        "completion_tokens": 3214,
+        "total_tokens": 4649,
+        "cost_usd": 0.004645,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 140,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 96,
+            "completion_tokens": 1056,
+            "total_tokens": 1152,
+            "duration_ms": 45078,
+            "cost_usd": 0.001404
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 96,
+            "completion_tokens": 1056,
+            "total_tokens": 1152,
+            "duration_ms": 45078,
+            "cost_usd": 0.001404
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\postgres-to-file__m1__p1000__a3__sp329ea448\\run_summary.json"
+    },
+    "kafka-to-postgres__m1__p1000__a1__sp329ea448": {
+      "run_id": "kafka-to-postgres__m1__p1000__a1__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL (replicate)",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "replicate",
+          "dispersion",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.\n"
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:31:42.475990+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:33:11.123045+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:31:42.475990+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:33:11.120045+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 87.1,
+        "stage1_duration_sec": 41.8,
+        "stage2_duration_sec": 0.14,
+        "prompt_tokens": 1459,
+        "completion_tokens": 3174,
+        "total_tokens": 4633,
+        "cost_usd": 0.0046,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 141,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 108,
+            "completion_tokens": 981,
+            "total_tokens": 1089,
+            "duration_ms": 41202,
+            "cost_usd": 0.00131
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 108,
+            "completion_tokens": 981,
+            "total_tokens": 1089,
+            "duration_ms": 41202,
+            "cost_usd": 0.00131
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 2,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "kafka-to-postgres__m1__p1000__a2__sp329ea448": {
+      "run_id": "kafka-to-postgres__m1__p1000__a2__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL (replicate)",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 2,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "replicate",
+          "dispersion",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.\n"
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:33:11.126045+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:34:36.921560+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:33:11.126045+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a2__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a2__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:34:36.915877+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a2__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a2__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a2__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a2__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 84.09,
+        "stage1_duration_sec": 47.2,
+        "stage2_duration_sec": 0.09,
+        "prompt_tokens": 1459,
+        "completion_tokens": 3859,
+        "total_tokens": 5318,
+        "cost_usd": 0.005491,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 142,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 108,
+            "completion_tokens": 1357,
+            "total_tokens": 1465,
+            "duration_ms": 46875,
+            "cost_usd": 0.001799
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 108,
+            "completion_tokens": 1357,
+            "total_tokens": 1465,
+            "duration_ms": 46875,
+            "cost_usd": 0.001799
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 1,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a2__sp329ea448\\run_summary.json"
+    },
+    "kafka-to-postgres__m1__p1000__a3__sp329ea448": {
+      "run_id": "kafka-to-postgres__m1__p1000__a3__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka to PostgreSQL (replicate)",
+      "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+      "query_file": null,
+      "attempt": 3,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "replicate",
+          "dispersion",
+          "level-2"
+        ],
+        "expected_behavior": "Сообщения из orders.created попадают в таблицу public.orders.\n"
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:34:36.926578+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:36:03.234953+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:34:36.926578+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a3__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a3__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:36:03.231371+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a3__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a3__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a3__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a3__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 84.23,
+        "stage1_duration_sec": 39.06,
+        "stage2_duration_sec": 0.09,
+        "prompt_tokens": 1459,
+        "completion_tokens": 3163,
+        "total_tokens": 4622,
+        "cost_usd": 0.004586,
+        "nifi_processor_count": 3,
+        "nifi_connection_count": 2,
+        "pim_source_count": 1,
+        "pim_step_count": 1,
+        "pim_sink_count": 1,
+        "session_id": 143,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 108,
+            "completion_tokens": 1101,
+            "total_tokens": 1209,
+            "duration_ms": 38781,
+            "cost_usd": 0.001466
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 108,
+            "completion_tokens": 1101,
+            "total_tokens": 1209,
+            "duration_ms": 38781,
+            "cost_usd": 0.001466
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 3,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\kafka-to-postgres__m1__p1000__a3__sp329ea448\\run_summary.json"
+    },
+    "tc12-multi-sink__m0__p1000__a1__sp329ea448": {
+      "run_id": "tc12-multi-sink__m0__p1000__a1__sp329ea448",
+      "case_id": "tc12-multi-sink",
+      "title": "Multi-Sink Complex Pipeline (TC-12)",
+      "query": "Забирай данные о транзакциях из REST API банка https://api.bank.example.com/transactions каждые 30 секунд, фильтруй транзакции на сумму более 100000 рублей, обогащай данные информацией о клиенте из PostgreSQL-таблицы public.clients по полю client_id, результат публикуй в Kafka-топик high_value_transactions и параллельно сохраняй в S3 бакет compliance-archive с партиционированием по дате.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "boundary",
+          "multi-sink",
+          "level-4"
+        ],
+        "expected_behavior": "Полный конвейер с HTTP-источником, фильтрацией, enrichment из PG и двумя стоками (Kafka + S3 с партиционированием).\n"
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:36:03.238898+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:38:21.956195+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:36:03.238898+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m0__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "0",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m0__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:38:21.953194+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m0__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m0__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m0__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m0__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 118.92,
+        "stage1_duration_sec": 103.07,
+        "stage2_duration_sec": null,
+        "prompt_tokens": 141,
+        "completion_tokens": 5605,
+        "total_tokens": 5746,
+        "cost_usd": 0.007332,
+        "nifi_processor_count": 5,
+        "nifi_connection_count": 4,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": 144,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "direct",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 141,
+            "completion_tokens": 5605,
+            "total_tokens": 5746,
+            "duration_ms": 102640,
+            "cost_usd": 0.007332
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "direct": {
+            "calls": 1,
+            "prompt_tokens": 141,
+            "completion_tokens": 5605,
+            "total_tokens": 5746,
+            "duration_ms": 102640,
+            "cost_usd": 0.007332
+          }
+        },
+        "nifi_import_success": false,
+        "nifi_error_count": 0,
+        "nifi_import_error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details."
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m0__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "tc12-multi-sink__m1__p1000__a1__sp329ea448": {
+      "run_id": "tc12-multi-sink__m1__p1000__a1__sp329ea448",
+      "case_id": "tc12-multi-sink",
+      "title": "Multi-Sink Complex Pipeline (TC-12)",
+      "query": "Забирай данные о транзакциях из REST API банка https://api.bank.example.com/transactions каждые 30 секунд, фильтруй транзакции на сумму более 100000 рублей, обогащай данные информацией о клиенте из PostgreSQL-таблицы public.clients по полю client_id, результат публикуй в Kafka-топик high_value_transactions и параллельно сохраняй в S3 бакет compliance-archive с партиционированием по дате.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "boundary",
+          "multi-sink",
+          "level-4"
+        ],
+        "expected_behavior": "Полный конвейер с HTTP-источником, фильтрацией, enrichment из PG и двумя стоками (Kafka + S3 с партиционированием).\n"
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:38:21.992562+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:44:52.961012+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:38:21.992562+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m1__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "1",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m1__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:44:52.960011+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m1__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m1__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for YAML PIM",
+        "duration_sec": 300.24,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m1__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "tc12-multi-sink__m2__p1000__a1__sp329ea448": {
+      "run_id": "tc12-multi-sink__m2__p1000__a1__sp329ea448",
+      "case_id": "tc12-multi-sink",
+      "title": "Multi-Sink Complex Pipeline (TC-12)",
+      "query": "Забирай данные о транзакциях из REST API банка https://api.bank.example.com/transactions каждые 30 секунд, фильтруй транзакции на сумму более 100000 рублей, обогащай данные информацией о клиенте из PostgreSQL-таблицы public.clients по полю client_id, результат публикуй в Kafka-топик high_value_transactions и параллельно сохраняй в S3 бакет compliance-archive с партиционированием по дате.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 2,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "boundary",
+          "multi-sink",
+          "level-4"
+        ],
+        "expected_behavior": "Полный конвейер с HTTP-источником, фильтрацией, enrichment из PG и двумя стоками (Kafka + S3 с партиционированием).\n"
+      },
+      "status": "failed_generation",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:44:52.977814+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:51:45.531238+00:00",
+          "status": "failed_generation",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:44:52.977814+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m2__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "2",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m2__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:51:45.529238+00:00",
+      "exit_code": 1,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m2__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m2__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m2__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m2__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": false,
+        "error": "timeout waiting for YAML PIM",
+        "duration_sec": 300.21,
+        "stage1_duration_sec": null,
+        "stage2_duration_sec": null,
+        "prompt_tokens": null,
+        "completion_tokens": null,
+        "total_tokens": null,
+        "cost_usd": null,
+        "nifi_processor_count": null,
+        "nifi_connection_count": null,
+        "pim_source_count": null,
+        "pim_step_count": null,
+        "pim_sink_count": null,
+        "session_id": null,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [],
+        "llm_usage_by_purpose": {},
+        "nifi_import_success": null,
+        "nifi_error_count": null,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m2__p1000__a1__sp329ea448\\run_summary.json"
+    },
+    "tc12-multi-sink__m3__p1000__a1__sp329ea448": {
+      "run_id": "tc12-multi-sink__m3__p1000__a1__sp329ea448",
+      "case_id": "tc12-multi-sink",
+      "title": "Multi-Sink Complex Pipeline (TC-12)",
+      "query": "Забирай данные о транзакциях из REST API банка https://api.bank.example.com/transactions каждые 30 секунд, фильтруй транзакции на сумму более 100000 рублей, обогащай данные информацией о клиенте из PostgreSQL-таблицы public.clients по полю client_id, результат публикуй в Kafka-топик high_value_transactions и параллельно сохраняй в S3 бакет compliance-archive с партиционированием по дате.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": false,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "boundary",
+          "multi-sink",
+          "level-4"
+        ],
+        "expected_behavior": "Полный конвейер с HTTP-источником, фильтрацией, enrichment из PG и двумя стоками (Kafka + S3 с партиционированием).\n"
+      },
+      "status": "failed_import",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-13T15:22:47.530289+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-13T15:51:45.550011+00:00",
+          "status": "running",
+          "reason": "runner_started"
+        },
+        {
+          "timestamp": "2026-05-13T15:54:51.623314+00:00",
+          "status": "failed_import",
+          "reason": "runner_finished"
+        }
+      ],
+      "started_at": "2026-05-13T15:51:45.549011+00:00",
+      "command": [
+        "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+        "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+        "--query-file",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m3__p1000__a1__sp329ea448\\query.txt",
+        "--preset",
+        "1000",
+        "--mode",
+        "3",
+        "--timeout",
+        "300",
+        "--report",
+        "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m3__p1000__a1__sp329ea448\\raw_report.json",
+        "--pim-preset",
+        "1000",
+        "--corrector-preset",
+        "1003",
+        "--nifi"
+      ],
+      "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+      "command_timeout_sec": 960,
+      "finished_at": "2026-05-13T15:54:51.617312+00:00",
+      "exit_code": 0,
+      "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m3__p1000__a1__sp329ea448\\raw_report.json",
+      "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m3__p1000__a1__sp329ea448\\runner_stdout.log",
+      "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m3__p1000__a1__sp329ea448\\runner_stderr.log",
+      "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m3__p1000__a1__sp329ea448\\query.txt",
+      "result_summary": {
+        "success": true,
+        "error": null,
+        "duration_sec": 184.55,
+        "stage1_duration_sec": 157.1,
+        "stage2_duration_sec": 8.66,
+        "prompt_tokens": 7939,
+        "completion_tokens": 13776,
+        "total_tokens": 21715,
+        "cost_usd": 0.020489,
+        "nifi_processor_count": 5,
+        "nifi_connection_count": 4,
+        "pim_source_count": 1,
+        "pim_step_count": 2,
+        "pim_sink_count": 2,
+        "session_id": 147,
+        "preset_id": 1000,
+        "preset_name": "openrouter qwen/qwen3.6-plus",
+        "preset_model": "qwen/qwen3.6-plus",
+        "llm_calls": [
+          {
+            "purpose": "pim_generation",
+            "provider": "common",
+            "model": "qwen/qwen3.6-plus",
+            "prompt_tokens": 1411,
+            "completion_tokens": 3195,
+            "total_tokens": 4606,
+            "duration_ms": 156639,
+            "cost_usd": 0.004612
+          },
+          {
+            "purpose": "nifi_correction",
+            "provider": "common",
+            "model": "google/gemini-2.5-flash-lite",
+            "prompt_tokens": 168,
+            "completion_tokens": 1321,
+            "total_tokens": 1489,
+            "duration_ms": 8407,
+            "cost_usd": 0.000545
+          }
+        ],
+        "llm_usage_by_purpose": {
+          "pim_generation": {
+            "calls": 1,
+            "prompt_tokens": 1411,
+            "completion_tokens": 3195,
+            "total_tokens": 4606,
+            "duration_ms": 156639,
+            "cost_usd": 0.004612
+          },
+          "nifi_correction": {
+            "calls": 1,
+            "prompt_tokens": 168,
+            "completion_tokens": 1321,
+            "total_tokens": 1489,
+            "duration_ms": 8407,
+            "cost_usd": 0.000545
+          }
+        },
+        "nifi_import_success": true,
+        "nifi_error_count": 5,
+        "nifi_import_error": null
+      },
+      "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m3__p1000__a1__sp329ea448\\run_summary.json"
+    }
+  },
+  "status_counts": {
+    "completed": 2,
+    "failed_import": 9,
+    "failed_generation": 2
+  }
+}

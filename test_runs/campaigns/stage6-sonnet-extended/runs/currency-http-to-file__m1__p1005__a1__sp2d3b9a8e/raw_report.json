@@ -1,0 +1,287 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T20:21:04.228795+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: exchange_rates_pipeline\n  name: Exchange Rates Pipeline\n  description: Fetch latest currency exchange rates from exchangerate.host API and\n    save the result to a local JSON file\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 1 hour\nsources:\n- id: source_exchange_api\n  name: Fetch Exchange Rates\n  type: HTTP_REST\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\n      headers: '{}'\n      timeout_seconds: '30'\nprocessing_elements:\n- id: process_parse_response\n  name: Parse API Response\n  operation: Transform\n  config:\n    input_format: json\n    action: parse_and_validate\n    description: Parse JSON response from exchangerate.host and validate required\n      fields (base, date, rates)\nsinks:\n- id: sink_json_file\n  name: Write Rates to JSON File\n  type: FileSystem\n  location: /data/output/rates.json\n  connection:\n    properties:\n      format: json\n      write_mode: overwrite\n      pretty_print: 'true'\nprocessed_data:\n- id: exchange_rates_json\n  format: json\nlinks:\n- from_id: source_exchange_api\n  to_id: process_parse_response\n  data_ref: exchange_rates_json\n- from_id: process_parse_response\n  to_id: sink_json_file\n  data_ref: exchange_rates_json",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "e98f6e82-5793-4bcb-97ab-70a99b978b79",
+          "name": "Exchange Rates Pipeline",
+          "comments": "Fetch latest currency exchange rates from exchangerate.host API and save the result to a local JSON file",
+          "processors": [
+            {
+              "identifier": "a3f18a0f-0497-4218-8c33-d5d4bd5fd6a9",
+              "name": "Fetch Exchange Rates",
+              "comments": "Generated from PIM source 'source_exchange_api' (HTTP_REST)",
+              "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "HTTP URL": "https://api.exchangerate.host/latest",
+                "HTTP Method": "GET",
+                "method": "GET",
+                "headers": "{}",
+                "timeout_seconds": "30"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "Original",
+                "Retry",
+                "No Retry",
+                "Failure"
+              ]
+            },
+            {
+              "identifier": "ce1edae5-9896-4317-8dbb-3878dcf720bc",
+              "name": "Parse API Response",
+              "comments": "Generated from PIM processing element 'process_parse_response' (Transform)",
+              "type": "org.apache.nifi.processors.standard.UpdateRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Record Writer": "f6b83bb3-339c-4a1b-8661-35ca6fad3c38",
+                "Record Reader": "064fc795-8cd0-40e8-aa8d-018bbc42e2a9",
+                "action": "parse_and_validate",
+                "description": "Parse JSON response from exchangerate.host and validate required fields (base, date, rates)"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            },
+            {
+              "identifier": "1fb4f757-8b76-4b1e-81e6-c72d201723a5",
+              "name": "Write Rates to JSON File",
+              "comments": "Generated from PIM sink 'sink_json_file' (FileSystem)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/output",
+                "Conflict Resolution Strategy": "replace",
+                "format": "json",
+                "pretty_print": "true"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "5b77fa69-f6ec-4b22-abb5-6e8170fa5cd9",
+              "name": "Fetch Exchange Rates -> Parse API Response",
+              "comments": "exchange_rates_json",
+              "source": {
+                "id": "a3f18a0f-0497-4218-8c33-d5d4bd5fd6a9",
+                "groupId": "e98f6e82-5793-4bcb-97ab-70a99b978b79",
+                "type": "PROCESSOR",
+                "name": "Fetch Exchange Rates"
+              },
+              "destination": {
+                "id": "ce1edae5-9896-4317-8dbb-3878dcf720bc",
+                "groupId": "e98f6e82-5793-4bcb-97ab-70a99b978b79",
+                "type": "PROCESSOR",
+                "name": "Parse API Response"
+              },
+              "selectedRelationships": [
+                "Response"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "7173e86b-bf44-41b2-bb99-9b1005cd6c16",
+              "name": "Parse API Response -> Write Rates to JSON File",
+              "comments": "exchange_rates_json",
+              "source": {
+                "id": "ce1edae5-9896-4317-8dbb-3878dcf720bc",
+                "groupId": "e98f6e82-5793-4bcb-97ab-70a99b978b79",
+                "type": "PROCESSOR",
+                "name": "Parse API Response"
+              },
+              "destination": {
+                "id": "1fb4f757-8b76-4b1e-81e6-c72d201723a5",
+                "groupId": "e98f6e82-5793-4bcb-97ab-70a99b978b79",
+                "type": "PROCESSOR",
+                "name": "Write Rates to JSON File"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "064fc795-8cd0-40e8-aa8d-018bbc42e2a9",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "f6b83bb3-339c-4a1b-8661-35ca6fad3c38",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "23006308-019e-1000-3fd7-7c29df350693",
+        "validation_errors": [
+          {
+            "name": "Write Rates to JSON File",
+            "type": "org.apache.nifi.processors.standard.PutFile",
+            "errors": [
+              "'format' validated against 'json' is invalid because 'format' is not a supported property or has no Validator associated with it",
+              "'pretty_print' validated against 'true' is invalid because 'pretty_print' is not a supported property or has no Validator associated with it"
+            ]
+          },
+          {
+            "name": "Parse API Response",
+            "type": "org.apache.nifi.processors.standard.UpdateRecord",
+            "errors": [
+              "'description' validated against 'Parse JSON response from exchangerate.host and validate required fields (base, date, rates)' is invalid because Property Name is not a valid RecordPath value: Unexpected token '<EOF>' at line 1, column 11. Query: description",
+              "'action' validated against 'parse_and_validate' is invalid because Property Name is not a valid RecordPath value: Unexpected token '<EOF>' at line 1, column 6. Query: action"
+            ]
+          }
+        ],
+        "error_count": 4,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 50.66,
+      "stage1_duration_sec": 8.01,
+      "stage2_duration_sec": 0.12,
+      "prompt_tokens": 1525,
+      "completion_tokens": 572,
+      "total_tokens": 2097,
+      "cost_usd": 0.013155,
+      "nifi_processor_count": 3,
+      "nifi_connection_count": 2,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 208,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 101,
+          "completion_tokens": 10,
+          "total_tokens": 111,
+          "duration_ms": 7704,
+          "cost_usd": 0.000453
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 101,
+          "completion_tokens": 10,
+          "total_tokens": 111,
+          "duration_ms": 7704,
+          "cost_usd": 0.000453
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

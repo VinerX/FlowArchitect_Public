@@ -1,0 +1,194 @@
+{
+  "flowContents": {
+    "identifier": "306cc0b6-5980-4534-a843-483bb5955291",
+    "name": "Filter Completed Orders CSV",
+    "comments": "Read CSV files from /data/input/orders/, filter rows where status is COMPLETED, and write to /data/output/completed_orders.csv",
+    "processors": [
+      {
+        "identifier": "ebbdcbf1-929c-401d-867e-40b44415fe2a",
+        "name": "Read Input CSVs",
+        "comments": "Generated from PIM source 'source_csv_input' (CSV)",
+        "type": "org.apache.nifi.processors.standard.GetFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Input Directory": "/data/input/orders/"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "15 min",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": []
+      },
+      {
+        "identifier": "4b2265ff-3162-437d-8630-fd778dada0ec",
+        "name": "Filter Completed Orders",
+        "comments": "Generated from PIM processing element 'process_filter' (Filter)",
+        "type": "org.apache.nifi.processors.standard.QueryRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 460.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "filtered": "status = 'COMPLETED'",
+          "Record Writer": "54ba39a3-2bbe-4c2c-9f5e-a1f60a3c58ee",
+          "Record Reader": "dc4cef4b-0b01-4ee7-9c7f-7f4cc05584f6"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "original"
+        ]
+      },
+      {
+        "identifier": "c41abc2b-6910-4064-bbe0-b29bfd3ae5aa",
+        "name": "Write Output CSV",
+        "comments": "Generated from PIM sink 'sink_csv_output' (CSV)",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Directory": "/data/output/completed_orders.csv"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "b31eb6ea-4f8a-43bc-b7f5-ffad3beb539c",
+        "name": "Read Input CSVs -> Filter Completed Orders",
+        "comments": "orders_data",
+        "source": {
+          "id": "ebbdcbf1-929c-401d-867e-40b44415fe2a",
+          "groupId": "306cc0b6-5980-4534-a843-483bb5955291",
+          "type": "PROCESSOR",
+          "name": "Read Input CSVs"
+        },
+        "destination": {
+          "id": "4b2265ff-3162-437d-8630-fd778dada0ec",
+          "groupId": "306cc0b6-5980-4534-a843-483bb5955291",
+          "type": "PROCESSOR",
+          "name": "Filter Completed Orders"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      },
+      {
+        "identifier": "98939012-9b3e-4bd1-8c6a-f2920e6c3ee1",
+        "name": "Filter Completed Orders -> Write Output CSV",
+        "comments": "orders_data",
+        "source": {
+          "id": "4b2265ff-3162-437d-8630-fd778dada0ec",
+          "groupId": "306cc0b6-5980-4534-a843-483bb5955291",
+          "type": "PROCESSOR",
+          "name": "Filter Completed Orders"
+        },
+        "destination": {
+          "id": "c41abc2b-6910-4064-bbe0-b29bfd3ae5aa",
+          "groupId": "306cc0b6-5980-4534-a843-483bb5955291",
+          "type": "PROCESSOR",
+          "name": "Write Output CSV"
+        },
+        "selectedRelationships": [
+          "filtered"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": [
+      {
+        "identifier": "dc4cef4b-0b01-4ee7-9c7f-7f4cc05584f6",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Access Strategy": "Infer Schema"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "54ba39a3-2bbe-4c2c-9f5e-a1f60a3c58ee",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Write Strategy": "Do Not Write Schema"
+        },
+        "propertyDescriptors": {}
+      }
+    ]
+  }
+}

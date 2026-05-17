@@ -1,0 +1,27 @@
+flow:
+  id: exchange_rates_flow
+  name: Exchange Rates Fetch and Save
+  description: Fetch latest exchange rates from exchangerate.host API and save to
+    JSON file
+triggers:
+- id: trigger_main
+  type: manual
+  condition: ''
+sources:
+- id: source_exchange_api
+  name: Exchange Rate API
+  type: HTTP
+  location: https://api.exchangerate.host/latest
+processing_elements: []
+sinks:
+- id: sink_file
+  name: Save to JSON File
+  type: File
+  location: /data/output/rates.json
+processed_data:
+- id: rates_json
+  format: json
+links:
+- from_id: source_exchange_api
+  to_id: sink_file
+  data_ref: rates_json

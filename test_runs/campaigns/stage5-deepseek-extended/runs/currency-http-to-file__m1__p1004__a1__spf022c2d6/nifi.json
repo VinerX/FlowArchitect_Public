@@ -1,0 +1,111 @@
+{
+  "flowContents": {
+    "identifier": "46fcb8e5-9445-4473-aa78-b7d3ed5c7513",
+    "name": "Exchange Rates Ingestion",
+    "comments": "Fetch latest exchange rates from API and save to file",
+    "processors": [
+      {
+        "identifier": "d75ba647-c5c9-4248-a3de-e2049eec805a",
+        "name": "Exchange Rate API",
+        "comments": "Generated from PIM source 'source_api' (REST API)",
+        "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "HTTP URL": "https://api.exchangerate.host/latest",
+          "HTTP Method": "GET"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "Original",
+          "Retry",
+          "No Retry",
+          "Failure"
+        ]
+      },
+      {
+        "identifier": "2ee8c492-ae6e-4959-83af-43b8b61ab982",
+        "name": "Save to rates.json",
+        "comments": "Generated from PIM sink 'sink_file' (File)",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Directory": "/data/output"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "a5f8a76a-76d4-4e60-b4f4-c9bdbc93f64e",
+        "name": "Exchange Rate API -> Save to rates.json",
+        "comments": "rates_data",
+        "source": {
+          "id": "d75ba647-c5c9-4248-a3de-e2049eec805a",
+          "groupId": "46fcb8e5-9445-4473-aa78-b7d3ed5c7513",
+          "type": "PROCESSOR",
+          "name": "Exchange Rate API"
+        },
+        "destination": {
+          "id": "2ee8c492-ae6e-4959-83af-43b8b61ab982",
+          "groupId": "46fcb8e5-9445-4473-aa78-b7d3ed5c7513",
+          "type": "PROCESSOR",
+          "name": "Save to rates.json"
+        },
+        "selectedRelationships": [
+          "Response"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": []
+  }
+}

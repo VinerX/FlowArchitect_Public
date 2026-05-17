@@ -1,0 +1,31 @@
+
+================================================================
+Query  : ����� �� ������� public.transactions ������ �� �������� PENDING, �������...
+Mode   : 3 � Adapter+LLM (NL->YAML->Adapter->LLM->JSON)
+Presets: [1005]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1005, 'error_corrector': 1005, 'nifi_corrector': 1005}
+Backend ready.
+
+--- Preset 1005: openrouter sonnet 4.6  [anthropic/claude-sonnet-4.6] ---
+  [1/2] USER_QUERY  mode=3  preset=1005
+  [1/2] PIM ready  (1395 chars, 9.47s)
+  [2/2] REQUEST_CONVERSION  mode=3  preset=1005
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (40s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (3 proc, 2 conn, 40.47s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: FAILED: NiFi unreachable: Cannot connect to https://localhost:8443
+  tokens: 5061 in / 3823 out / 8884 total  |  cost: $0.072528
+  Result : [OK]  (54.36s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage6-sonnet-extended\runs\postgres-to-kafka__m3__p1005__a1__sp2d3b9a8e\raw_report.json

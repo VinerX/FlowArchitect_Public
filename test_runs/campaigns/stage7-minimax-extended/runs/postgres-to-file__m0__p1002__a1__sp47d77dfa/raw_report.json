@@ -1,0 +1,173 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T19:45:36.789930+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flow": {
+          "name": "PostgreSQL Orders Export to JSON",
+          "description": "Периодически выбирает новые записи из PostgreSQL public.orders и сохраняет в JSON",
+          "processors": [
+            {
+              "id": "generate-trigger",
+              "type": "GenerateFlowFile",
+              "properties": {
+                "Batch Size": "1",
+                "Data Format": "Text",
+                "File Size": "0B",
+                "Unique FlowFiles": "true"
+              },
+              "scheduling": {
+                "type": "CRON",
+                "value": "0 */5 * * * *"
+              }
+            },
+            {
+              "id": "fetch-new-orders",
+              "type": "ExecuteSQL",
+              "properties": {
+                "Database Connection Pooling Service": "postgres-pool",
+                "SQL Pre-Query": "CREATE TABLE IF NOT EXISTS public.orders_exported (id BIGINT PRIMARY KEY, exported_at TIMESTAMP DEFAULT NOW())",
+                "SQL Select Query": "SELECT o.* FROM public.orders o LEFT JOIN public.orders_exported e ON o.id = e.id WHERE e.id IS NULL",
+                "Max Wait Time": "60 seconds",
+                "Fetch Size": "1000"
+              }
+            },
+            {
+              "id": "convert-to-json",
+              "type": "ConvertRecord",
+              "properties": {
+                "Record Reader": "postgres-reader",
+                "Record Writer": "json-writer"
+              }
+            },
+            {
+              "id": "write-to-file",
+              "type": "PutFile",
+              "properties": {
+                "Directory": "/data/output",
+                "File Name": "orders_export.json",
+                "Conflict Resolution Strategy": "replace"
+              }
+            },
+            {
+              "id": "mark-exported",
+              "type": "ExecuteSQL",
+              "properties": {
+                "Database Connection Pooling Service": "postgres-pool",
+                "SQL Pre-Query": "INSERT INTO public.orders_exported (id) ${sql:literal(${partial.id})}"
+              }
+            }
+          ],
+          "controllerServices": [
+            {
+              "id": "postgres-pool",
+              "type": "DBCPConnectionPool",
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://localhost:5432/mydb",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database Driver Location": "/opt/nifi/postgresql.jar",
+                "Database User": "nifi",
+                "Password": "********"
+              }
+            },
+            {
+              "id": "postgres-reader",
+              "type": "JsonPathReader",
+              "properties": {
+                "JsonPath Expression Cache": "1000",
+                "Schema Access Strategy": "infer-schema"
+              }
+            },
+            {
+              "id": "json-writer",
+              "type": "JsonRecordSetWriter",
+              "properties": {
+                "Schema Write Strategy": "do-not-write-schema",
+                "Output Format": "array"
+              }
+            }
+          ],
+          "connections": [
+            {
+              "from": "generate-trigger",
+              "to": "fetch-new-orders",
+              "name": "Trigger to Query"
+            },
+            {
+              "from": "fetch-new-orders",
+              "to": "convert-to-json",
+              "name": "Query to Convert"
+            },
+            {
+              "from": "convert-to-json",
+              "to": "write-to-file",
+              "name": "Convert to File"
+            },
+            {
+              "from": "write-to-file",
+              "to": "mark-exported",
+              "name": "File to Mark"
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22e07691-019e-1000-469c-74ed495fc224",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 78.41,
+      "stage1_duration_sec": 43.55,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 167,
+      "completion_tokens": 1009,
+      "total_tokens": 1176,
+      "cost_usd": 0.001261,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 187,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 97,
+          "completion_tokens": 6,
+          "total_tokens": 103,
+          "duration_ms": 43171,
+          "cost_usd": 3.6e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 97,
+          "completion_tokens": 6,
+          "total_tokens": 103,
+          "duration_ms": 43171,
+          "cost_usd": 3.6e-05
+        }
+      },
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

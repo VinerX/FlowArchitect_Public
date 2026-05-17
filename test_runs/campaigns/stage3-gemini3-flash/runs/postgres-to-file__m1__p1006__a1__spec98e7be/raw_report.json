@@ -1,0 +1,268 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:03:59.719401+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: postgres_to_json_export\n  name: PostgreSQL to JSON Export\n  description: Periodically extracts new records from public.orders and saves them\n    to a local JSON file.\ntriggers:\n- id: trigger_periodic\n  type: schedule\n  condition: every 1 hour\nsources:\n- id: src_postgres_orders\n  name: PostgreSQL Orders Source\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DB_NAME}}'\n      username: '{{DB_USER}}'\n      password: '{{DB_PASSWORD}}'\n      incremental_column: id\nprocessing_elements:\n- id: proc_format_json\n  name: Format to JSON\n  operation: Format\n  config:\n    format: json\nsinks:\n- id: sink_json_file\n  name: JSON File Sink\n  type: File\n  location: /data/output/orders_export.json\n  connection:\n    properties:\n      write_mode: append\nprocessed_data:\n- id: order_records\n  format: json\nlinks:\n- from_id: src_postgres_orders\n  to_id: proc_format_json\n  data_ref: order_records\n- from_id: proc_format_json\n  to_id: sink_json_file\n  data_ref: order_records",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "8cfd2637-0a70-4b70-8614-3c812e0c28aa",
+          "name": "PostgreSQL to JSON Export",
+          "comments": "Periodically extracts new records from public.orders and saves them to a local JSON file.",
+          "processors": [
+            {
+              "identifier": "ae9840ad-f2d2-42b8-9717-65110fe45460",
+              "name": "PostgreSQL Orders Source",
+              "comments": "Generated from PIM source 'src_postgres_orders' (PostgreSQL)",
+              "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Table Name": "public.orders",
+                "Database Type": "PostgreSQL",
+                "Database Connection Pooling Service": "013bd063-3eef-4096-a767-671db4afedd2",
+                "Record Writer": "6be3bc88-cd73-4ea7-bf81-72ee62fc9566",
+                "incremental_column": "id"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "60 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "193fc0c2-f6f5-48a2-a9a4-226b69b3b6fd",
+              "name": "Format to JSON",
+              "comments": "Generated from PIM processing element 'proc_format_json' (Format)",
+              "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-update-attribute-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "format": "json"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "86c105f0-07e5-4d2f-aec9-51b32db0baa0",
+              "name": "JSON File Sink",
+              "comments": "Generated from PIM sink 'sink_json_file' (File)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/output"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "f7ef5be1-49d8-4ab3-bdfe-5e9762a854ee",
+              "name": "PostgreSQL Orders Source -> Format to JSON",
+              "comments": "order_records",
+              "source": {
+                "id": "ae9840ad-f2d2-42b8-9717-65110fe45460",
+                "groupId": "8cfd2637-0a70-4b70-8614-3c812e0c28aa",
+                "type": "PROCESSOR",
+                "name": "PostgreSQL Orders Source"
+              },
+              "destination": {
+                "id": "193fc0c2-f6f5-48a2-a9a4-226b69b3b6fd",
+                "groupId": "8cfd2637-0a70-4b70-8614-3c812e0c28aa",
+                "type": "PROCESSOR",
+                "name": "Format to JSON"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "6fe0a8fe-a500-4054-88ff-004bfa28b0ea",
+              "name": "Format to JSON -> JSON File Sink",
+              "comments": "order_records",
+              "source": {
+                "id": "193fc0c2-f6f5-48a2-a9a4-226b69b3b6fd",
+                "groupId": "8cfd2637-0a70-4b70-8614-3c812e0c28aa",
+                "type": "PROCESSOR",
+                "name": "Format to JSON"
+              },
+              "destination": {
+                "id": "86c105f0-07e5-4d2f-aec9-51b32db0baa0",
+                "groupId": "8cfd2637-0a70-4b70-8614-3c812e0c28aa",
+                "type": "PROCESSOR",
+                "name": "JSON File Sink"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "013bd063-3eef-4096-a767-671db4afedd2",
+              "name": "DatabaseConnectionPool",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-dbcp-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database User": "{{DB_USER}}",
+                "Password": "{{DB_PASSWORD}}"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "6be3bc88-cd73-4ea7-bf81-72ee62fc9566",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "21027277-019e-1000-c8f2-50eb8563569d",
+        "validation_errors": [
+          {
+            "name": "PostgreSQL Orders Source",
+            "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+            "errors": [
+              "'Database Connection Pooling Service' validated against '51db56af-2e18-3a86-048f-ed45978e7e29' is invalid because Controller Service [Database Connection Pooling Service] Identifier [51db56af-2e18-3a86-048f-ed45978e7e29] state is Enabling"
+            ]
+          }
+        ],
+        "error_count": 1,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 88.4,
+      "stage1_duration_sec": 4.3,
+      "stage2_duration_sec": 0.1,
+      "prompt_tokens": 1454,
+      "completion_tokens": 561,
+      "total_tokens": 2015,
+      "cost_usd": 0.00241,
+      "nifi_processor_count": 3,
+      "nifi_connection_count": 2,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 116,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 82,
+          "completion_tokens": 6,
+          "total_tokens": 88,
+          "duration_ms": 3953,
+          "cost_usd": 5.9e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 82,
+          "completion_tokens": 6,
+          "total_tokens": 88,
+          "duration_ms": 3953,
+          "cost_usd": 5.9e-05
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

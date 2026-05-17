@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 23.88,
+  "stage1_duration_sec": 7.63,
+  "stage2_duration_sec": null,
+  "prompt_tokens": 173,
+  "completion_tokens": 868,
+  "total_tokens": 1041,
+  "cost_usd": 0.002691,
+  "nifi_processor_count": 6,
+  "nifi_connection_count": 5,
+  "pim_source_count": null,
+  "pim_step_count": null,
+  "pim_sink_count": null,
+  "session_id": 127,
+  "preset_id": 1006,
+  "preset_name": "openrouter gemini 3 flash",
+  "preset_model": "google/gemini-3-flash-preview",
+  "llm_calls": [
+    {
+      "purpose": "direct",
+      "provider": "common",
+      "model": "google/gemini-3-flash-preview",
+      "prompt_tokens": 99,
+      "completion_tokens": 8,
+      "total_tokens": 107,
+      "duration_ms": 7312,
+      "cost_usd": 7.3e-05
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "direct": {
+      "calls": 1,
+      "prompt_tokens": 99,
+      "completion_tokens": 8,
+      "total_tokens": 107,
+      "duration_ms": 7312,
+      "cost_usd": 7.3e-05
+    }
+  },
+  "nifi_import_success": false,
+  "nifi_error_count": 0,
+  "nifi_import_error": "HTTP 400: Cannot construct instance of `org.apache.nifi.flow.ConnectableComponent` (although at least one Creator exists): no String-argument constructor/factory method to deserialize from String value ('consume-kafka')\n at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 1869] (through reference chain: org.apache.nifi.web.api.entity.ProcessGroupEntity[\"versionedFlowSnapshot\"]->org.apache.nifi.registry.flow.RegisteredFlowSnapshot[\"flowContents\"]->org.apache.nifi.flow.VersionedProcessGroup[\"connections\"]->java.util.HashSet[0]->org.apache.nifi.flow.VersionedCon"
+}

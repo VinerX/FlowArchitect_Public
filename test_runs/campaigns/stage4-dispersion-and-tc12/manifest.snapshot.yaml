@@ -1,0 +1,104 @@
+campaign:
+  id: stage4-dispersion-and-tc12
+  title: Этап 4 — дисперсия на лучших кейсах + TC-12 multi-sink (верхняя граница)
+  owner: Дмитрий Макаров
+  objective: "Две цели в одной кампании: (1) replicate-серия: 3 best-кейса × mode\
+    \ 1 × repeat 3 = 9 запусков для\n    статистической оценки дисперсии в режиме\
+    \ адаптера.\n(2) TC-12 multi-sink × 4 режима × 1 = 4 запуска как boundary-case\
+    \ для\n    демонстрации верхней границы применимости метода.\nМодель — Qwen 3.6\
+    \ Plus (preset 1000), corrector — Gemini Flash Lite (1003) для прямой сопоставимости\
+    \ с stage2.\n"
+  tags:
+  - thesis
+  - stage4
+  - dispersion
+  - tc12
+defaults:
+  presets:
+  - 1000
+  modes:
+  - 1
+  stage_presets:
+    pim: 1000
+    corrector: 1003
+  repeat: 1
+  timeout_sec: 300
+  nifi_validate: true
+  manual_nifi_required: false
+  requires_user_input: false
+  stop_after_statuses:
+  - cancelled
+cases:
+- id: currency-http-to-file
+  title: Currency HTTP to File (replicate)
+  query: 'Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат
+    в файл /data/output/rates.json.
+
+    '
+  modes:
+  - 1
+  repeat: 3
+  tags:
+  - replicate
+  - dispersion
+  - level-1
+  expected_behavior: 'По расписанию /data/output/rates.json обновляется актуальными
+    курсами.
+
+    '
+- id: postgres-to-file
+  title: PostgreSQL to File (replicate)
+  query: 'Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй
+    их в JSON-файл /data/output/orders_export.json.
+
+    '
+  modes:
+  - 1
+  repeat: 3
+  tags:
+  - replicate
+  - dispersion
+  - level-1
+  expected_behavior: 'Записи из public.orders экспортируются в /data/output/orders_export.json.
+
+    '
+- id: kafka-to-postgres
+  title: Kafka to PostgreSQL (replicate)
+  query: 'Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля
+    order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders
+    в PostgreSQL.
+
+    '
+  modes:
+  - 1
+  repeat: 3
+  tags:
+  - replicate
+  - dispersion
+  - level-2
+  expected_behavior: 'Сообщения из orders.created попадают в таблицу public.orders.
+
+    '
+- id: tc12-multi-sink
+  title: Multi-Sink Complex Pipeline (TC-12)
+  query: 'Забирай данные о транзакциях из REST API банка https://api.bank.example.com/transactions
+    каждые 30 секунд, фильтруй транзакции на сумму более 100000 рублей, обогащай данные
+    информацией о клиенте из PostgreSQL-таблицы public.clients по полю client_id,
+    результат публикуй в Kafka-топик high_value_transactions и параллельно сохраняй
+    в S3 бакет compliance-archive с партиционированием по дате.
+
+    '
+  modes:
+  - 0
+  - 1
+  - 2
+  - 3
+  repeat: 1
+  tags:
+  - boundary
+  - multi-sink
+  - level-4
+  expected_behavior: 'Полный конвейер с HTTP-источником, фильтрацией, enrichment из
+    PG и двумя стоками (Kafka + S3 с партиционированием).
+
+    '

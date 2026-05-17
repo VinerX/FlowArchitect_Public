@@ -228,20 +228,25 @@ class NiFiClient:
             token = self._get_token()
             headers = self._auth_headers(token)
 
-            r = self._session.get(
-                self._api(f"/flow/process-groups/{pg_id}/controller-services"),
-                headers=headers,
-                timeout=self.timeout,
-            )
-            r.raise_for_status()
-            services = r.json().get("controllerServices", [])
+            def _load_services() -> list[dict]:
+                response = self._session.get(
+                    self._api(f"/flow/process-groups/{pg_id}/controller-services"),
+                    headers=headers,
+                    timeout=self.timeout,
+                )
+                response.raise_for_status()
+                return response.json().get("controllerServices", [])
+
+            services = _load_services()
 
             enabled = 0
             for svc in services:
-                if svc.get("component", {}).get("state") == "DISABLED":
+                component = svc.get("component", {})
+                state = component.get("state") or svc.get("status", {}).get("runStatus")
+                if state == "DISABLED":
                     cs_id = svc["id"]
                     revision = svc.get("revision", {"version": 0})
-                    self._session.put(
+                    response = self._session.put(
                         self._api(f"/controller-services/{cs_id}/run-status"),
                         json={
                             "revision": revision,
@@ -251,10 +256,23 @@ class NiFiClient:
                         headers=headers,
                         timeout=self.timeout,
                     )
+                    response.raise_for_status()
                     enabled += 1
 
             if enabled:
-                time.sleep(1.5)  # wait for NiFi to finish enabling
+                # Give NiFi time to transition services from ENABLING to ENABLED.
+                for _ in range(10):
+                    time.sleep(1.5)
+                    services = _load_services()
+                    still_disabled = any(
+                        (
+                            svc.get("component", {}).get("state")
+                            or svc.get("status", {}).get("runStatus")
+                        ) in {"DISABLED", "ENABLING"}
+                        for svc in services
+                    )
+                    if not still_disabled:
+                        break
 
             return enabled
         except Exception:

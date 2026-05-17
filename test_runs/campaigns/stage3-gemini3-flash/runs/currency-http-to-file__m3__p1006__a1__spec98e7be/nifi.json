@@ -1,0 +1,119 @@
+{
+  "flowContents": {
+    "identifier": "416cb646-afe7-46a6-8046-8482e68b75c5",
+    "name": "Currency Exchange Rates Pipeline",
+    "comments": "Fetches latest exchange rates from an API and saves them to a local JSON file.",
+    "processors": [
+      {
+        "identifier": "cab1a9d9-553f-4228-9c76-2eff9da49590",
+        "name": "Exchange Rate API",
+        "comments": "Generated from PIM source 'source_api' (HTTP_REST)",
+        "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "HTTP URL": "https://api.exchangerate.host/latest",
+          "HTTP Method": "GET"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "Original",
+          "Retry",
+          "No Retry",
+          "Failure"
+        ]
+      },
+      {
+        "identifier": "d72a7d71-e21a-43ac-9d83-093320b68376",
+        "name": "Local JSON Storage",
+        "comments": "Generated from PIM sink 'sink_file' (File)",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Directory": "/data/output",
+          "Conflict Resolution Strategy": "replace",
+          "Create Parent Directories": "false",
+          "File Size": "0 B",
+          "Last Modified Time": "0 sec",
+          "Permissions": "rw-r--r--",
+          "Directory as Filename": "false",
+          "Target System Timezone": "UTC",
+          "Atomic Operation Safety": "true"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "51732d5e-fbfb-4901-92c9-2eb1d8beb761",
+        "name": "Exchange Rate API -> Local JSON Storage",
+        "comments": "exchange_rates_data",
+        "source": {
+          "id": "cab1a9d9-553f-4228-9c76-2eff9da49590",
+          "groupId": "416cb646-afe7-46a6-8046-8482e68b75c5",
+          "type": "PROCESSOR",
+          "name": "Exchange Rate API"
+        },
+        "destination": {
+          "id": "d72a7d71-e21a-43ac-9d83-093320b68376",
+          "groupId": "416cb646-afe7-46a6-8046-8482e68b75c5",
+          "type": "PROCESSOR",
+          "name": "Local JSON Storage"
+        },
+        "selectedRelationships": [
+          "Response"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": []
+  }
+}

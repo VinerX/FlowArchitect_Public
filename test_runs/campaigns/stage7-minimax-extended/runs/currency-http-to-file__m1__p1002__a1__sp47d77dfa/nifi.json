@@ -1,0 +1,165 @@
+{
+  "flowContents": {
+    "identifier": "ed13e701-8d9b-41f5-8496-adafadeb4880",
+    "name": "Currency Exchange Rates Fetcher",
+    "comments": "Fetch exchange rates from API and save to JSON file",
+    "processors": [
+      {
+        "identifier": "b2c9734b-e62d-4a56-9f5a-e8c3a9df3b62",
+        "name": "Exchange Rate API",
+        "comments": "Generated from PIM source 'source_api' (HTTP)",
+        "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "HTTP URL": "https://api.exchangerate.host/latest",
+          "HTTP Method": "GET",
+          "method": "GET"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "Original",
+          "Retry",
+          "No Retry",
+          "Failure"
+        ]
+      },
+      {
+        "identifier": "c4a0154a-315c-412b-97fe-58a9d702acdb",
+        "name": "Pass Through",
+        "comments": "Generated from PIM processing element 'process_pass' (PassThrough)",
+        "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-update-attribute-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 460.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {},
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": []
+      },
+      {
+        "identifier": "78c62452-1876-4414-9ed3-d1e76ee1feec",
+        "name": "Write to JSON File",
+        "comments": "Generated from PIM sink 'sink_file' (File)",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Directory": "/data/output"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "2dd71430-9e4e-434e-819e-4574679ff2aa",
+        "name": "Exchange Rate API -> Pass Through",
+        "comments": "rates_json",
+        "source": {
+          "id": "b2c9734b-e62d-4a56-9f5a-e8c3a9df3b62",
+          "groupId": "ed13e701-8d9b-41f5-8496-adafadeb4880",
+          "type": "PROCESSOR",
+          "name": "Exchange Rate API"
+        },
+        "destination": {
+          "id": "c4a0154a-315c-412b-97fe-58a9d702acdb",
+          "groupId": "ed13e701-8d9b-41f5-8496-adafadeb4880",
+          "type": "PROCESSOR",
+          "name": "Pass Through"
+        },
+        "selectedRelationships": [
+          "Response"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      },
+      {
+        "identifier": "cb608aa4-383c-4c1d-bdda-ddbf396bce50",
+        "name": "Pass Through -> Write to JSON File",
+        "comments": "rates_json",
+        "source": {
+          "id": "c4a0154a-315c-412b-97fe-58a9d702acdb",
+          "groupId": "ed13e701-8d9b-41f5-8496-adafadeb4880",
+          "type": "PROCESSOR",
+          "name": "Pass Through"
+        },
+        "destination": {
+          "id": "78c62452-1876-4414-9ed3-d1e76ee1feec",
+          "groupId": "ed13e701-8d9b-41f5-8496-adafadeb4880",
+          "type": "PROCESSOR",
+          "name": "Write to JSON File"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": []
+  }
+}

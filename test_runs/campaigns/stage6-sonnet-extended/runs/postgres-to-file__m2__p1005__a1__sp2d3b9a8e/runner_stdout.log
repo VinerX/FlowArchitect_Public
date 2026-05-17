@@ -1,0 +1,30 @@
+
+================================================================
+Query  : ������������ ������� ����� ������ �� PostgreSQL public.orders � ��������...
+Mode   : 2 � LLMx2 (NL->YAML->LLM->JSON)
+Presets: [1005]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1005, 'error_corrector': 1005, 'nifi_corrector': 1005}
+Backend ready.
+
+--- Preset 1005: openrouter sonnet 4.6  [anthropic/claude-sonnet-4.6] ---
+  [1/2] USER_QUERY  mode=2  preset=1005
+  [1/2] PIM ready  (1506 chars, 9.8s)
+  [2/2] REQUEST_CONVERSION  mode=2  preset=1005
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (4 proc, 3 conn, 31.37s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: FAILED: HTTP 500: An unexpected error has occurred. Please check the logs for additional details.
+  tokens: 2533 in / 3483 out / 6016 total  |  cost: $0.059844
+  Result : [OK]  (65.81s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage6-sonnet-extended\runs\postgres-to-file__m2__p1005__a1__sp2d3b9a8e\raw_report.json

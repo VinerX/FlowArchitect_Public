@@ -1,0 +1,387 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+  "mode": 3,
+  "mode_name": "Adapter+LLM (NL->YAML->Adapter->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-11T17:06:00.219365+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: postgres_to_kafka_pipeline\n  name: PostgreSQL to Kafka Analytics Pipeline\n  description: Периодически выбирает новые записи из PostgreSQL и публикует их в Kafka\n    topic analytics.events в формате JSON\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 1 minute\nsources:\n- id: source_postgres\n  name: Read New Records from PostgreSQL\n  type: PostgreSQL\n  location: '{{DB_SCHEMA}}.{{DB_TABLE}}'\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DB_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\nprocessing_elements:\n- id: process_filter_new\n  name: Filter New Records\n  operation: Filter\n  config:\n    condition: created_at > {{LAST_PROCESSED_TIMESTAMP}}\n    watermark_field: created_at\n    state_store: '{{WATERMARK_STATE_STORE}}'\n- id: process_to_json\n  name: Convert to JSON\n  operation: Serialize\n  config:\n    format: json\n    include_schema: 'false'\nsinks:\n- id: sink_kafka\n  name: Publish to Kafka analytics.events\n  type: Kafka\n  location: analytics.events\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      acks: all\n      key_serializer: org.apache.kafka.common.serialization.StringSerializer\n      value_serializer: org.apache.kafka.common.serialization.StringSerializer\nprocessed_data:\n- id: new_records_raw\n  format: tabular\n- id: new_records_json\n  format: json\nlinks:\n- from_id: source_postgres\n  to_id: process_filter_new\n  data_ref: new_records_raw\n- from_id: process_filter_new\n  to_id: process_to_json\n  data_ref: new_records_raw\n- from_id: process_to_json\n  to_id: sink_kafka\n  data_ref: new_records_json",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "ce46466b-8a75-4a25-9f61-c458d55aa235",
+          "name": "PostgreSQL to Kafka Analytics Pipeline",
+          "comments": "Периодически выбирает новые записи из PostgreSQL и публикует их в Kafka topic analytics.events в формате JSON",
+          "processors": [
+            {
+              "identifier": "bdfc4411-47dd-4dd3-8816-2dd012d74d97",
+              "name": "Read New Records from PostgreSQL",
+              "comments": "Generated from PIM source 'source_postgres' (PostgreSQL)",
+              "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Table Name": "{{DB_SCHEMA}}.{{DB_TABLE}}",
+                "Database Type": "PostgreSQL",
+                "Database Connection Pooling Service": "b3e449bf-3924-47ad-b169-21440efdbc78",
+                "Record Writer": "bc1d29ba-0a9e-4f82-af26-c75bd60eecaa"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "60 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "664f9fb4-e71f-4746-abc7-68a701ee2b7b",
+              "name": "Filter New Records",
+              "comments": "Generated from PIM processing element 'process_filter_new' (Filter)",
+              "type": "org.apache.nifi.processors.standard.QueryRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "filtered": "SELECT * FROM FLOWFILE WHERE created_at > '${LAST_PROCESSED_TIMESTAMP}'",
+                "Record Writer": "bc1d29ba-0a9e-4f82-af26-c75bd60eecaa",
+                "Record Reader": "7701545f-c5b1-4c67-9686-eb9bb79e65ad"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure",
+                "original"
+              ]
+            },
+            {
+              "identifier": "dc774e61-8c14-4f45-9278-2710fcb67125",
+              "name": "Convert to JSON",
+              "comments": "Generated from PIM processing element 'process_to_json' (Serialize)",
+              "type": "org.apache.nifi.processors.standard.ConvertRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Record Writer": "bc1d29ba-0a9e-4f82-af26-c75bd60eecaa",
+                "Record Reader": "7701545f-c5b1-4c67-9686-eb9bb79e65ad"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            },
+            {
+              "identifier": "0a4be7d6-b05f-47a9-8292-bac4add12441",
+              "name": "Publish to Kafka analytics.events",
+              "comments": "Generated from PIM sink 'sink_kafka' (Kafka)",
+              "type": "org.apache.nifi.kafka.processors.PublishKafka",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 1220.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Topic Name": "analytics.events",
+                "Kafka Connection Service": "165725b0-5fce-4577-aa11-8ac0ab0b2e1d",
+                "Acknowledgment Wait Time": "5 secs",
+                "Record Reader": "7701545f-c5b1-4c67-9686-eb9bb79e65ad"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "1d15fa4e-f13f-4464-a4d6-ee2c29b8abe0",
+              "name": "Read New Records from PostgreSQL -> Filter New Records",
+              "comments": "new_records_raw",
+              "source": {
+                "id": "bdfc4411-47dd-4dd3-8816-2dd012d74d97",
+                "groupId": "ce46466b-8a75-4a25-9f61-c458d55aa235",
+                "type": "PROCESSOR",
+                "name": "Read New Records from PostgreSQL"
+              },
+              "destination": {
+                "id": "664f9fb4-e71f-4746-abc7-68a701ee2b7b",
+                "groupId": "ce46466b-8a75-4a25-9f61-c458d55aa235",
+                "type": "PROCESSOR",
+                "name": "Filter New Records"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "8400be9c-e082-4812-af40-78480fcbd8bc",
+              "name": "Filter New Records -> Convert to JSON",
+              "comments": "new_records_raw",
+              "source": {
+                "id": "664f9fb4-e71f-4746-abc7-68a701ee2b7b",
+                "groupId": "ce46466b-8a75-4a25-9f61-c458d55aa235",
+                "type": "PROCESSOR",
+                "name": "Filter New Records"
+              },
+              "destination": {
+                "id": "dc774e61-8c14-4f45-9278-2710fcb67125",
+                "groupId": "ce46466b-8a75-4a25-9f61-c458d55aa235",
+                "type": "PROCESSOR",
+                "name": "Convert to JSON"
+              },
+              "selectedRelationships": [
+                "filtered"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "278900ef-d804-4475-a0ba-886caaed34d7",
+              "name": "Convert to JSON -> Publish to Kafka analytics.events",
+              "comments": "new_records_json",
+              "source": {
+                "id": "dc774e61-8c14-4f45-9278-2710fcb67125",
+                "groupId": "ce46466b-8a75-4a25-9f61-c458d55aa235",
+                "type": "PROCESSOR",
+                "name": "Convert to JSON"
+              },
+              "destination": {
+                "id": "0a4be7d6-b05f-47a9-8292-bac4add12441",
+                "groupId": "ce46466b-8a75-4a25-9f61-c458d55aa235",
+                "type": "PROCESSOR",
+                "name": "Publish to Kafka analytics.events"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "b3e449bf-3924-47ad-b169-21440efdbc78",
+              "name": "DatabaseConnectionPool",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-dbcp-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database User": "{{DB_USERNAME}}",
+                "Password": "{{DB_PASSWORD}}"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "165725b0-5fce-4577-aa11-8ac0ab0b2e1d",
+              "name": "KafkaConnectionService",
+              "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-3-service-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "bootstrap.servers": "{{KAFKA_BROKERS}}",
+                "security.protocol": "PLAINTEXT"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "7701545f-c5b1-4c67-9686-eb9bb79e65ad",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "bc1d29ba-0a9e-4f82-af26-c75bd60eecaa",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "1801ed64-019e-1000-6828-3397bfc70879",
+        "validation_errors": [
+          {
+            "name": "Read New Records from PostgreSQL",
+            "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+            "errors": [
+              "'Database Connection Pooling Service' validated against '9de00d50-db3e-352c-f9c4-ab844d041efd' is invalid because Controller Service [Database Connection Pooling Service] Identifier [9de00d50-db3e-352c-f9c4-ab844d041efd] state is Enabling"
+            ]
+          },
+          {
+            "name": "Publish to Kafka analytics.events",
+            "type": "org.apache.nifi.kafka.processors.PublishKafka",
+            "errors": [
+              "'Acknowledgment Wait Time' validated against '5 secs' is invalid because 'Acknowledgment Wait Time' is not a supported property or has no Validator associated with it"
+            ]
+          }
+        ],
+        "error_count": 2,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 101.09,
+      "stage1_duration_sec": 9.78,
+      "stage2_duration_sec": 45.28,
+      "prompt_tokens": 5978,
+      "completion_tokens": 4701,
+      "total_tokens": 10679,
+      "cost_usd": 0.088449,
+      "nifi_processor_count": 4,
+      "nifi_connection_count": 3,
+      "pim_source_count": 1,
+      "pim_step_count": 2,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 61,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 1418,
+          "completion_tokens": 777,
+          "total_tokens": 2195,
+          "duration_ms": 9484,
+          "cost_usd": 0.015909
+        },
+        {
+          "purpose": "nifi_correction",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 4465,
+          "completion_tokens": 3914,
+          "total_tokens": 8379,
+          "duration_ms": 45094,
+          "cost_usd": 0.072105
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1418,
+          "completion_tokens": 777,
+          "total_tokens": 2195,
+          "duration_ms": 9484,
+          "cost_usd": 0.015909
+        },
+        "nifi_correction": {
+          "calls": 1,
+          "prompt_tokens": 4465,
+          "completion_tokens": 3914,
+          "total_tokens": 8379,
+          "duration_ms": 45094,
+          "cost_usd": 0.072105
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

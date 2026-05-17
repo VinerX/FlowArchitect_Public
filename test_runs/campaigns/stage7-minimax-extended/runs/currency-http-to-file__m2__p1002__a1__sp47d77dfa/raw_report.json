@@ -1,0 +1,220 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T19:27:21.629936+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: currency_rates_fetch\n  name: Currency Exchange Rates Fetch\n  description: Fetch exchange rates from API and save to JSON file\ntriggers:\n- id: trigger_main\n  type: manual\n  condition: on demand\nsources:\n- id: source_exchange_rates\n  name: Exchange Rate API\n  type: REST API\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\n      headers: {}\nprocessing_elements: []\nsinks:\n- id: sink_file\n  name: Save to JSON File\n  type: File\n  location: /data/output/rates.json\n  connection:\n    properties:\n      format: json\n      directory: /data/output\nprocessed_data:\n- id: rates_data\n  format: json\nlinks:\n- from_id: source_exchange_rates\n  to_id: sink_file\n  data_ref: rates_data",
+      "nifi_json": {
+        "content": {
+          "flow": {
+            "id": "currency_rates_fetch",
+            "name": "Currency Exchange Rates Fetch",
+            "description": "Fetch exchange rates from API and save to JSON file",
+            "processGroup": {
+              "id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+              "name": "Currency Exchange Rates Fetch",
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "processors": [
+                {
+                  "id": "a1b2c3d4-5678-90ab-cdef-111111111111",
+                  "name": "Exchange Rate API",
+                  "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+                  "position": {
+                    "x": 200,
+                    "y": 200
+                  },
+                  "properties": {
+                    "HTTP URL": "https://api.exchangerate.host/latest",
+                    "HTTP Method": "GET",
+                    "Connect Timeout": "5 secs",
+                    "Read Timeout": "15 secs",
+                    "Idle Timeout": "5 mins",
+                    "Include Header": "false",
+                    "Ignore Response Content": "false",
+                    "Add Response Headers": "false",
+                    "Destination": "response-body",
+                    "curl command": null
+                  },
+                  "propertyDescriptors": {},
+                  "schedulingPeriod": "0 sec",
+                  "schedulingStrategy": "TIMER_DRIVEN",
+                  "executionNode": "ALL",
+                  "penalty Duration": "30 sec",
+                  "yield Duration": "1 sec",
+                  "bulletinLevel": "WARN",
+                  "runDurationMillis": 0,
+                  "componentType": "PROCESSOR",
+                  "groupIdentifier": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                },
+                {
+                  "id": "b2c3d4e5-6789-01bc-defg-222222222222",
+                  "name": "Save to JSON File",
+                  "type": "org.apache.nifi.processors.standard.PutFile",
+                  "position": {
+                    "x": 600,
+                    "y": 200
+                  },
+                  "properties": {
+                    "Directory": "/data/output",
+                    "File Permission": "0640",
+                    "Conflict Resolution Strategy": "fail",
+                    "Create Missing Directories": "true",
+                    "Maximum File Size": "1 GB",
+                    "Last Modified Date": null,
+                    "Dot Dot Special Tokens": "false"
+                  },
+                  "propertyDescriptors": {},
+                  "schedulingPeriod": "0 sec",
+                  "schedulingStrategy": "TIMER_DRIVEN",
+                  "executionNode": "ALL",
+                  "penalty Duration": "30 sec",
+                  "yield Duration": "1 sec",
+                  "bulletinLevel": "WARN",
+                  "runDurationMillis": 0,
+                  "componentType": "PROCESSOR",
+                  "groupIdentifier": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                }
+              ],
+              "connections": [
+                {
+                  "id": "c3d4e5f6-7890-12cd-efgh-333333333333",
+                  "name": "Exchange Rate API -> Save to JSON File",
+                  "source": {
+                    "id": "a1b2c3d4-5678-90ab-cdef-111111111111",
+                    "groupId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                    "type": "PROCESSOR",
+                    "name": "Exchange Rate API"
+                  },
+                  "destination": {
+                    "id": "b2c3d4e5-6789-01bc-defg-222222222222",
+                    "groupId": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+                    "type": "PROCESSOR",
+                    "name": "Save to JSON File"
+                  },
+                  "relationship": {
+                    "name": "success",
+                    "description": "FlowFiles that were transferred successfully"
+                  },
+                  "selectedRelationships": [
+                    "success"
+                  ],
+                  "flowFileExpiration": "0 sec",
+                  "backPressureObjectThreshold": 10000,
+                  "backPressureDataSizeThreshold": "1 GB",
+                  "queueWeightCriterion": "0.5",
+                  "prioritizers": [],
+                  "componentType": "CONNECTION",
+                  "groupIdentifier": "f47ac10b-58cc-4372-a567-0e02b2c3d479"
+                }
+              ],
+              "controllerServices": [],
+              "inputPorts": [],
+              "outputPorts": [],
+              "processGroups": [],
+              "remoteProcessGroups": [],
+              "variables": {},
+              "parameterContexts": [],
+              "defaultBackPressureDataSizeThreshold": "256 MB",
+              "defaultBackPressureObjectThreshold": 10000,
+              "defaultFlowFileExpiration": "0 sec",
+              "componentType": "PROCESS_GROUP"
+            }
+          }
+        },
+        "revision": {
+          "version": 1,
+          "currentRevision": {
+            "version": 1,
+            "clientId": "currency_rates_fetch_converter"
+          }
+        },
+        "metadata": {
+          "pim_source": "yaml",
+          "pim_version": "1.0",
+          "conversion_notes": [
+            "Source REST API mapped to InvokeHTTP processor",
+            "Sink File mapped to PutFile processor",
+            "No transformation step required - direct flow",
+            "Success relationship connects source to sink"
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22d08908-019e-1000-ae1c-8a55f3b7553b",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 128.86,
+      "stage1_duration_sec": 15.3,
+      "stage2_duration_sec": 79.96,
+      "prompt_tokens": 1972,
+      "completion_tokens": 2045,
+      "total_tokens": 4017,
+      "cost_usd": 0.003046,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": 1,
+      "pim_step_count": 0,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 181,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 1244,
+          "completion_tokens": 823,
+          "total_tokens": 2067,
+          "duration_ms": 14938,
+          "cost_usd": 0.001361
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 635,
+          "completion_tokens": 1216,
+          "total_tokens": 1851,
+          "duration_ms": 79750,
+          "cost_usd": 0.00165
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1244,
+          "completion_tokens": 823,
+          "total_tokens": 2067,
+          "duration_ms": 14938,
+          "cost_usd": 0.001361
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 635,
+          "completion_tokens": 1216,
+          "total_tokens": 1851,
+          "duration_ms": 79750,
+          "cost_usd": 0.00165
+        }
+      },
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

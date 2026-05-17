@@ -1,0 +1,65 @@
+{
+  "flow": {
+    "name": "Filter Completed Orders",
+    "processors": [
+      {
+        "id": "get-file-orders",
+        "type": "GetFile",
+        "properties": {
+          "Input Directory": "/data/input/orders/",
+          "File Filter": ".*\\.csv$",
+          "Keep Source File": "true",
+          "Recurse Subdirectories": "false"
+        },
+        "scheduling": "0 0 0 * * *"
+      },
+      {
+        "id": "csv-reader",
+        "type": "CsvReader",
+        "properties": {
+          "Schema Access Strategy": "infer-schema",
+          "Delimiter": ",",
+          "Quote Char": "\"",
+          "Escape Char": "\\"
+        }
+      },
+      {
+        "id": "filter-completed",
+        "type": "QueryRecord",
+        "properties": {
+          "Record Reader": "csv-reader",
+          "Record Writer": "csv-writer",
+          "SQL SELECT Query": "SELECT * FROM flowfile WHERE status = 'COMPLETED'"
+        }
+      },
+      {
+        "id": "csv-writer",
+        "type": "CsvRecordSetWriter",
+        "properties": {
+          "Schema Access Strategy": "inherit-schema",
+          "Delimiter": ","
+        }
+      },
+      {
+        "id": "put-completed-orders",
+        "type": "PutFile",
+        "properties": {
+          "Directory": "/data/output",
+          "Conflict Resolution Strategy": "fail"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": "get-file-orders",
+        "to": "filter-completed",
+        "name": "Fetched CSV to Filter"
+      },
+      {
+        "from": "filter-completed",
+        "to": "put-completed-orders",
+        "name": "Filtered Results to Output"
+      }
+    ]
+  }
+}

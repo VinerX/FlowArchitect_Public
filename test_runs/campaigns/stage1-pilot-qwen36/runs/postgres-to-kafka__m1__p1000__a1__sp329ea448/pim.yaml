@@ -1,0 +1,46 @@
+flow:
+  id: postgres_to_kafka_pipeline
+  name: PostgreSQL to Kafka Events Pipeline
+  description: Periodically fetch new records from PostgreSQL and publish them to
+    Kafka topic analytics.events in JSON format
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 10 minutes
+sources:
+- id: source_pg
+  name: Read from PostgreSQL
+  type: PostgreSQL
+  location: '{{PG_TABLE}}'
+  connection:
+    properties:
+      host: '{{PG_HOST}}'
+      port: '{{PG_PORT}}'
+      database: '{{PG_DATABASE}}'
+      username: '{{PG_USERNAME}}'
+      password: '{{PG_PASSWORD}}'
+processing_elements:
+- id: process_format_json
+  name: Format Records to JSON
+  operation: Transform
+  config:
+    format: json
+    incremental_tracking: true
+sinks:
+- id: sink_kafka
+  name: Publish to Kafka
+  type: Kafka
+  location: analytics.events
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: events_json
+  format: json
+links:
+- from_id: source_pg
+  to_id: process_format_json
+  data_ref: events_json
+- from_id: process_format_json
+  to_id: sink_kafka
+  data_ref: events_json

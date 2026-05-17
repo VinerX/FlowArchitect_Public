@@ -1,0 +1,39 @@
+flow:
+  id: exchange_rates_pipeline
+  name: Exchange Rates Fetcher
+  description: Fetches latest currency exchange rates from a public API and saves
+    them to a local JSON file.
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 1 hour
+sources:
+- id: source_exchangerate_api
+  name: Fetch Exchange Rates
+  type: HTTP
+  location: https://api.exchangerate.host/latest
+  connection:
+    properties:
+      method: GET
+      accept: application/json
+processing_elements:
+- id: process_parse_json
+  name: Parse API Response
+  operation: Parse JSON
+  config:
+    target_field: rates
+sinks:
+- id: sink_json_file
+  name: Save Rates to File
+  type: File
+  location: /data/output/rates.json
+processed_data:
+- id: rates_json
+  format: json
+links:
+- from_id: source_exchangerate_api
+  to_id: process_parse_json
+  data_ref: rates_json
+- from_id: process_parse_json
+  to_id: sink_json_file
+  data_ref: rates_json

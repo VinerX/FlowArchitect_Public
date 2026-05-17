@@ -1,0 +1,29 @@
+flow:
+  id: exchange_rates_pipeline
+  name: Exchange Rates Pipeline
+  description: Fetch currency exchange rates from API and save to file
+triggers:
+- id: trigger_main
+  type: schedule
+  condition: every day
+sources:
+- id: source_api
+  name: Exchange Rate API
+  type: HTTP
+  location: https://api.exchangerate.host/latest
+  connection:
+    properties:
+      method: GET
+processing_elements: []
+sinks:
+- id: sink_file
+  name: Save to File
+  type: File
+  location: /data/output/rates.json
+processed_data:
+- id: rates_json
+  format: json
+links:
+- from_id: source_api
+  to_id: sink_file
+  data_ref: rates_json

@@ -1,0 +1,178 @@
+{
+  "identifier": "88a74124-7622-4916-8686-778899aabbcc",
+  "name": "S3 Raw Logs to PostgreSQL",
+  "componentType": "PROCESS_GROUP",
+  "processGroups": [],
+  "processors": [
+    {
+      "identifier": "s3_source",
+      "name": "S3 Raw Logs",
+      "type": "org.apache.nifi.processors.aws.s3.ListS3",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-aws-nar",
+        "version": "1.23.2"
+      },
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "properties": {
+        "Bucket": "raw-logs",
+        "Region": "{{S3_REGION}}",
+        "Access Key": "{{S3_ACCESS_KEY}}",
+        "Secret Key": "{{S3_SECRET_KEY}}"
+      },
+      "schedulingStrategy": "CRON_DRIVEN",
+      "schedulingPeriod": "0 * * * *"
+    },
+    {
+      "identifier": "fetch_s3_content",
+      "name": "Fetch S3 Content",
+      "type": "org.apache.nifi.processors.aws.s3.FetchS3Object",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-aws-nar",
+        "version": "1.23.2"
+      },
+      "position": {
+        "x": 0,
+        "y": 200
+      },
+      "properties": {
+        "Bucket": "raw-logs",
+        "Region": "{{S3_REGION}}",
+        "Access Key": "{{S3_ACCESS_KEY}}",
+        "Secret Key": "{{S3_SECRET_KEY}}",
+        "Object Key": "${filename}"
+      }
+    },
+    {
+      "identifier": "add_timestamp",
+      "name": "Add processed_at field",
+      "type": "org.apache.nifi.processors.standard.UpdateRecord",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-record-serialization-services-nar",
+        "version": "1.23.2"
+      },
+      "position": {
+        "x": 0,
+        "y": 400
+      },
+      "properties": {
+        "record-reader": "json-reader",
+        "record-writer": "json-writer",
+        "replacement-value-strategy": "literal_value",
+        "/processed_at": "${now():format(\"yyyy-MM-dd'T'HH:mm:ss'Z'\", \"UTC\")}"
+      }
+    },
+    {
+      "identifier": "postgres_sink",
+      "name": "PostgreSQL Event Log",
+      "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-database-adapter-nar",
+        "version": "1.23.2"
+      },
+      "position": {
+        "x": 0,
+        "y": 600
+      },
+      "properties": {
+        "record-reader": "json-reader",
+        "database-type": "PostgreSQL",
+        "db-connection-pool": "db-connection-pool",
+        "table-name": "public.event_log",
+        "statement-type": "INSERT"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "identifier": "conn-1",
+      "source": {
+        "id": "s3_source",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "fetch_s3_content",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ]
+    },
+    {
+      "identifier": "conn-2",
+      "source": {
+        "id": "fetch_s3_content",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "add_timestamp",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ]
+    },
+    {
+      "identifier": "conn-3",
+      "source": {
+        "id": "add_timestamp",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "postgres_sink",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ]
+    }
+  ],
+  "controllerServices": [
+    {
+      "identifier": "json-reader",
+      "name": "JsonTreeReader",
+      "type": "org.apache.nifi.json.JsonTreeReader",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-record-serialization-services-nar",
+        "version": "1.23.2"
+      },
+      "properties": {}
+    },
+    {
+      "identifier": "json-writer",
+      "name": "JsonRecordSetWriter",
+      "type": "org.apache.nifi.json.JsonRecordSetWriter",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-record-serialization-services-nar",
+        "version": "1.23.2"
+      },
+      "properties": {
+        "output-grouping": "output-array"
+      }
+    },
+    {
+      "identifier": "db-connection-pool",
+      "name": "DBCPConnectionPool",
+      "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-dbcp-service-nar",
+        "version": "1.23.2"
+      },
+      "properties": {
+        "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+        "Database Driver Class Name": "org.postgresql.Driver",
+        "Database User": "{{DB_USER}}",
+        "Password": "{{DB_PASSWORD}}"
+      }
+    }
+  ]
+}

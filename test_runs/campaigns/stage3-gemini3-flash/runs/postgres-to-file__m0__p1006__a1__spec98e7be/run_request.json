@@ -1,0 +1,66 @@
+{
+  "run_id": "postgres-to-file__m0__p1006__a1__spec98e7be",
+  "case_id": "postgres-to-file",
+  "title": "PostgreSQL to File",
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 0,
+  "preset_id": 1006,
+  "stage_presets": {
+    "pim": 1006,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "postgres",
+      "file",
+      "level-1"
+    ],
+    "expected_behavior": "Записи из public.orders экспортируются в /data/output/orders_export.json.",
+    "manual_test_checklist": [
+      "Импортировать nifi.json в NiFi, подставить JDBC параметры.",
+      "Запустить поток, проверить наличие orders_export.json."
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-13T10:58:32.984152+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-13T11:03:16.523938+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-13T11:03:16.523938+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m0__p1006__a1__spec98e7be\\query.txt",
+    "--preset",
+    "1006",
+    "--mode",
+    "0",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-file__m0__p1006__a1__spec98e7be\\raw_report.json",
+    "--pim-preset",
+    "1006",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

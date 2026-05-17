@@ -1,0 +1,47 @@
+flow:
+  id: orders_export_pipeline
+  name: Orders Export to JSON
+  description: Периодическая выгрузка новых записей из PostgreSQL public.orders в
+    JSON-файл
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 5 minutes
+sources:
+- id: source_orders
+  name: Read Orders from PostgreSQL
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processing_elements:
+- id: process_filter_new
+  name: Filter New Records
+  operation: Filter
+  config:
+    condition: created_at > {{LAST_EXPORT_TIMESTAMP}}
+    incremental_column: created_at
+sinks:
+- id: sink_json
+  name: Write to JSON File
+  type: File
+  location: /data/output/orders_export.json
+  connection:
+    properties:
+      format: json
+      append: 'false'
+processed_data:
+- id: orders_json
+  format: json
+links:
+- from_id: source_orders
+  to_id: process_filter_new
+  data_ref: orders_json
+- from_id: process_filter_new
+  to_id: sink_json
+  data_ref: orders_json

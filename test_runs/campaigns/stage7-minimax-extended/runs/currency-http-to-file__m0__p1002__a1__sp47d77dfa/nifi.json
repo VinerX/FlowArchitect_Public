@@ -1,0 +1,53 @@
+{
+  "flow": {
+    "name": "ExchangeRatesFetcher",
+    "description": "Fetches currency exchange rates and saves to file",
+    "processors": [
+      {
+        "id": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+        "name": "InvokeHTTP_GetExchangeRates",
+        "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+        "properties": {
+          "HTTP Method": "GET",
+          "URL": "https://api.exchangerate.host/latest",
+          "Connect Timeout": "5 secs",
+          "Read Timeout": "15 secs",
+          "Idle Timeout": "5 mins"
+        },
+        "schedulingPeriod": "0 0 0 * * ?",
+        "auto-terminatedRelationships": [
+          "failure",
+          "retry"
+        ],
+        "propertiesAttributes": {}
+      },
+      {
+        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "PutFile_SaveRates",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "properties": {
+          "Directory": "/data/output",
+          "File Name": "rates.json",
+          "Conflict Resolution Strategy": "replace",
+          "Create Missing Directories": "true"
+        },
+        "schedulingPeriod": "0 0 0 * * ?",
+        "auto-terminatedRelationships": [
+          "failure"
+        ],
+        "propertiesAttributes": {}
+      }
+    ],
+    "connections": [
+      {
+        "id": "conn1-1234-5678-abcd-ef1234567890",
+        "name": "FlowFiles_To_File",
+        "sourceProcessorId": "f1a2b3c4-d5e6-7890-abcd-ef1234567890",
+        "targetProcessorId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "relationship": "success"
+      }
+    ],
+    "controllerServices": [],
+    "variables": {}
+  }
+}

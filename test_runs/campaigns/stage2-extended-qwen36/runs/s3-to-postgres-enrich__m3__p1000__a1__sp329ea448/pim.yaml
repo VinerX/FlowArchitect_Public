@@ -1,0 +1,49 @@
+flow:
+  id: s3_to_pg_event_log
+  name: S3 Raw Logs to PostgreSQL Event Log
+  description: Hourly pipeline to read JSON files from S3, add processed_at timestamp,
+    and load into PostgreSQL.
+triggers:
+- id: trigger_hourly
+  type: schedule
+  condition: every hour
+sources:
+- id: source_s3_logs
+  name: Read S3 JSON Logs
+  type: S3
+  location: raw-logs
+  connection:
+    properties:
+      bucket: raw-logs
+      aws_access_key_id: '{{AWS_ACCESS_KEY_ID}}'
+      aws_secret_access_key: '{{AWS_SECRET_ACCESS_KEY}}'
+      region: '{{AWS_REGION}}'
+processing_elements:
+- id: process_add_timestamp
+  name: Add processed_at Field
+  operation: Transform
+  config:
+    add_field: processed_at
+    value: '{{CURRENT_TIMESTAMP}}'
+sinks:
+- id: sink_postgres
+  name: Write to PostgreSQL
+  type: PostgreSQL
+  location: public.event_log
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processed_data:
+- id: logs_json
+  format: json
+links:
+- from_id: source_s3_logs
+  to_id: process_add_timestamp
+  data_ref: logs_json
+- from_id: process_add_timestamp
+  to_id: sink_postgres
+  data_ref: logs_json

@@ -1,0 +1,63 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 82.44,
+  "stage1_duration_sec": 23.28,
+  "stage2_duration_sec": 8.12,
+  "prompt_tokens": 4307,
+  "completion_tokens": 4929,
+  "total_tokens": 9236,
+  "cost_usd": 0.007807,
+  "nifi_processor_count": 3,
+  "nifi_connection_count": 2,
+  "pim_source_count": 1,
+  "pim_step_count": 1,
+  "pim_sink_count": 1,
+  "session_id": 84,
+  "preset_id": 1000,
+  "preset_name": "openrouter qwen/qwen3.6-plus",
+  "preset_model": "qwen/qwen3.6-plus",
+  "llm_calls": [
+    {
+      "purpose": "pim_generation",
+      "provider": "common",
+      "model": "qwen/qwen3.6-plus",
+      "prompt_tokens": 1347,
+      "completion_tokens": 1150,
+      "total_tokens": 2497,
+      "duration_ms": 22921,
+      "cost_usd": 0.001933
+    },
+    {
+      "purpose": "nifi_correction",
+      "provider": "common",
+      "model": "google/gemini-2.5-flash-lite",
+      "prompt_tokens": 104,
+      "completion_tokens": 1554,
+      "total_tokens": 1658,
+      "duration_ms": 7922,
+      "cost_usd": 0.000632
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "pim_generation": {
+      "calls": 1,
+      "prompt_tokens": 1347,
+      "completion_tokens": 1150,
+      "total_tokens": 2497,
+      "duration_ms": 22921,
+      "cost_usd": 0.001933
+    },
+    "nifi_correction": {
+      "calls": 1,
+      "prompt_tokens": 104,
+      "completion_tokens": 1554,
+      "total_tokens": 1658,
+      "duration_ms": 7922,
+      "cost_usd": 0.000632
+    }
+  },
+  "nifi_import_success": true,
+  "nifi_error_count": 2,
+  "nifi_import_error": null
+}

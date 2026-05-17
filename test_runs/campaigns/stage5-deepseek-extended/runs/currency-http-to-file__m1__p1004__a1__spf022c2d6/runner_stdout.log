@@ -1,0 +1,30 @@
+
+================================================================
+Query  : ������� ����� ����� � https://api.exchangerate.host/latest � �������� ��...
+Mode   : 1 � Adapter (NL->YAML->JSON)
+Presets: [1004]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1004, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1004: openrouter deepseek  [deepseek/deepseek-v4-pro] ---
+  [1/2] USER_QUERY  mode=1  preset=1004
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  ... waiting for YAML PIM (20s elapsed, timeout=300s)
+  ... waiting for YAML PIM (30s elapsed, timeout=300s)
+  [1/2] PIM ready  (571 chars, 36.01s)
+  [2/2] REQUEST_CONVERSION  mode=1  preset=1004
+  [2/2] NiFi JSON ready  (2 proc, 1 conn, 0.09s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 1393 in / 1375 out / 2768 total  |  cost: $0.001802
+  Result : [OK]  (69.92s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage5-deepseek-extended\runs\currency-http-to-file__m1__p1004__a1__spf022c2d6\raw_report.json

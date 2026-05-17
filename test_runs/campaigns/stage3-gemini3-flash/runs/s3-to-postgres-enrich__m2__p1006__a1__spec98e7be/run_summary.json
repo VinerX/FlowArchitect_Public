@@ -1,0 +1,63 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 29.81,
+  "stage1_duration_sec": 4.58,
+  "stage2_duration_sec": 8.89,
+  "prompt_tokens": 2325,
+  "completion_tokens": 2191,
+  "total_tokens": 4516,
+  "cost_usd": 0.007736,
+  "nifi_processor_count": 4,
+  "nifi_connection_count": 3,
+  "pim_source_count": 1,
+  "pim_step_count": 1,
+  "pim_sink_count": 1,
+  "session_id": 133,
+  "preset_id": 1006,
+  "preset_name": "openrouter gemini 3 flash",
+  "preset_model": "google/gemini-3-flash-preview",
+  "llm_calls": [
+    {
+      "purpose": "pim_generation",
+      "provider": "common",
+      "model": "google/gemini-3-flash-preview",
+      "prompt_tokens": 1384,
+      "completion_tokens": 598,
+      "total_tokens": 1982,
+      "duration_ms": 4281,
+      "cost_usd": 0.002486
+    },
+    {
+      "purpose": "psm_conversion",
+      "provider": "common",
+      "model": "google/gemini-3-flash-preview",
+      "prompt_tokens": 847,
+      "completion_tokens": 1586,
+      "total_tokens": 2433,
+      "duration_ms": 8671,
+      "cost_usd": 0.005182
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "pim_generation": {
+      "calls": 1,
+      "prompt_tokens": 1384,
+      "completion_tokens": 598,
+      "total_tokens": 1982,
+      "duration_ms": 4281,
+      "cost_usd": 0.002486
+    },
+    "psm_conversion": {
+      "calls": 1,
+      "prompt_tokens": 847,
+      "completion_tokens": 1586,
+      "total_tokens": 2433,
+      "duration_ms": 8671,
+      "cost_usd": 0.005182
+    }
+  },
+  "nifi_import_success": false,
+  "nifi_error_count": 0,
+  "nifi_import_error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details."
+}

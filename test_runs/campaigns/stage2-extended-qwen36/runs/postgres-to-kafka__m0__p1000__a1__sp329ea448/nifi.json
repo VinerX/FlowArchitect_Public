@@ -1,0 +1,144 @@
+{
+  "flow": {
+    "processGroups": [
+      {
+        "id": "pg-001",
+        "name": "Pending Transactions to Kafka",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "processors": [
+          {
+            "id": "proc-db-001",
+            "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+            "name": "Query Pending Transactions",
+            "position": {
+              "x": 100,
+              "y": 100
+            },
+            "config": {
+              "properties": {
+                "Database Connection Pool": "cs-dbcp-001",
+                "Table Name": "public.transactions",
+                "Where Clause": "status = 'PENDING'",
+                "Record Writer": "cs-json-001",
+                "Stateful Cache": "",
+                "Maximum-value Columns": ""
+              },
+              "autoTerminatedRelationships": [],
+              "schedulingPeriod": "10 sec",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "comments": "",
+              "lossTolerant": false,
+              "scheduledState": "ENABLED",
+              "annotationData": ""
+            }
+          },
+          {
+            "id": "proc-kafka-001",
+            "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+            "name": "Publish to Kafka",
+            "position": {
+              "x": 100,
+              "y": 300
+            },
+            "config": {
+              "properties": {
+                "Kafka Brokers": "localhost:9092",
+                "Topic Name": "transactions.overdue",
+                "Use Transactions": "false",
+                "Delivery Guarantee": "best-effort",
+                "Client Name": "nifi-kafka-publisher"
+              },
+              "autoTerminatedRelationships": [
+                "failure",
+                "success"
+              ],
+              "schedulingPeriod": "0 sec",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "comments": "",
+              "lossTolerant": false,
+              "scheduledState": "ENABLED",
+              "annotationData": ""
+            }
+          }
+        ],
+        "connections": [
+          {
+            "id": "conn-001",
+            "source": {
+              "id": "proc-db-001",
+              "type": "PROCESSOR",
+              "groupId": "pg-001"
+            },
+            "destination": {
+              "id": "proc-kafka-001",
+              "type": "PROCESSOR",
+              "groupId": "pg-001"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "name": "success",
+            "backPressureObjectThreshold": 10000,
+            "backPressureDataSizeThreshold": "1 GB",
+            "flowFileExpiration": "0 sec",
+            "prioritizers": [],
+            "bends": [],
+            "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
+            "partitioningAttribute": "",
+            "loadBalanceCompression": "DO_NOT_COMPRESS"
+          }
+        ],
+        "remoteProcessGroups": [],
+        "labels": [],
+        "funnels": []
+      }
+    ],
+    "controllerServices": [
+      {
+        "id": "cs-dbcp-001",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "name": "DBCPConnectionPool",
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://localhost:5432/your_database",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database User": "your_username",
+          "Password": "your_password",
+          "Max Wait Time": "500 millis",
+          "Max Total Connections": "8",
+          "Validation-query": "SELECT 1"
+        },
+        "state": "ENABLED",
+        "bulletinLevel": "WARN",
+        "comments": ""
+      },
+      {
+        "id": "cs-json-001",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "name": "JsonRecordSetWriter",
+        "properties": {
+          "Schema Access Strategy": "use-string-fields-from-avro-schema",
+          "Schema Write Strategy": "no-schema",
+          "Pretty Print JSON": "false"
+        },
+        "state": "ENABLED",
+        "bulletinLevel": "WARN",
+        "comments": ""
+      }
+    ]
+  }
+}

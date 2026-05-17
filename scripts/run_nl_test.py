@@ -216,6 +216,7 @@ def _nifi_import(nifi_json: dict, replace_existing: bool = False) -> dict:
                 "validation_errors": [], "error_count": 0}
 
     pg_id = result
+    client.enable_controller_services(pg_id)
     errors = client.get_validation_errors(pg_id)
     error_count = sum(len(e["errors"]) for e in errors)
 

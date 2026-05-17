@@ -1,0 +1,44 @@
+flow:
+  id: csv_filter_pipeline
+  name: CSV Orders Filter Pipeline
+  description: Read CSV files from /data/input/orders/, keep only rows where status
+    equals COMPLETED, write to /data/output/completed_orders.csv
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 1 hour
+sources:
+- id: source_csv
+  name: Read Orders CSV
+  type: CSV
+  location: /data/input/orders/
+  connection:
+    properties:
+      path: /data/input/orders/
+      file_pattern: '*.csv'
+      delimiter: '{{CSV_DELIMITER}}'
+processing_elements:
+- id: process_filter
+  name: Filter Completed Orders
+  operation: Filter
+  config:
+    condition: status == 'COMPLETED'
+sinks:
+- id: sink_csv
+  name: Write Completed Orders CSV
+  type: CSV
+  location: /data/output/completed_orders.csv
+  connection:
+    properties:
+      path: /data/output/completed_orders.csv
+      delimiter: '{{CSV_DELIMITER}}'
+processed_data:
+- id: csv_data
+  format: csv
+links:
+- from_id: source_csv
+  to_id: process_filter
+  data_ref: csv_data
+- from_id: process_filter
+  to_id: sink_csv
+  data_ref: csv_data

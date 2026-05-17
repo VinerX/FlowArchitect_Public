@@ -1,0 +1,28 @@
+{
+  "success": false,
+  "error": {
+    "error": "json_parse_failed",
+    "details": "JSON parse error: Expecting value: line 1 column 1 (char 0)"
+  },
+  "duration_sec": 203.52,
+  "stage1_duration_sec": 27.02,
+  "stage2_duration_sec": 176.49,
+  "prompt_tokens": null,
+  "completion_tokens": null,
+  "total_tokens": null,
+  "cost_usd": null,
+  "nifi_processor_count": null,
+  "nifi_connection_count": null,
+  "pim_source_count": 1,
+  "pim_step_count": 1,
+  "pim_sink_count": 1,
+  "session_id": null,
+  "preset_id": 1002,
+  "preset_name": "openrouter minimax/minimax-m2.7",
+  "preset_model": "minimax/minimax-m2.7",
+  "llm_calls": [],
+  "llm_usage_by_purpose": {},
+  "nifi_import_success": null,
+  "nifi_error_count": null,
+  "nifi_import_error": null
+}

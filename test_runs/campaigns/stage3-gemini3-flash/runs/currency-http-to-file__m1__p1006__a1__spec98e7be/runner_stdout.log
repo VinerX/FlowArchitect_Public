@@ -1,0 +1,27 @@
+
+================================================================
+Query  : ������� ����� ����� � https://api.exchangerate.host/latest � �������� ��...
+Mode   : 1 � Adapter (NL->YAML->JSON)
+Presets: [1006]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1006, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1006: openrouter gemini 3 flash  [google/gemini-3-flash-preview] ---
+  [1/2] USER_QUERY  mode=1  preset=1006
+  [1/2] PIM ready  (738 chars, 5.07s)
+  [2/2] REQUEST_CONVERSION  mode=1  preset=1006
+  [2/2] NiFi JSON ready  (2 proc, 1 conn, 0.19s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: FAILED: NiFi unreachable: HTTPSConnectionPool(host='localhost', port=8443): Read timed out. (read timeout=15)
+  tokens: 1454 in / 417 out / 1871 total  |  cost: $0.001978
+  Result : [OK]  (22.65s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage3-gemini3-flash\runs\currency-http-to-file__m1__p1006__a1__spec98e7be\raw_report.json

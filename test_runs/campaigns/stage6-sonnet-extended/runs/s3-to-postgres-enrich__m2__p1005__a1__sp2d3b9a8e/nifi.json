@@ -1,0 +1,429 @@
+{
+  "encodingVersion": {
+    "majorVersion": 2,
+    "minorVersion": 0
+  },
+  "maxTimerDrivenThreadCount": 10,
+  "maxEventDrivenThreadCount": 1,
+  "processGroups": [],
+  "remoteProcessGroups": [],
+  "labels": [],
+  "funnels": [],
+  "controllerServices": [
+    {
+      "identifier": "cs-json-reader-001",
+      "instanceIdentifier": "cs-json-reader-001",
+      "name": "JsonTreeReader",
+      "comments": "Reads JSON records from S3 files",
+      "type": "org.apache.nifi.json.JsonTreeReader",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-record-serialization-services-nar",
+        "version": "2.0.0"
+      },
+      "properties": {
+        "schema-access-strategy": "infer-schema",
+        "date-format": "yyyy-MM-dd",
+        "time-format": "HH:mm:ss",
+        "timestamp-format": "yyyy-MM-dd HH:mm:ss"
+      },
+      "controllerServiceApis": [
+        {
+          "type": "org.apache.nifi.serialization.RecordReaderFactory",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-record-serialization-services-nar",
+            "version": "2.0.0"
+          }
+        }
+      ],
+      "scheduledState": "ENABLED"
+    },
+    {
+      "identifier": "cs-json-writer-001",
+      "instanceIdentifier": "cs-json-writer-001",
+      "name": "JsonRecordSetWriter",
+      "comments": "Writes JSON records for downstream processing",
+      "type": "org.apache.nifi.json.JsonRecordSetWriter",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-record-serialization-services-nar",
+        "version": "2.0.0"
+      },
+      "properties": {
+        "schema-access-strategy": "inherit-record-schema",
+        "output-grouping": "output-oneline",
+        "date-format": "yyyy-MM-dd",
+        "time-format": "HH:mm:ss",
+        "timestamp-format": "yyyy-MM-dd HH:mm:ss",
+        "pretty-print-json": "false"
+      },
+      "controllerServiceApis": [
+        {
+          "type": "org.apache.nifi.serialization.RecordSetWriterFactory",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-record-serialization-services-nar",
+            "version": "2.0.0"
+          }
+        }
+      ],
+      "scheduledState": "ENABLED"
+    },
+    {
+      "identifier": "cs-dbcp-postgres-001",
+      "instanceIdentifier": "cs-dbcp-postgres-001",
+      "name": "DBCPConnectionPool - PostgreSQL event_log",
+      "comments": "JDBC connection pool for PostgreSQL public.event_log",
+      "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-dbcp-service-nar",
+        "version": "2.0.0"
+      },
+      "properties": {
+        "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+        "Database Driver Class Name": "org.postgresql.Driver",
+        "database-driver-locations": "{{POSTGRES_JDBC_DRIVER_PATH}}",
+        "Database User": "{{DB_USERNAME}}",
+        "Password": "{{DB_PASSWORD}}",
+        "Max Wait Time": "500 millis",
+        "Max Total Connections": "8",
+        "Validation query": "SELECT 1"
+      },
+      "controllerServiceApis": [
+        {
+          "type": "org.apache.nifi.dbcp.DBCPService",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-dbcp-service-nar",
+            "version": "2.0.0"
+          }
+        }
+      ],
+      "scheduledState": "ENABLED"
+    }
+  ],
+  "processors": [
+    {
+      "identifier": "proc-list-s3-001",
+      "instanceIdentifier": "proc-list-s3-001",
+      "name": "ListS3 - raw-logs",
+      "comments": "Lists JSON files in S3 bucket raw-logs on an hourly schedule",
+      "type": "org.apache.nifi.processors.aws.s3.ListS3",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-aws-nar",
+        "version": "2.0.0"
+      },
+      "properties": {
+        "Bucket": "raw-logs",
+        "Region": "{{AWS_REGION}}",
+        "Access Key ID": "{{AWS_ACCESS_KEY_ID}}",
+        "Secret Access Key": "{{AWS_SECRET_ACCESS_KEY}}",
+        "Prefix": "{{S3_PATH_PREFIX}}",
+        "Delimiter": "/",
+        "Use Versions": "false",
+        "List Type": "2",
+        "Communications Timeout": "30 secs",
+        "Endpoint Override URL": "{{S3_ENDPOINT_OVERRIDE_URL}}"
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "1 hour",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "bulletinLevel": "WARN",
+      "runDurationMillis": 0,
+      "concurrentlySchedulableTaskCount": 1,
+      "autoTerminatedRelationships": [],
+      "scheduledState": "ENABLED",
+      "position": {
+        "x": 100,
+        "y": 200
+      }
+    },
+    {
+      "identifier": "proc-fetch-s3-001",
+      "instanceIdentifier": "proc-fetch-s3-001",
+      "name": "FetchS3Object - raw-logs",
+      "comments": "Fetches each JSON file object from S3 raw-logs bucket",
+      "type": "org.apache.nifi.processors.aws.s3.FetchS3Object",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-aws-nar",
+        "version": "2.0.0"
+      },
+      "properties": {
+        "Bucket": "raw-logs",
+        "Object Key": "${filename}",
+        "Region": "{{AWS_REGION}}",
+        "Access Key ID": "{{AWS_ACCESS_KEY_ID}}",
+        "Secret Access Key": "{{AWS_SECRET_ACCESS_KEY}}",
+        "Communications Timeout": "30 secs",
+        "Endpoint Override URL": "{{S3_ENDPOINT_OVERRIDE_URL}}"
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "0 sec",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "bulletinLevel": "WARN",
+      "runDurationMillis": 0,
+      "concurrentlySchedulableTaskCount": 1,
+      "autoTerminatedRelationships": [],
+      "scheduledState": "ENABLED",
+      "position": {
+        "x": 400,
+        "y": 200
+      }
+    },
+    {
+      "identifier": "proc-update-record-001",
+      "instanceIdentifier": "proc-update-record-001",
+      "name": "UpdateRecord - Add processed_at Field",
+      "comments": "Enriches each JSON record with a processed_at timestamp using current time",
+      "type": "org.apache.nifi.processors.standard.UpdateRecord",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-standard-nar",
+        "version": "2.0.0"
+      },
+      "properties": {
+        "record-reader": "cs-json-reader-001",
+        "record-writer": "cs-json-writer-001",
+        "/processed_at": "${now():format('yyyy-MM-dd HH:mm:ss')}"
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "0 sec",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "bulletinLevel": "WARN",
+      "runDurationMillis": 0,
+      "concurrentlySchedulableTaskCount": 1,
+      "autoTerminatedRelationships": [],
+      "scheduledState": "ENABLED",
+      "position": {
+        "x": 700,
+        "y": 200
+      }
+    },
+    {
+      "identifier": "proc-put-db-record-001",
+      "instanceIdentifier": "proc-put-db-record-001",
+      "name": "PutDatabaseRecord - public.event_log",
+      "comments": "Inserts enriched JSON records into PostgreSQL public.event_log table",
+      "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-standard-nar",
+        "version": "2.0.0"
+      },
+      "properties": {
+        "record-reader": "cs-json-reader-001",
+        "database-connection-pooling-service": "cs-dbcp-postgres-001",
+        "statement-type": "INSERT",
+        "table-name": "event_log",
+        "schema-name": "public",
+        "translate-field-names": "true",
+        "unmatched-field-behavior": "Ignore Unmatched Fields",
+        "unmatched-column-behavior": "Fail on Unmatched Columns",
+        "update-keys": "",
+        "field-containing-sql": "",
+        "quoted-identifiers": "false",
+        "query-timeout": "0 seconds",
+        "rollback-on-failure": "false",
+        "max-batch-size": "1000"
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "0 sec",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "bulletinLevel": "WARN",
+      "runDurationMillis": 0,
+      "concurrentlySchedulableTaskCount": 1,
+      "autoTerminatedRelationships": [
+        "success"
+      ],
+      "scheduledState": "ENABLED",
+      "position": {
+        "x": 1000,
+        "y": 200
+      }
+    },
+    {
+      "identifier": "proc-log-failure-001",
+      "instanceIdentifier": "proc-log-failure-001",
+      "name": "LogAttribute - Failure Handler",
+      "comments": "Logs failed FlowFiles for debugging and alerting",
+      "type": "org.apache.nifi.processors.standard.LogAttribute",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-standard-nar",
+        "version": "2.0.0"
+      },
+      "properties": {
+        "Log Level": "ERROR",
+        "Log Payload": "true",
+        "Attributes to Log": "",
+        "Attributes to Ignore": "",
+        "Log prefix": "[FAILURE] S3-to-PostgreSQL flow error:"
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "0 sec",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "bulletinLevel": "WARN",
+      "runDurationMillis": 0,
+      "concurrentlySchedulableTaskCount": 1,
+      "autoTerminatedRelationships": [
+        "success"
+      ],
+      "scheduledState": "ENABLED",
+      "position": {
+        "x": 700,
+        "y": 450
+      }
+    }
+  ],
+  "connections": [
+    {
+      "identifier": "conn-list-to-fetch-001",
+      "instanceIdentifier": "conn-list-to-fetch-001",
+      "name": "ListS3 -> FetchS3Object",
+      "source": {
+        "id": "proc-list-s3-001",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-fetch-s3-001",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB",
+      "flowFileExpiration": "0 sec",
+      "prioritizers": [],
+      "bends": []
+    },
+    {
+      "identifier": "conn-fetch-to-update-001",
+      "instanceIdentifier": "conn-fetch-to-update-001",
+      "name": "FetchS3Object -> UpdateRecord (Add processed_at)",
+      "source": {
+        "id": "proc-fetch-s3-001",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-update-record-001",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB",
+      "flowFileExpiration": "0 sec",
+      "prioritizers": [],
+      "bends": []
+    },
+    {
+      "identifier": "conn-fetch-failure-001",
+      "instanceIdentifier": "conn-fetch-failure-001",
+      "name": "FetchS3Object failure -> LogAttribute",
+      "source": {
+        "id": "proc-fetch-s3-001",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-log-failure-001",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "failure"
+      ],
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB",
+      "flowFileExpiration": "0 sec",
+      "prioritizers": [],
+      "bends": []
+    },
+    {
+      "identifier": "conn-update-to-putdb-001",
+      "instanceIdentifier": "conn-update-to-putdb-001",
+      "name": "UpdateRecord -> PutDatabaseRecord (public.event_log)",
+      "source": {
+        "id": "proc-update-record-001",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-put-db-record-001",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB",
+      "flowFileExpiration": "0 sec",
+      "prioritizers": [],
+      "bends": []
+    },
+    {
+      "identifier": "conn-update-failure-001",
+      "instanceIdentifier": "conn-update-failure-001",
+      "name": "UpdateRecord failure -> LogAttribute",
+      "source": {
+        "id": "proc-update-record-001",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-log-failure-001",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "failure"
+      ],
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB",
+      "flowFileExpiration": "0 sec",
+      "prioritizers": [],
+      "bends": []
+    },
+    {
+      "identifier": "conn-putdb-failure-001",
+      "instanceIdentifier": "conn-putdb-failure-001",
+      "name": "PutDatabaseRecord failure -> LogAttribute",
+      "source": {
+        "id": "proc-put-db-record-001",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-log-failure-001",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "failure"
+      ],
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB",
+      "flowFileExpiration": "0 sec",
+      "prioritizers": [],
+      "bends": []
+    }
+  ],
+  "identifier": "pg-s3-to-postgres-event-log-001",
+  "instanceIdentifier": "pg-s3-to-postgres-event-log-001",
+  "name": "S3 Raw Logs to PostgreSQL Event Log",
+  "comments": "Every hour, read JSON files from S3 bucket raw-logs, enrich each record with processed_at timestamp, and load into public.event_log in PostgreSQL",
+  "position": {
+    "x": 0,
+    "y": 0
+  },
+  "defaultFlowFileExpiration": "0 sec",
+  "defaultBackPressureObjectThreshold": 10000,
+  "defaultBackPressureDataSizeThreshold": "1 GB",
+  "scheduledState": "RUNNING",
+  "flowFileConcurrency": "UNBOUNDED",
+  "flowFileOutboundPolicy": "STREAM_WHEN_AVAILABLE"
+}

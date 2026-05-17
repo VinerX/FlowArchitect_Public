@@ -1,0 +1,236 @@
+{
+  "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:12:46.300986+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: pending_transactions_to_kafka\n  name: Pending Transactions to Kafka\n  description: Reads PENDING transactions from PostgreSQL and publishes them to a\n    Kafka topic in JSON format.\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 1 minute\nsources:\n- id: source_pg_transactions\n  name: Read Pending Transactions\n  type: PostgreSQL\n  location: public.transactions\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DB_NAME}}'\n      username: '{{DB_USER}}'\n      password: '{{DB_PASSWORD}}'\n      query: SELECT * FROM public.transactions WHERE status = 'PENDING'\nprocessing_elements:\n- id: process_json_conv\n  name: Convert to JSON\n  operation: FormatConversion\n  config:\n    target_format: json\nsinks:\n- id: sink_kafka_overdue\n  name: Publish to Kafka\n  type: Kafka\n  location: transactions.overdue\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      client_id: flow_producer_overdue\nprocessed_data:\n- id: transaction_record\n  format: json\nlinks:\n- from_id: source_pg_transactions\n  to_id: process_json_conv\n  data_ref: transaction_record\n- from_id: process_json_conv\n  to_id: sink_kafka_overdue\n  data_ref: transaction_record",
+      "nifi_json": {
+        "revision": {
+          "version": 0
+        },
+        "component": {
+          "id": "786407e3-018d-1000-0000-000000000001",
+          "name": "Pending Transactions to Kafka",
+          "contents": {
+            "processGroups": [],
+            "processors": [
+              {
+                "id": "786407e3-018d-1000-0000-000000000002",
+                "name": "Read Pending Transactions",
+                "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-standard-nar",
+                  "version": "1.23.2"
+                },
+                "position": {
+                  "x": 300,
+                  "y": 100
+                },
+                "config": {
+                  "schedulingStrategy": "TIMER_DRIVEN",
+                  "schedulingPeriod": "1 min",
+                  "properties": {
+                    "Database Connection Pool": "786407e3-018d-1000-0000-000000000005",
+                    "db-fetch-db-type": "PostgreSQL",
+                    "table-name": "public.transactions",
+                    "db-fetch-sql-query": "SELECT * FROM public.transactions WHERE status = 'PENDING'",
+                    "record-writer": "786407e3-018d-1000-0000-000000000006"
+                  }
+                }
+              },
+              {
+                "id": "786407e3-018d-1000-0000-000000000003",
+                "name": "Convert to JSON",
+                "type": "org.apache.nifi.processors.standard.ConvertRecord",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-standard-nar",
+                  "version": "1.23.2"
+                },
+                "position": {
+                  "x": 300,
+                  "y": 350
+                },
+                "config": {
+                  "properties": {
+                    "record-reader": "786407e3-018d-1000-0000-000000000007",
+                    "record-writer": "786407e3-018d-1000-0000-000000000006"
+                  }
+                }
+              },
+              {
+                "id": "786407e3-018d-1000-0000-000000000004",
+                "name": "Publish to Kafka",
+                "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord_3_0",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-kafka-3-0-nar",
+                  "version": "1.23.2"
+                },
+                "position": {
+                  "x": 300,
+                  "y": 600
+                },
+                "config": {
+                  "properties": {
+                    "bootstrap.servers": "{{KAFKA_BROKERS}}",
+                    "topic": "transactions.overdue",
+                    "record-reader": "786407e3-018d-1000-0000-000000000007",
+                    "record-writer": "786407e3-018d-1000-0000-000000000006",
+                    "client.id": "flow_producer_overdue"
+                  }
+                }
+              }
+            ],
+            "connections": [
+              {
+                "id": "786407e3-018d-1000-0000-000000000008",
+                "source": {
+                  "id": "786407e3-018d-1000-0000-000000000002",
+                  "type": "PROCESSOR"
+                },
+                "destination": {
+                  "id": "786407e3-018d-1000-0000-000000000003",
+                  "type": "PROCESSOR"
+                },
+                "selectedRelationships": [
+                  "success"
+                ]
+              },
+              {
+                "id": "786407e3-018d-1000-0000-000000000009",
+                "source": {
+                  "id": "786407e3-018d-1000-0000-000000000003",
+                  "type": "PROCESSOR"
+                },
+                "destination": {
+                  "id": "786407e3-018d-1000-0000-000000000004",
+                  "type": "PROCESSOR"
+                },
+                "selectedRelationships": [
+                  "success"
+                ]
+              }
+            ],
+            "controllerServices": [
+              {
+                "id": "786407e3-018d-1000-0000-000000000005",
+                "name": "DBCPConnectionPool",
+                "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-dbcp-service-nar",
+                  "version": "1.23.2"
+                },
+                "properties": {
+                  "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+                  "Database Driver Class Name": "org.postgresql.Driver",
+                  "Database User": "{{DB_USER}}",
+                  "Password": "{{DB_PASSWORD}}"
+                }
+              },
+              {
+                "id": "786407e3-018d-1000-0000-000000000006",
+                "name": "JsonRecordSetWriter",
+                "type": "org.apache.nifi.json.JsonRecordSetWriter",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-record-serialization-services-nar",
+                  "version": "1.23.2"
+                },
+                "properties": {
+                  "output-grouping": "output-array"
+                }
+              },
+              {
+                "id": "786407e3-018d-1000-0000-000000000007",
+                "name": "JsonTreeReader",
+                "type": "org.apache.nifi.json.JsonTreeReader",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-record-serialization-services-nar",
+                  "version": "1.23.2"
+                },
+                "properties": {}
+              }
+            ]
+          }
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "210a8172-019e-1000-1f3e-f1b76117cde9",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 49.16,
+      "stage1_duration_sec": 4.51,
+      "stage2_duration_sec": 10.49,
+      "prompt_tokens": 2277,
+      "completion_tokens": 2508,
+      "total_tokens": 4785,
+      "cost_usd": 0.008663,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 125,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 1372,
+          "completion_tokens": 581,
+          "total_tokens": 1953,
+          "duration_ms": 4141,
+          "cost_usd": 0.002429
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 823,
+          "completion_tokens": 1921,
+          "total_tokens": 2744,
+          "duration_ms": 10280,
+          "cost_usd": 0.006175
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1372,
+          "completion_tokens": 581,
+          "total_tokens": 1953,
+          "duration_ms": 4141,
+          "cost_usd": 0.002429
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 823,
+          "completion_tokens": 1921,
+          "total_tokens": 2744,
+          "duration_ms": 10280,
+          "cost_usd": 0.006175
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+flow:
+  id: event_routing_flow
+  name: Event Routing Pipeline
+  description: 'Read events from Kafka topic events.all, route by type: purchase to
+    PG purchases, refund to PG refunds, rest to Kafka events.unknown'
+triggers:
+- id: trigger_1
+  type: event
+  condition: on new message in events.all
+sources:
+- id: source_kafka
+  name: Kafka Source
+  type: Kafka
+  location: events.all
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: event_routing_group
+processing_elements:
+- id: proc_router
+  name: Type Router
+  operation: Router
+  config:
+    routes:
+    - condition: type == 'purchase'
+      output: purchase_data
+    - condition: type == 'refund'
+      output: refund_data
+    default_output: unknown_data
+sinks:
+- id: sink_pg_purchases
+  name: PostgreSQL Purchases
+  type: PostgreSQL
+  location: public.purchases
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_pg_refunds
+  name: PostgreSQL Refunds
+  type: PostgreSQL
+  location: public.refunds
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_kafka_unknown
+  name: Kafka Unknown Events
+  type: Kafka
+  location: events.unknown
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: raw_data
+  format: json
+- id: purchase_data
+  format: json
+- id: refund_data
+  format: json
+- id: unknown_data
+  format: json
+links:
+- from_id: source_kafka
+  to_id: proc_router
+  data_ref: raw_data
+- from_id: proc_router
+  to_id: sink_pg_purchases
+  data_ref: purchase_data
+- from_id: proc_router
+  to_id: sink_pg_refunds
+  data_ref: refund_data
+- from_id: proc_router
+  to_id: sink_kafka_unknown
+  data_ref: unknown_data

@@ -1,0 +1,135 @@
+[37mINFO     [settings_manager.py:36]       | Settings loaded successfully.[0m
+[37mINFO     [api_preset_manager.py:270]    | [ApiPresetsManager] initialized[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'session.list_updated'[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'chat_user_message_saved'[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'chat_new_message'[0m
+[37mINFO     [provider_manager.py:26]       | Registered 3 providers: ['openai', 'gemini', 'common'][0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 1/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[31mERROR    [llm_request_runner.py:95]     | Attempt 1 timed out after 60.0s.[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'on_failed_attempt_for_response'[0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 2/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'etl_pim_generated'[0m
+[37mINFO     [provider_manager.py:26]       | Registered 3 providers: ['openai', 'gemini', 'common'][0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 1/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[37mINFO     [placeholder_manager.py:211]   | PlaceholderManager: loaded 2 global entries[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'chat_new_message'[0m
+[37mINFO     [provider_manager.py:26]       | Registered 3 providers: ['openai', 'gemini', 'common'][0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 1/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'session.name_updated'[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'session.list_updated'[0m
+[31mERROR    [llm_request_runner.py:95]     | Attempt 1 timed out after 120.0s.[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'on_failed_attempt_for_response'[0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 2/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[31mERROR    [llm_request_runner.py:95]     | Attempt 2 timed out after 120.0s.[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'on_failed_attempt_for_response'[0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 3/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[31mERROR    [llm_request_runner.py:95]     | Attempt 3 timed out after 120.0s.[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'on_failed_attempt_for_response'[0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 4/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[31mERROR    [llm_request_runner.py:95]     | Attempt 4 timed out after 120.0s.[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'on_failed_attempt_for_response'[0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 5/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[31mERROR    [llm_request_runner.py:97]     | Error during generation attempt 5: HTTPSConnectionPool(host='openrouter.ai', port=443): Max retries exceeded with url: /api/v1/chat/completions (Caused by NameResolutionError("HTTPSConnection(host='openrouter.ai', port=443): Failed to resolve 'openrouter.ai' ([Errno 11001] getaddrinfo failed)"))[0m
+Traceback (most recent call last):
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\connection.py", line 204, in _new_conn
+    sock = connection.create_connection(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\util\connection.py", line 60, in create_connection
+    for res in socket.getaddrinfo(host, port, family, socket.SOCK_STREAM):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\socket.py", line 978, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\connectionpool.py", line 787, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\connectionpool.py", line 488, in _make_request
+    raise new_e
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\connectionpool.py", line 464, in _make_request
+    self._validate_conn(conn)
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\connectionpool.py", line 1093, in _validate_conn
+    conn.connect()
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\connection.py", line 759, in connect
+    self.sock = sock = self._new_conn()
+                       ^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\connection.py", line 211, in _new_conn
+    raise NameResolutionError(self.host, self, e) from e
+urllib3.exceptions.NameResolutionError: HTTPSConnection(host='openrouter.ai', port=443): Failed to resolve 'openrouter.ai' ([Errno 11001] getaddrinfo failed)
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\adapters.py", line 644, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\connectionpool.py", line 841, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\util\retry.py", line 535, in increment
+    raise MaxRetryError(_pool, url, reason) from reason  # type: ignore[arg-type]
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+urllib3.exceptions.MaxRetryError: HTTPSConnectionPool(host='openrouter.ai', port=443): Max retries exceeded with url: /api/v1/chat/completions (Caused by NameResolutionError("HTTPSConnection(host='openrouter.ai', port=443): Failed to resolve 'openrouter.ai' ([Errno 11001] getaddrinfo failed)"))
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "F:\Education\Diplom\FlowArchitect\src\managers\llm_request_runner.py", line 87, in run
+    response_text = self._call_with_timeout(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\src\managers\llm_request_runner.py", line 111, in _call_with_timeout
+    return future.result(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\src\managers\provider_manager.py", line 79, in generate
+    return provider.generate(req)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\src\handlers\llm_providers\openai_http_base.py", line 125, in generate
+    resp = self._request(req, payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\src\handlers\llm_providers\openai_http_base.py", line 108, in _request
+    return requests.post(req.api_url, headers=headers, json=payload, stream=req.stream, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\adapters.py", line 677, in send
+    raise ConnectionError(e, request=request)
+requests.exceptions.ConnectionError: HTTPSConnectionPool(host='openrouter.ai', port=443): Max retries exceeded with url: /api/v1/chat/completions (Caused by NameResolutionError("HTTPSConnection(host='openrouter.ai', port=443): Failed to resolve 'openrouter.ai' ([Errno 11001] getaddrinfo failed)"))
+[31mERROR    [llm_request_runner.py:103]    | All generation attempts failed.[0m

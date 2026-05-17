@@ -1,0 +1,181 @@
+{
+  "formatVersion": 2,
+  "flowContents": {
+    "identifier": "root-process-group",
+    "name": "Periodic orders export",
+    "processors": [
+      {
+        "identifier": "proc-query-db",
+        "type": "org.apache.nifi.processors.standard.QueryDatabaseTable",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "name": "QueryDatabaseTable",
+        "properties": {
+          "Database Connection Pooling Service": {
+            "identifier": "dbc-pool",
+            "name": "DBCPConnectionPool"
+          },
+          "Database Type": "PostgreSQL",
+          "Table Name": "public.orders",
+          "Maximum-value Columns": "id",
+          "Columns to Return": ""
+        },
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "60 sec",
+        "autoTerminatedRelationships": [],
+        "relationships": [
+          {
+            "name": "success",
+            "description": "Success",
+            "autoTerminate": false
+          },
+          {
+            "name": "failure",
+            "description": "Failure",
+            "autoTerminate": true
+          }
+        ]
+      },
+      {
+        "identifier": "proc-convert-record",
+        "type": "org.apache.nifi.processors.standard.ConvertRecord",
+        "position": {
+          "x": 400,
+          "y": 0
+        },
+        "name": "ConvertRecord",
+        "properties": {
+          "record-reader": {
+            "identifier": "avro-reader",
+            "name": "AvroReader"
+          },
+          "record-writer": {
+            "identifier": "json-writer",
+            "name": "JsonRecordSetWriter"
+          }
+        },
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "autoTerminatedRelationships": [],
+        "relationships": [
+          {
+            "name": "success",
+            "description": "Success",
+            "autoTerminate": false
+          },
+          {
+            "name": "failure",
+            "description": "Failure",
+            "autoTerminate": true
+          }
+        ]
+      },
+      {
+        "identifier": "proc-put-file",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "position": {
+          "x": 800,
+          "y": 0
+        },
+        "name": "PutFile",
+        "properties": {
+          "Directory": "/data/output",
+          "Conflict Resolution Strategy": "replace",
+          "Create Missing Directories": "true"
+        },
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "autoTerminatedRelationships": [
+          {
+            "name": "failure",
+            "description": "Failure",
+            "autoTerminate": true
+          },
+          {
+            "name": "success",
+            "description": "Success",
+            "autoTerminate": true
+          }
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "conn-query-to-convert",
+        "name": "QueryDB to Convert",
+        "source": {
+          "id": "proc-query-db",
+          "relationship": "success"
+        },
+        "destination": {
+          "id": "proc-convert-record"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": 10000
+      },
+      {
+        "identifier": "conn-convert-to-put",
+        "name": "Convert to PutFile",
+        "source": {
+          "id": "proc-convert-record",
+          "relationship": "success"
+        },
+        "destination": {
+          "id": "proc-put-file"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureDataSizeThreshold": "1 GB",
+        "backPressureObjectThreshold": 10000
+      }
+    ],
+    "controllerServices": [
+      {
+        "identifier": "dbc-pool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "name": "DBCPConnectionPool",
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://localhost:5432/mydb",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database Driver Location(s)": "",
+          "Database User": "",
+          "Password": "",
+          "Max Wait Time": "1 sec",
+          "Max Total Connections": "8",
+          "Validation-query": "SELECT 1"
+        }
+      },
+      {
+        "identifier": "avro-reader",
+        "type": "org.apache.nifi.avro.AvroReader",
+        "name": "AvroReader",
+        "properties": {
+          "Schema Access Strategy": "Inherit Record Schema"
+        }
+      },
+      {
+        "identifier": "json-writer",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "name": "JsonRecordSetWriter",
+        "properties": {
+          "Schema Write Strategy": "Do Not Write Schema",
+          "Output Grouping": "Array",
+          "Pretty Print JSON": "true"
+        }
+      }
+    ],
+    "variables": {},
+    "processGroups": [],
+    "funnels": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "remoteProcessGroups": [],
+    "labels": []
+  }
+}

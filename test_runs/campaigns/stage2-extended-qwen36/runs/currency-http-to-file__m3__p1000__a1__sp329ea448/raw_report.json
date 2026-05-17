@@ -1,0 +1,289 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 3,
+  "mode_name": "Adapter+LLM (NL->YAML->Adapter->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-12T16:24:16.094564+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: exchange_rates_pipeline\n  name: Exchange Rates Fetcher\n  description: Fetches latest currency exchange rates from a public API and saves\n    them to a local JSON file.\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 1 hour\nsources:\n- id: source_exchangerate_api\n  name: Fetch Exchange Rates\n  type: HTTP\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\n      accept: application/json\nprocessing_elements:\n- id: process_parse_json\n  name: Parse API Response\n  operation: Parse JSON\n  config:\n    target_field: rates\nsinks:\n- id: sink_json_file\n  name: Save Rates to File\n  type: File\n  location: /data/output/rates.json\nprocessed_data:\n- id: rates_json\n  format: json\nlinks:\n- from_id: source_exchangerate_api\n  to_id: process_parse_json\n  data_ref: rates_json\n- from_id: process_parse_json\n  to_id: sink_json_file\n  data_ref: rates_json",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+          "name": "Exchange Rates Fetcher",
+          "comments": "Fetches latest currency exchange rates from a public API and saves them to a local JSON file.",
+          "processors": [
+            {
+              "identifier": "32b8e110-9dd6-445a-a523-4f3090c3b70c",
+              "name": "Fetch Exchange Rates",
+              "comments": "Generated from PIM source 'source_exchangerate_api' (HTTP)",
+              "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "HTTP URL": "https://api.exchangerate.host/latest",
+                "HTTP Method": "GET"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "Original",
+                "Retry",
+                "No Retry",
+                "Failure"
+              ]
+            },
+            {
+              "identifier": "1c1786f3-cb62-4f75-9b38-4dc3bfcedd8a",
+              "name": "Parse API Response",
+              "comments": "Generated from PIM processing element 'process_parse_json' (Parse JSON)",
+              "type": "org.apache.nifi.processors.standard.ConvertRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Record Writer": "76019726-83ee-4976-a674-d1c296f82977",
+                "Record Reader": "fd4c7b52-e714-4edf-8f8d-2637a461b82b",
+                "target_field": "rates"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            },
+            {
+              "identifier": "e56c846e-ba2f-4e95-901f-8efd5108e029",
+              "name": "Save Rates to File",
+              "comments": "Generated from PIM sink 'sink_json_file' (File)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/output"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "5aa5165a-a6b5-4d15-b860-e8efa701d623",
+              "name": "Fetch Exchange Rates -> Parse API Response",
+              "comments": "rates_json",
+              "source": {
+                "id": "32b8e110-9dd6-445a-a523-4f3090c3b70c",
+                "groupId": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+                "type": "PROCESSOR",
+                "name": "Fetch Exchange Rates"
+              },
+              "destination": {
+                "id": "1c1786f3-cb62-4f75-9b38-4dc3bfcedd8a",
+                "groupId": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+                "type": "PROCESSOR",
+                "name": "Parse API Response"
+              },
+              "selectedRelationships": [
+                "Response"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "909134fb-29cc-4168-ba06-3f6d689d9d54",
+              "name": "Parse API Response -> Save Rates to File",
+              "comments": "rates_json",
+              "source": {
+                "id": "1c1786f3-cb62-4f75-9b38-4dc3bfcedd8a",
+                "groupId": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+                "type": "PROCESSOR",
+                "name": "Parse API Response"
+              },
+              "destination": {
+                "id": "e56c846e-ba2f-4e95-901f-8efd5108e029",
+                "groupId": "5604ec9c-3f21-47e1-af36-0b67b7fdb6e9",
+                "type": "PROCESSOR",
+                "name": "Save Rates to File"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "fd4c7b52-e714-4edf-8f8d-2637a461b82b",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "76019726-83ee-4976-a674-d1c296f82977",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "1d0238ac-019e-1000-a294-ec246e7d7cc1",
+        "validation_errors": [
+          {
+            "name": "Parse API Response",
+            "type": "org.apache.nifi.processors.standard.ConvertRecord",
+            "errors": [
+              "'target_field' validated against 'rates' is invalid because 'target_field' is not a supported property or has no Validator associated with it"
+            ]
+          }
+        ],
+        "error_count": 1,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 115.48,
+      "stage1_duration_sec": 56.71,
+      "stage2_duration_sec": 5.41,
+      "prompt_tokens": 4359,
+      "completion_tokens": 6346,
+      "total_tokens": 10705,
+      "cost_usd": 0.009666,
+      "nifi_processor_count": 3,
+      "nifi_connection_count": 2,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 80,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 1336,
+          "completion_tokens": 3011,
+          "total_tokens": 4347,
+          "duration_ms": 56217,
+          "cost_usd": 0.004348
+        },
+        {
+          "purpose": "nifi_correction",
+          "provider": "common",
+          "model": "google/gemini-2.5-flash-lite",
+          "prompt_tokens": 93,
+          "completion_tokens": 1070,
+          "total_tokens": 1163,
+          "duration_ms": 5109,
+          "cost_usd": 0.000437
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1336,
+          "completion_tokens": 3011,
+          "total_tokens": 4347,
+          "duration_ms": 56217,
+          "cost_usd": 0.004348
+        },
+        "nifi_correction": {
+          "calls": 1,
+          "prompt_tokens": 93,
+          "completion_tokens": 1070,
+          "total_tokens": 1163,
+          "duration_ms": 5109,
+          "cost_usd": 0.000437
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

@@ -1,0 +1,69 @@
+flow:
+  id: kafka_event_router
+  name: Kafka Event Routing Pipeline
+  description: Routes events from Kafka to PostgreSQL tables or a fallback Kafka topic
+    based on event type.
+triggers:
+- id: trigger_kafka
+  type: event
+  condition: on_message_received
+sources:
+- id: src_kafka_events
+  name: Kafka Events Source
+  type: Kafka
+  location: events.all
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_GROUP_ID}}'
+processing_elements:
+- id: proc_router
+  name: Type Router
+  operation: Route
+  config:
+    rules: type == 'purchase' -> sink_pg_purchases; type == 'refund' -> sink_pg_refunds;
+      default -> sink_kafka_unknown
+sinks:
+- id: sink_pg_purchases
+  name: Postgres Purchases Table
+  type: PostgreSQL
+  location: purchases
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USER}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_pg_refunds
+  name: Postgres Refunds Table
+  type: PostgreSQL
+  location: refunds
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USER}}'
+      password: '{{DB_PASSWORD}}'
+- id: sink_kafka_unknown
+  name: Kafka Unknown Topic
+  type: Kafka
+  location: events.unknown
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: event_stream
+  format: json
+links:
+- from_id: src_kafka_events
+  to_id: proc_router
+  data_ref: event_stream
+- from_id: proc_router
+  to_id: sink_pg_purchases
+  data_ref: event_stream
+- from_id: proc_router
+  to_id: sink_pg_refunds
+  data_ref: event_stream
+- from_id: proc_router
+  to_id: sink_kafka_unknown
+  data_ref: event_stream

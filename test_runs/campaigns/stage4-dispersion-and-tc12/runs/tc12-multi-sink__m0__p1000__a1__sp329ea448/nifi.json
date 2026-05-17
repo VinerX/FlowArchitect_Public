@@ -1,0 +1,264 @@
+{
+  "id": "root-process-group",
+  "name": "Bank Transaction ETL",
+  "comments": "Fetches transactions, filters >100k RUB, enriches with client data, publishes to Kafka and S3",
+  "position": {
+    "x": 0,
+    "y": 0
+  },
+  "processGroups": [],
+  "remoteProcessGroups": [],
+  "processors": [
+    {
+      "id": "proc-invokehttp",
+      "name": "Fetch Transactions",
+      "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+      "position": {
+        "x": 50,
+        "y": 50
+      },
+      "config": {
+        "schedulingPeriod": "30 sec",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "properties": {
+          "Remote URL": "https://api.bank.example.com/transactions",
+          "HTTP Method": "GET",
+          "Connection Timeout": "5 secs",
+          "Read Timeout": "15 secs",
+          "Max Concurrency": "1"
+        },
+        "autoTerminatedRelationships": [
+          "failure",
+          "retry",
+          "no retry"
+        ]
+      }
+    },
+    {
+      "id": "proc-queryrecord",
+      "name": "Filter High Value",
+      "type": "org.apache.nifi.processors.standard.QueryRecord",
+      "position": {
+        "x": 50,
+        "y": 250
+      },
+      "config": {
+        "schedulingPeriod": "0 sec",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "properties": {
+          "Record Reader": "cs-jsonreader",
+          "Record Writer": "cs-jsonwriter",
+          "sql1": "SELECT * FROM FLOWFILE WHERE amount > 100000"
+        },
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "proc-lookuprecord",
+      "name": "Enrich Client Info",
+      "type": "org.apache.nifi.processors.standard.LookupRecord",
+      "position": {
+        "x": 50,
+        "y": 450
+      },
+      "config": {
+        "schedulingPeriod": "0 sec",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "properties": {
+          "Record Reader": "cs-jsonreader",
+          "Record Writer": "cs-jsonwriter",
+          "Lookup Service": "cs-dblookup",
+          "Routing Strategy": "Route to 'matched'",
+          "client_id": "client_id"
+        },
+        "autoTerminatedRelationships": [
+          "unmatched",
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "proc-kafka",
+      "name": "Publish to Kafka",
+      "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord_0_10",
+      "position": {
+        "x": -150,
+        "y": 650
+      },
+      "config": {
+        "schedulingPeriod": "0 sec",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "properties": {
+          "Kafka Brokers": "localhost:9092",
+          "Topic Name": "high_value_transactions",
+          "Record Writer": "cs-jsonwriter",
+          "Delivery Guarantee": "best effort",
+          "Use Transactions": "false"
+        },
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "proc-s3",
+      "name": "Archive to S3",
+      "type": "org.apache.nifi.processors.standard.PutS3Object",
+      "position": {
+        "x": 250,
+        "y": 650
+      },
+      "config": {
+        "schedulingPeriod": "0 sec",
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "properties": {
+          "Bucket": "compliance-archive",
+          "Key": "${now():format('yyyy/MM/dd/')}${uuid()}.json",
+          "Access Key": "${s3.access.key}",
+          "Secret Key": "${s3.secret.key}",
+          "Region": "us-east-1",
+          "Content Type": "application/json"
+        },
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-1",
+      "name": "Fetch -> Filter",
+      "source": {
+        "id": "proc-invokehttp",
+        "groupId": "root-process-group",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-queryrecord",
+        "groupId": "root-process-group",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "allowBackPressure": true,
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB"
+    },
+    {
+      "id": "conn-2",
+      "name": "Filter -> Enrich",
+      "source": {
+        "id": "proc-queryrecord",
+        "groupId": "root-process-group",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-lookuprecord",
+        "groupId": "root-process-group",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "sql1"
+      ],
+      "allowBackPressure": true,
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB"
+    },
+    {
+      "id": "conn-3",
+      "name": "Enrich -> Kafka",
+      "source": {
+        "id": "proc-lookuprecord",
+        "groupId": "root-process-group",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-kafka",
+        "groupId": "root-process-group",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "matched"
+      ],
+      "allowBackPressure": true,
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB"
+    },
+    {
+      "id": "conn-4",
+      "name": "Enrich -> S3",
+      "source": {
+        "id": "proc-lookuprecord",
+        "groupId": "root-process-group",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-s3",
+        "groupId": "root-process-group",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "matched"
+      ],
+      "allowBackPressure": true,
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB"
+    }
+  ],
+  "labels": [],
+  "funnels": [],
+  "ports": [],
+  "inputPorts": [],
+  "outputPorts": [],
+  "controllerServices": [
+    {
+      "id": "cs-jsonreader",
+      "name": "JsonTreeReader",
+      "type": "org.apache.nifi.json.JsonTreeReader",
+      "properties": {
+        "schema-access-strategy": "infer-schema"
+      },
+      "state": "ENABLED"
+    },
+    {
+      "id": "cs-jsonwriter",
+      "name": "JsonRecordSetWriter",
+      "type": "org.apache.nifi.json.JsonRecordSetWriter",
+      "properties": {
+        "schema-access-strategy": "inherit-record-schema",
+        "schema-cache": null,
+        "pretty-print": "false"
+      },
+      "state": "ENABLED"
+    },
+    {
+      "id": "cs-dbcp",
+      "name": "PostgreSQL Connection Pool",
+      "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+      "properties": {
+        "Database Connection URL": "jdbc:postgresql://db-host:5432/bank_db",
+        "Database Driver Class Name": "org.postgresql.Driver",
+        "Database User": "nifi_user",
+        "Password": "${db.password}",
+        "Max Wait Time": "500 millis",
+        "Max Total Connections": "10"
+      },
+      "state": "ENABLED"
+    },
+    {
+      "id": "cs-dblookup",
+      "name": "DatabaseRecordLookupService",
+      "type": "org.apache.nifi.lookup.db.DatabaseRecordLookupService",
+      "properties": {
+        "dbcp-service": "cs-dbcp",
+        "sql-query": "SELECT * FROM public.clients WHERE client_id = ?",
+        "sql-query-args": "client_id"
+      },
+      "state": "ENABLED"
+    }
+  ]
+}

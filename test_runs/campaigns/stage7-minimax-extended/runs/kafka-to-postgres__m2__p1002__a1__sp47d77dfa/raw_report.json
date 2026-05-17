@@ -1,0 +1,364 @@
+{
+  "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T19:54:35.513469+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: kafka_orders_to_postgres\n  name: Kafka Orders to PostgreSQL Pipeline\n  description: Read orders.created topic from Kafka, parse JSON, extract fields and\n    insert into PostgreSQL public.orders table\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: continuous\nsources:\n- id: source_kafka\n  name: Kafka Orders Source\n  type: Kafka\n  location: orders.created\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      group_id: orders_to_postgres_group\n      auto_offset_reset: earliest\nprocessing_elements:\n- id: parse_json\n  name: Parse JSON Message\n  operation: ParseJSON\n  config: {}\n- id: extract_fields\n  name: Extract Order Fields\n  operation: SelectFields\n  config:\n    fields:\n    - order_id\n    - user_id\n    - amount\n    - created_at\nsinks:\n- id: sink_postgres\n  name: PostgreSQL Orders Sink\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\nprocessed_data:\n- id: raw_message\n  format: string\n- id: parsed_order\n  format: json\n- id: order_record\n  format: row\nlinks:\n- from_id: source_kafka\n  to_id: parse_json\n  data_ref: raw_message\n- from_id: parse_json\n  to_id: extract_fields\n  data_ref: parsed_order\n- from_id: extract_fields\n  to_id: sink_postgres\n  data_ref: order_record",
+      "nifi_json": {
+        "content": {
+          "flow": {
+            "configs": {
+              "flowFileChunkSize": "1000"
+            }
+          },
+          "controllerServices": [
+            {
+              "id": "kafka-conn-svc",
+              "name": "Kafka Connection Service",
+              "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+              "properties": {
+                "Kafka Properties": {
+                  "bootstrap.servers": "{{KAFKA_BROKERS}}"
+                }
+              },
+              "comments": "Kafka connection service for ConsumeKafkaRecord_2"
+            },
+            {
+              "id": "json-reader-svc",
+              "name": "JSON Reader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "properties": {
+                "schema-access-strategy": "inherit-record-schema",
+                "schema-registry": {
+                  "type": "NoValueSchemaRegistry",
+                  "schema-access-strategy": "inherit-record-schema"
+                }
+              },
+              "comments": "Reads JSON content from flow file content field"
+            },
+            {
+              "id": "json-writer-svc",
+              "name": "JSON Writer",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "properties": {
+                "schema-access-strategy": "inherit-record-schema",
+                "pretty-print-json": "true"
+              }
+            },
+            {
+              "id": "db-conn-pool-svc",
+              "name": "PostgreSQL Connection Pool",
+              "type": "org.apache.nifi.dbcp.connectionpool.PostgreSQLConnectionPool",
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+                "Database User": "{{DB_USERNAME}}",
+                "Password": "{{DB_PASSWORD}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database Driver Location": "{{POSTGRES_DRIVER_URL}}"
+              }
+            }
+          ],
+          "processGroups": [],
+          "processors": [
+            {
+              "id": "source_kafka",
+              "name": "Kafka Orders Source",
+              "class": "org.apache.nifi.kafka.processors.ConsumeKafkaRecord_2",
+              "type": "org.apache.nifi.kafka.processors.ConsumeKafkaRecord_2",
+              "position": {
+                "x": 200,
+                "y": 250
+              },
+              "properties": {
+                "Kafka Connection Service": "kafka-conn-svc",
+                "Topic": "orders.created",
+                "Topic Type": "names",
+                "Group ID": "orders_to_postgres_group",
+                "Auto Offset Reset": "earliest",
+                "Record Reader": "json-reader-svc",
+                "Record Writer": "json-writer-svc",
+                "Header Extraction Pattern": null,
+                "Max Poll Records": null,
+                "Message Header Encoding": "UTF-8",
+                "Honor Transactions": "true",
+                "Offset Reset": "earliest",
+                "Failure Strategy": "route-to-failure",
+                "Security Protocol": "PLAINTEXT",
+                "SASL Mechanism": null,
+                "SASL Username": null,
+                "SASL Password": null,
+                "Kerberos Principal": null,
+                "Kerberos Keytab": null,
+                "SSL Context Service": null
+              },
+              "propertyDescriptors": {},
+              "schedulingPeriod": "0 sec",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "executionNode": "PRIMARY",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "comments": "Consume messages from Kafka topic orders.created",
+              "lossTolerance": "1 sec",
+              "state": "ENABLED"
+            },
+            {
+              "id": "parse_json",
+              "name": "Parse JSON Message",
+              "class": "org.apache.nifi.record.update.processors.UpdateRecord",
+              "type": "org.apache.nifi.record.update.processors.UpdateRecord",
+              "position": {
+                "x": 500,
+                "y": 250
+              },
+              "properties": {
+                "Record Reader": "json-reader-svc",
+                "Record Writer": "json-writer-svc",
+                "Replacement Value Strategy": "record-path-value",
+                "record-path-replacements": [
+                  {
+                    "key": "/order_id",
+                    "value": "/order_id"
+                  },
+                  {
+                    "key": "/user_id",
+                    "value": "/user_id"
+                  },
+                  {
+                    "key": "/amount",
+                    "value": "/amount"
+                  },
+                  {
+                    "key": "/created_at",
+                    "value": "/created_at"
+                  }
+                ]
+              },
+              "propertyDescriptors": {},
+              "schedulingPeriod": "0 sec",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "comments": "Parse JSON message and extract order fields: order_id, user_id, amount, created_at",
+              "state": "ENABLED"
+            },
+            {
+              "id": "sink_postgres",
+              "name": "PostgreSQL Orders Sink",
+              "class": "org.apache.nifi.dbcp.processors.PutDatabaseRecord",
+              "type": "org.apache.nifi.dbcp.processors.PutDatabaseRecord",
+              "position": {
+                "x": 800,
+                "y": 250
+              },
+              "properties": {
+                "Database Connection Pooling Service": "db-conn-pool-svc",
+                "Table Name": "public.orders",
+                "Catalog Name": null,
+                "Schema Name": null,
+                "Record Reader": "json-reader-svc",
+                "Statement Type": "INSERT",
+                "Translate Field Names": "true",
+                "Update Keys": null,
+                "Batch Size": null,
+                "Obtain Generated Keys": "false",
+                "Database Decimal Type": null,
+                "Unmatched Column Behavior": "FAIL",
+                "Unmatched Field Mode": "FAIL",
+                "Allow Null Replacement": "false",
+                "Quote Identifiers": "false",
+                "Field Validation": "true"
+              },
+              "propertyDescriptors": {},
+              "schedulingPeriod": "0 sec",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "executionNode": "PRIMARY",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "comments": "Insert order records into PostgreSQL public.orders table",
+              "state": "ENABLED"
+            }
+          ],
+          "connections": [
+            {
+              "id": "conn-source-parse",
+              "name": "raw_message",
+              "sourceId": "source_kafka",
+              "targetId": "parse_json",
+              "relationship": {
+                "class": "org.apache.nifi.connect.model.PositionedConnection",
+                "matches": {
+                  "class": "org.apache.nifi.connect.model.Bullet",
+                  "matches": "success"
+                }
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "backPressureObjectCount": 10000,
+              "backPressureDataSize": "1 GB",
+              "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
+              "partitioningAttribute": null,
+              "comments": "Link from Kafka source to Parse JSON processor"
+            },
+            {
+              "id": "conn-parse-sink",
+              "name": "order_record",
+              "sourceId": "parse_json",
+              "targetId": "sink_postgres",
+              "relationship": {
+                "class": "org.apache.nifi.connect.model.PositionedConnection",
+                "matches": {
+                  "class": "org.apache.nifi.connect.model.Bullet",
+                  "matches": "success"
+                }
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "backPressureObjectCount": 10000,
+              "backPressureDataSize": "1 GB",
+              "loadBalanceStrategy": "DO_NOT_LOAD_BALANCE",
+              "partitioningAttribute": null,
+              "comments": "Link from Parse JSON processor to PostgreSQL sink"
+            }
+          ],
+          "funnels": [],
+          "labels": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "variables": {}
+        },
+        "revision": {
+          "version": 1,
+          "clientId": "kafka-orders-to-postgres-pipeline",
+          "disconnectedNodeAcknowledged": false
+        },
+        "snippet": {
+          "controllerServices": [
+            {
+              "id": "kafka-conn-svc"
+            },
+            {
+              "id": "json-reader-svc"
+            },
+            {
+              "id": "json-writer-svc"
+            },
+            {
+              "id": "db-conn-pool-svc"
+            }
+          ],
+          "processors": [
+            {
+              "id": "source_kafka"
+            },
+            {
+              "id": "parse_json"
+            },
+            {
+              "id": "sink_postgres"
+            }
+          ],
+          "connections": [
+            {
+              "id": "conn-source-parse"
+            },
+            {
+              "id": "conn-parse-sink"
+            }
+          ]
+        },
+        "flowEncodingVersion": "1.0",
+        "generated": "Converted from PIM: kafka_orders_to_postgres"
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22e9d2a0-019e-1000-d78e-77cb21751491",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 152.28,
+      "stage1_duration_sec": 24.38,
+      "stage2_duration_sec": 93.99,
+      "prompt_tokens": 2183,
+      "completion_tokens": 2887,
+      "total_tokens": 5070,
+      "cost_usd": 0.004119,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": 1,
+      "pim_step_count": 2,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 193,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 1258,
+          "completion_tokens": 766,
+          "total_tokens": 2024,
+          "duration_ms": 24000,
+          "cost_usd": 0.001297
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 817,
+          "completion_tokens": 2114,
+          "total_tokens": 2931,
+          "duration_ms": 93844,
+          "cost_usd": 0.002782
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1258,
+          "completion_tokens": 766,
+          "total_tokens": 2024,
+          "duration_ms": 24000,
+          "cost_usd": 0.001297
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 817,
+          "completion_tokens": 2114,
+          "total_tokens": 2931,
+          "duration_ms": 93844,
+          "cost_usd": 0.002782
+        }
+      },
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

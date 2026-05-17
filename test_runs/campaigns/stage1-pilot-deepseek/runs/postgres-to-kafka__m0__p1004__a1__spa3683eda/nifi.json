@@ -1,0 +1,182 @@
+{
+  "flowContents": {
+    "identifier": "e4a91f0b-4c4e-4c7a-9a3f-8c7e1f568d2b",
+    "instanceIdentifier": "e4a91f0b-4c4e-4c7a-9a3f-8c7e1f568d2b",
+    "name": "PostgreSQL to Kafka",
+    "position": {
+      "x": 0.0,
+      "y": 0.0
+    },
+    "processors": [
+      {
+        "identifier": "f1d2a3b4-5c6d-7e8f-9a0b-1c2d3e4f5a6b",
+        "instanceIdentifier": "f1d2a3b4-5c6d-7e8f-9a0b-1c2d3e4f5a6b",
+        "name": "QueryDatabaseTableRecord",
+        "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "1.23.0"
+        },
+        "position": {
+          "x": 100.0,
+          "y": 100.0
+        },
+        "config": {
+          "properties": {
+            "Database Connection Pooling Service": "dbc-pool-id",
+            "Table Name": "my_table",
+            "Columns to Return": "*",
+            "Maximum-value Columns": "id",
+            "record-writer": "json-writer-id"
+          },
+          "schedulingPeriod": "60 sec",
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "executionNode": "ALL",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "autoTerminatedRelationships": [],
+          "comments": "",
+          "lossTolerant": false
+        },
+        "relationships": [
+          {
+            "name": "success",
+            "description": "All FlowFiles are routed to this relationship"
+          }
+        ]
+      },
+      {
+        "identifier": "a2b3c4d5-6e7f-8a9b-0c1d-2e3f4a5b6c7d",
+        "instanceIdentifier": "a2b3c4d5-6e7f-8a9b-0c1d-2e3f4a5b6c7d",
+        "name": "PublishKafka_2_6",
+        "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-2-6-nar",
+          "version": "1.23.0"
+        },
+        "position": {
+          "x": 400.0,
+          "y": 100.0
+        },
+        "config": {
+          "properties": {
+            "bootstrap.servers": "localhost:9092",
+            "topic": "analytics.events",
+            "useTransactions": "false",
+            "delivery.guarantee": "delivery.guarantee.replicated",
+            "max.request.size": "1 MB",
+            "acknowledgements": "-1",
+            "compression.type": "none",
+            "max.in.flight.requests": "5",
+            "request.timeout.ms": "30 sec",
+            "message.header.encoding": "UTF-8"
+          },
+          "schedulingPeriod": "0 sec",
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "executionNode": "ALL",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "autoTerminatedRelationships": [
+            "success"
+          ],
+          "comments": "",
+          "lossTolerant": false
+        },
+        "relationships": [
+          {
+            "name": "success",
+            "description": "FlowFiles that were sent to Kafka successfully"
+          },
+          {
+            "name": "failure",
+            "description": "FlowFiles that failed to be sent to Kafka"
+          }
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "b1c2d3e4-5f6a-7b8c-9d0e-1f2a3b4c5d6e",
+        "instanceIdentifier": "b1c2d3e4-5f6a-7b8c-9d0e-1f2a3b4c5d6e",
+        "name": "success",
+        "source": {
+          "id": "f1d2a3b4-5c6d-7e8f-9a0b-1c2d3e4f5a6b",
+          "groupId": "e4a91f0b-4c4e-4c7a-9a3f-8c7e1f568d2b",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "a2b3c4d5-6e7f-8a9b-0c1d-2e3f4a5b6c7d",
+          "groupId": "e4a91f0b-4c4e-4c7a-9a3f-8c7e1f568d2b",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "prioritizers": [],
+        "bends": [],
+        "labelIndex": 1,
+        "zIndex": 0
+      }
+    ],
+    "controllerServices": [
+      {
+        "identifier": "dbc-pool-id",
+        "instanceIdentifier": "dbc-pool-id",
+        "name": "DBCPConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-dbcp-service-nar",
+          "version": "1.23.0"
+        },
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://localhost/my_database",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database Driver Location(s)": "",
+          "Database User": "my_user",
+          "Password": "my_password",
+          "Max Wait Time": "5000 millis",
+          "Max Total Connections": "8",
+          "Validation-query": "SELECT 1"
+        },
+        "state": "ENABLED"
+      },
+      {
+        "identifier": "json-writer-id",
+        "instanceIdentifier": "json-writer-id",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.serialization.RecordSetWriterFactory",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "1.23.0"
+        },
+        "properties": {
+          "Schema Write Strategy": "do-not-write-schema",
+          "Pretty Print JSON": "false",
+          "Suppress Nulls": "never-suppress",
+          "Output Grouping": "output-array",
+          "Compression Format": "none",
+          "Character Set": "UTF-8"
+        },
+        "state": "ENABLED"
+      }
+    ],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": []
+  }
+}

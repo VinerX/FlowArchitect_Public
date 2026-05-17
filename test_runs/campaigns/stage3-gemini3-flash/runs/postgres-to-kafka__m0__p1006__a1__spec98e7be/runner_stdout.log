@@ -1,0 +1,25 @@
+
+================================================================
+Query  : ����� �� ������� public.transactions ������ �� �������� PENDING, �������...
+Mode   : 0 � Direct (NL->JSON)
+Presets: [1006]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1006, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1006: openrouter gemini 3 flash  [google/gemini-3-flash-preview] ---
+  [1/2] USER_QUERY  mode=0  preset=1006
+  [2/2] NiFi JSON ready  (0 proc, 0 conn, Nones)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 139 in / 425 out / 564 total  |  cost: $0.001344
+  Result : [OK]  (37.79s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage3-gemini3-flash\runs\postgres-to-kafka__m0__p1006__a1__spec98e7be\raw_report.json

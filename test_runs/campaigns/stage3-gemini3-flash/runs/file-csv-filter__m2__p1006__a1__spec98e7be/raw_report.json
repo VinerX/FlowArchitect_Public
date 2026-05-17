@@ -1,0 +1,218 @@
+{
+  "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:02:16.355973+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: csv_order_processor\n  name: CSV Order Status Filter\n  description: Reads CSV orders, filters for COMPLETED status, and writes to a new\n    CSV file.\ntriggers:\n- id: trigger_manual\n  type: manual\n  condition: on_demand\nsources:\n- id: source_csv_orders\n  name: Read Orders CSV\n  type: LocalFileSystem\n  location: /data/input/orders/\n  connection:\n    properties:\n      format: csv\n      recursive: 'false'\nprocessing_elements:\n- id: filter_completed\n  name: Filter Completed Orders\n  operation: Filter\n  config:\n    condition: status == 'COMPLETED'\nsinks:\n- id: sink_csv_completed\n  name: Write Completed Orders\n  type: LocalFileSystem\n  location: /data/output/completed_orders.csv\n  connection:\n    properties:\n      format: csv\n      mode: overwrite\nprocessed_data:\n- id: order_records\n  format: csv\nlinks:\n- from_id: source_csv_orders\n  to_id: filter_completed\n  data_ref: order_records\n- from_id: filter_completed\n  to_id: sink_csv_completed\n  data_ref: order_records",
+      "nifi_json": {
+        "revision": {
+          "version": 0
+        },
+        "component": {
+          "id": "8777179b-0001-1000-0000-000000000001",
+          "name": "CSV Order Status Filter",
+          "contents": {
+            "processors": [
+              {
+                "id": "8777179b-0001-1000-0000-000000000002",
+                "name": "Read Orders CSV",
+                "type": "org.apache.nifi.processors.standard.GetFile",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-standard-nar",
+                  "version": "1.23.2"
+                },
+                "position": {
+                  "x": 0.0,
+                  "y": 0.0
+                },
+                "config": {
+                  "properties": {
+                    "Input Directory": "/data/input/orders/",
+                    "Keep Source File": "false",
+                    "Recurse Subdirectories": "false",
+                    "File Filter": "[^\\.].*"
+                  },
+                  "schedulingStrategy": "TIMER_DRIVEN",
+                  "schedulingPeriod": "1 min"
+                }
+              },
+              {
+                "id": "8777179b-0001-1000-0000-000000000003",
+                "name": "Filter Completed Orders",
+                "type": "org.apache.nifi.processors.standard.QueryRecord",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-standard-nar",
+                  "version": "1.23.2"
+                },
+                "position": {
+                  "x": 0.0,
+                  "y": 250.0
+                },
+                "config": {
+                  "properties": {
+                    "record-reader": "8777179b-0001-1000-0000-000000000006",
+                    "record-writer": "8777179b-0001-1000-0000-000000000007",
+                    "completed": "SELECT * FROM FLOWFILE WHERE status = 'COMPLETED'"
+                  }
+                }
+              },
+              {
+                "id": "8777179b-0001-1000-0000-000000000004",
+                "name": "Write Completed Orders",
+                "type": "org.apache.nifi.processors.standard.PutFile",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-standard-nar",
+                  "version": "1.23.2"
+                },
+                "position": {
+                  "x": 0.0,
+                  "y": 500.0
+                },
+                "config": {
+                  "properties": {
+                    "Directory": "/data/output/",
+                    "Conflict Strategy": "replace"
+                  }
+                }
+              }
+            ],
+            "connections": [
+              {
+                "id": "8777179b-0001-1000-0000-000000000008",
+                "source": {
+                  "id": "8777179b-0001-1000-0000-000000000002",
+                  "type": "PROCESSOR"
+                },
+                "destination": {
+                  "id": "8777179b-0001-1000-0000-000000000003",
+                  "type": "PROCESSOR"
+                },
+                "selectedRelationships": [
+                  "success"
+                ]
+              },
+              {
+                "id": "8777179b-0001-1000-0000-000000000009",
+                "source": {
+                  "id": "8777179b-0001-1000-0000-000000000003",
+                  "type": "PROCESSOR"
+                },
+                "destination": {
+                  "id": "8777179b-0001-1000-0000-000000000004",
+                  "type": "PROCESSOR"
+                },
+                "selectedRelationships": [
+                  "completed"
+                ]
+              }
+            ],
+            "controllerServices": [
+              {
+                "id": "8777179b-0001-1000-0000-000000000006",
+                "name": "CSVReader",
+                "type": "org.apache.nifi.csv.CSVReader",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-record-serialization-services-nar",
+                  "version": "1.23.2"
+                },
+                "properties": {
+                  "schema-access-strategy": "infer-schema"
+                }
+              },
+              {
+                "id": "8777179b-0001-1000-0000-000000000007",
+                "name": "CSVRecordSetWriter",
+                "type": "org.apache.nifi.csv.CSVRecordSetWriter",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-record-serialization-services-nar",
+                  "version": "1.23.2"
+                },
+                "properties": {
+                  "schema-access-strategy": "inherit-record-schema"
+                }
+              }
+            ]
+          }
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "2100e297-019e-1000-ebc1-1e8f657978a6",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 48.99,
+      "stage1_duration_sec": 5.34,
+      "stage2_duration_sec": 9.03,
+      "prompt_tokens": 2222,
+      "completion_tokens": 2036,
+      "total_tokens": 4258,
+      "cost_usd": 0.007219,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 113,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 1381,
+          "completion_tokens": 508,
+          "total_tokens": 1889,
+          "duration_ms": 5078,
+          "cost_usd": 0.002214
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 750,
+          "completion_tokens": 1522,
+          "total_tokens": 2272,
+          "duration_ms": 8812,
+          "cost_usd": 0.004941
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1381,
+          "completion_tokens": 508,
+          "total_tokens": 1889,
+          "duration_ms": 5078,
+          "cost_usd": 0.002214
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 750,
+          "completion_tokens": 1522,
+          "total_tokens": 2272,
+          "duration_ms": 8812,
+          "cost_usd": 0.004941
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

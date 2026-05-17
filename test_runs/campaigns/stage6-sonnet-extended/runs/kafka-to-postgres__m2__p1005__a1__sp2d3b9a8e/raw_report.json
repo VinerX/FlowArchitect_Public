@@ -1,0 +1,416 @@
+{
+  "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T20:38:26.840999+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: kafka_orders_to_postgres\n  name: Kafka Orders to PostgreSQL\n  description: Считывает сообщения из Kafka topic orders.created, парсит JSON, извлекает\n    поля order_id, user_id, amount, created_at и вставляет строки в таблицу public.orders\n    в PostgreSQL\ntriggers:\n- id: trigger_event\n  type: event\n  condition: New message in Kafka topic orders.created\nsources:\n- id: source_kafka_orders\n  name: Kafka Topic orders.created\n  type: Kafka\n  location: orders.created\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      group_id: '{{KAFKA_CONSUMER_GROUP_ID}}'\n      security_protocol: '{{KAFKA_SECURITY_PROTOCOL}}'\n      auto_offset_reset: earliest\nprocessing_elements:\n- id: process_parse_json\n  name: Parse JSON Message\n  operation: Deserialize\n  config:\n    format: json\n    input_field: value\n- id: process_extract_fields\n  name: Extract Fields\n  operation: FieldExtraction\n  config:\n    fields:\n    - order_id\n    - user_id\n    - amount\n    - created_at\nsinks:\n- id: sink_postgres_orders\n  name: PostgreSQL public.orders\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DB_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\nprocessed_data:\n- id: raw_kafka_message\n  format: bytes\n- id: parsed_order_json\n  format: json\n- id: extracted_order_fields\n  format: record\nlinks:\n- from_id: source_kafka_orders\n  to_id: process_parse_json\n  data_ref: raw_kafka_message\n- from_id: process_parse_json\n  to_id: process_extract_fields\n  data_ref: parsed_order_json\n- from_id: process_extract_fields\n  to_id: sink_postgres_orders\n  data_ref: extracted_order_fields",
+      "nifi_json": {
+        "id": "a1b2c3d4-0001-0000-0000-000000000000",
+        "identifier": "a1b2c3d4-0001-0000-0000-000000000000",
+        "name": "Kafka Orders to PostgreSQL",
+        "comments": "Считывает сообщения из Kafka topic orders.created, парсит JSON, извлекает поля order_id, user_id, amount, created_at и вставляет строки в таблицу public.orders в PostgreSQL",
+        "position": {
+          "x": 0.0,
+          "y": 0.0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "processors": [
+          {
+            "id": "a1b2c3d4-0010-0000-0000-000000000001",
+            "identifier": "a1b2c3d4-0010-0000-0000-000000000001",
+            "name": "Kafka Topic orders.created",
+            "comments": "Source: Consume messages from Kafka topic orders.created",
+            "type": "org.apache.nifi.kafka.processors.ConsumeKafka",
+            "bundle": {
+              "group": "org.apache.nifi",
+              "artifact": "nifi-kafka-3-integration-nar",
+              "version": "2.0.0"
+            },
+            "position": {
+              "x": 200.0,
+              "y": 200.0
+            },
+            "style": {},
+            "schedulingPeriod": "0 sec",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "executionNode": "ALL",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [],
+            "properties": {
+              "kafka-connection-service": "a1b2c3d4-0020-0000-0000-000000000001",
+              "topic": "orders.created",
+              "topic-type": "names",
+              "group-id": "{{KAFKA_CONSUMER_GROUP_ID}}",
+              "auto-offset-reset": "earliest",
+              "key-format": "byte-array",
+              "value-format": "record",
+              "record-reader": "a1b2c3d4-0020-0000-0000-000000000002",
+              "record-set-writer": "a1b2c3d4-0020-0000-0000-000000000003",
+              "header-encoding": "UTF-8",
+              "max-uncommitted-time": "1 secs",
+              "commit-offsets": "true"
+            },
+            "propertyDescriptors": {},
+            "scheduledState": "ENABLED"
+          },
+          {
+            "id": "a1b2c3d4-0010-0000-0000-000000000002",
+            "identifier": "a1b2c3d4-0010-0000-0000-000000000002",
+            "name": "Parse JSON Message",
+            "comments": "Transform: Deserialize raw Kafka bytes as JSON records using UpdateRecord (pass-through with JsonTreeReader/JsonRecordSetWriter to normalize the record)",
+            "type": "org.apache.nifi.processors.standard.UpdateRecord",
+            "bundle": {
+              "group": "org.apache.nifi",
+              "artifact": "nifi-standard-nar",
+              "version": "2.0.0"
+            },
+            "position": {
+              "x": 200.0,
+              "y": 450.0
+            },
+            "style": {},
+            "schedulingPeriod": "0 sec",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "executionNode": "ALL",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [
+              "failure"
+            ],
+            "properties": {
+              "record-reader": "a1b2c3d4-0020-0000-0000-000000000002",
+              "record-writer": "a1b2c3d4-0020-0000-0000-000000000003"
+            },
+            "propertyDescriptors": {},
+            "scheduledState": "ENABLED"
+          },
+          {
+            "id": "a1b2c3d4-0010-0000-0000-000000000003",
+            "identifier": "a1b2c3d4-0010-0000-0000-000000000003",
+            "name": "Extract Fields",
+            "comments": "Transform: Extract fields order_id, user_id, amount, created_at using QueryRecord",
+            "type": "org.apache.nifi.processors.standard.QueryRecord",
+            "bundle": {
+              "group": "org.apache.nifi",
+              "artifact": "nifi-standard-nar",
+              "version": "2.0.0"
+            },
+            "position": {
+              "x": 200.0,
+              "y": 700.0
+            },
+            "style": {},
+            "schedulingPeriod": "0 sec",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "executionNode": "ALL",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [
+              "failure",
+              "original"
+            ],
+            "properties": {
+              "record-reader": "a1b2c3d4-0020-0000-0000-000000000002",
+              "record-writer": "a1b2c3d4-0020-0000-0000-000000000003",
+              "include-zero-record-flowfiles": "false",
+              "extracted_order_fields": "SELECT order_id, user_id, amount, created_at FROM FLOWFILE"
+            },
+            "propertyDescriptors": {},
+            "scheduledState": "ENABLED"
+          },
+          {
+            "id": "a1b2c3d4-0010-0000-0000-000000000004",
+            "identifier": "a1b2c3d4-0010-0000-0000-000000000004",
+            "name": "PostgreSQL public.orders",
+            "comments": "Sink: Insert extracted records into PostgreSQL table public.orders",
+            "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+            "bundle": {
+              "group": "org.apache.nifi",
+              "artifact": "nifi-standard-nar",
+              "version": "2.0.0"
+            },
+            "position": {
+              "x": 200.0,
+              "y": 950.0
+            },
+            "style": {},
+            "schedulingPeriod": "0 sec",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "executionNode": "ALL",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [
+              "failure",
+              "retry"
+            ],
+            "properties": {
+              "record-reader": "a1b2c3d4-0020-0000-0000-000000000002",
+              "statement-type": "INSERT",
+              "dbcp-connection-pool": "a1b2c3d4-0020-0000-0000-000000000004",
+              "table-name": "public.orders",
+              "schema-name": "public",
+              "translate-field-names": "false",
+              "unmatched-field-behavior": "Ignore Unmatched Fields",
+              "unmatched-column-behavior": "Fail on Unmatched Columns",
+              "update-keys": "",
+              "field-containing-sql": "",
+              "quoted-identifiers": "false",
+              "query-timeout": "0 seconds",
+              "rollback-on-failure": "false",
+              "max-batch-size": "1000"
+            },
+            "propertyDescriptors": {},
+            "scheduledState": "ENABLED"
+          }
+        ],
+        "connections": [
+          {
+            "id": "a1b2c3d4-0030-0000-0000-000000000001",
+            "identifier": "a1b2c3d4-0030-0000-0000-000000000001",
+            "name": "source_kafka_orders -> process_parse_json",
+            "source": {
+              "id": "a1b2c3d4-0010-0000-0000-000000000001",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "a1b2c3d4-0010-0000-0000-000000000002",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "flowFileExpiration": "0 sec",
+            "prioritizers": [],
+            "bends": []
+          },
+          {
+            "id": "a1b2c3d4-0030-0000-0000-000000000002",
+            "identifier": "a1b2c3d4-0030-0000-0000-000000000002",
+            "name": "process_parse_json -> process_extract_fields",
+            "source": {
+              "id": "a1b2c3d4-0010-0000-0000-000000000002",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "a1b2c3d4-0010-0000-0000-000000000003",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "flowFileExpiration": "0 sec",
+            "prioritizers": [],
+            "bends": []
+          },
+          {
+            "id": "a1b2c3d4-0030-0000-0000-000000000003",
+            "identifier": "a1b2c3d4-0030-0000-0000-000000000003",
+            "name": "process_extract_fields -> sink_postgres_orders",
+            "source": {
+              "id": "a1b2c3d4-0010-0000-0000-000000000003",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "a1b2c3d4-0010-0000-0000-000000000004",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "extracted_order_fields"
+            ],
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "flowFileExpiration": "0 sec",
+            "prioritizers": [],
+            "bends": []
+          }
+        ],
+        "labels": [],
+        "funnels": [],
+        "controllerServices": [
+          {
+            "id": "a1b2c3d4-0020-0000-0000-000000000001",
+            "identifier": "a1b2c3d4-0020-0000-0000-000000000001",
+            "name": "Kafka3ConnectionService",
+            "comments": "Controller service for Kafka 3 broker connectivity",
+            "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+            "bundle": {
+              "group": "org.apache.nifi",
+              "artifact": "nifi-kafka-3-integration-nar",
+              "version": "2.0.0"
+            },
+            "properties": {
+              "bootstrap.servers": "{{KAFKA_BROKERS}}",
+              "security.protocol": "{{KAFKA_SECURITY_PROTOCOL}}",
+              "sasl.mechanism": "{{KAFKA_SASL_MECHANISM}}",
+              "sasl.username": "{{KAFKA_SASL_USERNAME}}",
+              "sasl.password": "{{KAFKA_SASL_PASSWORD}}"
+            },
+            "propertyDescriptors": {},
+            "scheduledState": "ENABLED",
+            "bulletinLevel": "WARN"
+          },
+          {
+            "id": "a1b2c3d4-0020-0000-0000-000000000002",
+            "identifier": "a1b2c3d4-0020-0000-0000-000000000002",
+            "name": "JsonTreeReader",
+            "comments": "Reads JSON records from FlowFile content",
+            "type": "org.apache.nifi.json.JsonTreeReader",
+            "bundle": {
+              "group": "org.apache.nifi",
+              "artifact": "nifi-record-serialization-services-nar",
+              "version": "2.0.0"
+            },
+            "properties": {
+              "schema-access-strategy": "infer-schema",
+              "date-format": "yyyy-MM-dd",
+              "time-format": "HH:mm:ss",
+              "timestamp-format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+            },
+            "propertyDescriptors": {},
+            "scheduledState": "ENABLED",
+            "bulletinLevel": "WARN"
+          },
+          {
+            "id": "a1b2c3d4-0020-0000-0000-000000000003",
+            "identifier": "a1b2c3d4-0020-0000-0000-000000000003",
+            "name": "JsonRecordSetWriter",
+            "comments": "Writes records as JSON to FlowFile content",
+            "type": "org.apache.nifi.json.JsonRecordSetWriter",
+            "bundle": {
+              "group": "org.apache.nifi",
+              "artifact": "nifi-record-serialization-services-nar",
+              "version": "2.0.0"
+            },
+            "properties": {
+              "schema-access-strategy": "inherit-record-schema",
+              "output-grouping": "output-array",
+              "pretty-print-json": "false",
+              "date-format": "yyyy-MM-dd",
+              "time-format": "HH:mm:ss",
+              "timestamp-format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+            },
+            "propertyDescriptors": {},
+            "scheduledState": "ENABLED",
+            "bulletinLevel": "WARN"
+          },
+          {
+            "id": "a1b2c3d4-0020-0000-0000-000000000004",
+            "identifier": "a1b2c3d4-0020-0000-0000-000000000004",
+            "name": "DBCPConnectionPool - PostgreSQL",
+            "comments": "DBCP connection pool for PostgreSQL public.orders",
+            "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+            "bundle": {
+              "group": "org.apache.nifi",
+              "artifact": "nifi-dbcp-service-nar",
+              "version": "2.0.0"
+            },
+            "properties": {
+              "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+              "Database Driver Class Name": "org.postgresql.Driver",
+              "database-driver-locations": "{{POSTGRESQL_JDBC_DRIVER_PATH}}",
+              "Database User": "{{DB_USERNAME}}",
+              "Password": "{{DB_PASSWORD}}",
+              "Max Wait Time": "500 millis",
+              "Max Total Connections": "8",
+              "Validation query": "SELECT 1"
+            },
+            "propertyDescriptors": {},
+            "scheduledState": "ENABLED",
+            "bulletinLevel": "WARN"
+          }
+        ],
+        "variables": {}
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details.",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 77.62,
+      "stage1_duration_sec": 9.45,
+      "stage2_duration_sec": 43.21,
+      "prompt_tokens": 2630,
+      "completion_tokens": 5065,
+      "total_tokens": 7695,
+      "cost_usd": 0.083865,
+      "nifi_processor_count": 4,
+      "nifi_connection_count": 3,
+      "pim_source_count": 1,
+      "pim_step_count": 2,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 221,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 1443,
+          "completion_tokens": 792,
+          "total_tokens": 2235,
+          "duration_ms": 9077,
+          "cost_usd": 0.016209
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 1067,
+          "completion_tokens": 4263,
+          "total_tokens": 5330,
+          "duration_ms": 43047,
+          "cost_usd": 0.067146
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1443,
+          "completion_tokens": 792,
+          "total_tokens": 2235,
+          "duration_ms": 9077,
+          "cost_usd": 0.016209
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 1067,
+          "completion_tokens": 4263,
+          "total_tokens": 5330,
+          "duration_ms": 43047,
+          "cost_usd": 0.067146
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

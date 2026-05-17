@@ -1,0 +1,35 @@
+
+================================================================
+Query  : ������� ����� ����� � https://api.exchangerate.host/latest � �������� ��...
+Mode   : 2 � LLMx2 (NL->YAML->LLM->JSON)
+Presets: [1002]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1002, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1002: openrouter minimax/minimax-m2.7  [minimax/minimax-m2.7] ---
+  [1/2] USER_QUERY  mode=2  preset=1002
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  [1/2] PIM ready  (730 chars, 15.3s)
+  [2/2] REQUEST_CONVERSION  mode=2  preset=1002
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (40s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (50s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (60s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (70s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (0 proc, 0 conn, 79.96s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 1972 in / 2045 out / 4017 total  |  cost: $0.003046
+  Result : [OK]  (128.86s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage7-minimax-extended\runs\currency-http-to-file__m2__p1002__a1__sp47d77dfa\raw_report.json

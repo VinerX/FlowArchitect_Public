@@ -1,0 +1,23 @@
+
+================================================================
+Query  : ����� CSV-����� �� ���������� /data/input/orders/, �������� ������ �����...
+Mode   : 1 � Adapter (NL->YAML->JSON)
+Presets: [1006]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1006, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1006: openrouter gemini 3 flash  [google/gemini-3-flash-preview] ---
+  [1/2] USER_QUERY  mode=1  preset=1006
+  [1/2] PIM ready  (955 chars, 4.7s)
+  [2/2] REQUEST_CONVERSION  mode=1  preset=1006
+  Result : [FAIL] {'error': 'manual_trigger_warning', 'details': "Trigger(s) ['trigger_manual'] have type 'manual'.\nThe flow will NOT start automatically in NiFi � someone must press Run in the NiFi UI.\nChange trigger type to 'schedule' or 'event' for production use."}  (4.78s)
+
+================================================================
+Results: 0/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage3-gemini3-flash\runs\file-csv-filter__m1__p1006__a1__spec98e7be\raw_report.json

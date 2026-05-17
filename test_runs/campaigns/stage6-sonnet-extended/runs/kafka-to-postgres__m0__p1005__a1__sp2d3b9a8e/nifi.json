@@ -1,0 +1,599 @@
+{
+  "encodingVersion": 1,
+  "maxTimerDrivenThreadCount": 10,
+  "maxEventDrivenThreadCount": 5,
+  "registries": [],
+  "parameterContexts": [
+    {
+      "identifier": "param-context-001",
+      "name": "Kafka-PostgreSQL Parameters",
+      "description": "Parameters for Kafka consumer and PostgreSQL connection",
+      "parameters": [
+        {
+          "name": "kafka.bootstrap.servers",
+          "value": "localhost:9092",
+          "sensitive": false,
+          "description": "Kafka bootstrap servers"
+        },
+        {
+          "name": "kafka.topic",
+          "value": "orders.created",
+          "sensitive": false,
+          "description": "Kafka topic to consume"
+        },
+        {
+          "name": "kafka.group.id",
+          "value": "nifi-orders-consumer-group",
+          "sensitive": false,
+          "description": "Kafka consumer group ID"
+        },
+        {
+          "name": "postgres.host",
+          "value": "localhost",
+          "sensitive": false,
+          "description": "PostgreSQL host"
+        },
+        {
+          "name": "postgres.port",
+          "value": "5432",
+          "sensitive": false,
+          "description": "PostgreSQL port"
+        },
+        {
+          "name": "postgres.database",
+          "value": "mydb",
+          "sensitive": false,
+          "description": "PostgreSQL database name"
+        },
+        {
+          "name": "postgres.username",
+          "value": "postgres",
+          "sensitive": false,
+          "description": "PostgreSQL username"
+        },
+        {
+          "name": "postgres.password",
+          "value": "secret",
+          "sensitive": true,
+          "description": "PostgreSQL password"
+        }
+      ]
+    }
+  ],
+  "controllerServices": [
+    {
+      "identifier": "cs-dbcp-001",
+      "name": "PostgreSQL Connection Pool",
+      "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-dbcp-service-nar",
+        "version": "1.23.2"
+      },
+      "properties": {
+        "Database Connection URL": "jdbc:postgresql://#{postgres.host}:#{postgres.port}/#{postgres.database}",
+        "Database Driver Class Name": "org.postgresql.Driver",
+        "database-driver-locations": "/opt/nifi/extra-libs/postgresql-42.6.0.jar",
+        "Database User": "#{postgres.username}",
+        "Password": "#{postgres.password}",
+        "Max Wait Time": "500 millis",
+        "Max Total Connections": "20",
+        "Min Idle Connections": "2",
+        "Max Idle Connections": "10",
+        "Max Connection Lifetime": "30 mins",
+        "Validation query": "SELECT 1"
+      },
+      "controllerServiceApis": [
+        {
+          "type": "org.apache.nifi.dbcp.DBCPService"
+        }
+      ],
+      "scheduledState": "ENABLED",
+      "bulletinLevel": "WARN"
+    },
+    {
+      "identifier": "cs-json-reader-001",
+      "name": "JsonTreeReader",
+      "type": "org.apache.nifi.json.JsonTreeReader",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-record-serialization-services-nar",
+        "version": "1.23.2"
+      },
+      "properties": {
+        "schema-access-strategy": "infer-schema",
+        "date-format": "yyyy-MM-dd",
+        "time-format": "HH:mm:ss",
+        "timestamp-format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      },
+      "controllerServiceApis": [
+        {
+          "type": "org.apache.nifi.serialization.RecordReaderFactory"
+        }
+      ],
+      "scheduledState": "ENABLED",
+      "bulletinLevel": "WARN"
+    },
+    {
+      "identifier": "cs-json-writer-001",
+      "name": "JsonRecordSetWriter",
+      "type": "org.apache.nifi.json.JsonRecordSetWriter",
+      "bundle": {
+        "group": "org.apache.nifi",
+        "artifact": "nifi-record-serialization-services-nar",
+        "version": "1.23.2"
+      },
+      "properties": {
+        "schema-write-strategy": "no-schema",
+        "output-grouping": "output-oneline",
+        "suppress-nulls": "never-suppress",
+        "pretty-print-json": "false",
+        "date-format": "yyyy-MM-dd",
+        "time-format": "HH:mm:ss",
+        "timestamp-format": "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+      },
+      "controllerServiceApis": [
+        {
+          "type": "org.apache.nifi.serialization.RecordSetWriterFactory"
+        }
+      ],
+      "scheduledState": "ENABLED",
+      "bulletinLevel": "WARN"
+    }
+  ],
+  "processGroups": [
+    {
+      "identifier": "pg-root-001",
+      "name": "Kafka orders.created → PostgreSQL public.orders",
+      "position": {
+        "x": 0.0,
+        "y": 0.0
+      },
+      "processGroups": [],
+      "remoteProcessGroups": [],
+      "processors": [
+        {
+          "identifier": "proc-consume-kafka-001",
+          "name": "ConsumeKafkaRecord_2_6 - orders.created",
+          "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafkaRecord_2_6",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-kafka-2-6-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 100.0,
+            "y": 200.0
+          },
+          "properties": {
+            "bootstrap.servers": "#{kafka.bootstrap.servers}",
+            "topic": "#{kafka.topic}",
+            "topic_type": "names",
+            "group.id": "#{kafka.group.id}",
+            "auto.offset.reset": "latest",
+            "key-attribute-encoding": "utf-8",
+            "message-demarcator": "",
+            "separate-by-key": "false",
+            "record-reader": "cs-json-reader-001",
+            "record-writer": "cs-json-writer-001",
+            "honor-transactions": "true",
+            "commit-offsets": "true",
+            "max-uncommit-offset-wait": "1 secs",
+            "max.poll.records": "10000",
+            "max-uncommitted-time": "1 secs",
+            "Communications Timeout": "60 secs",
+            "security.protocol": "PLAINTEXT",
+            "message-header-encoding": "UTF-8",
+            "header-name-regex": ""
+          },
+          "autoTerminatedRelationships": [],
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "1 sec",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "scheduledState": "RUNNING",
+          "retryCount": 10,
+          "retriedRelationships": [],
+          "backoffMechanism": "PENALIZE_FLOWFILE",
+          "maxBackoffPeriod": "10 mins",
+          "componentType": "PROCESSOR"
+        },
+        {
+          "identifier": "proc-query-record-001",
+          "name": "QueryRecord - Extract order fields",
+          "type": "org.apache.nifi.processors.standard.QueryRecord",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 500.0,
+            "y": 200.0
+          },
+          "properties": {
+            "record-reader": "cs-json-reader-001",
+            "record-writer": "cs-json-writer-001",
+            "include-zero-record-flowfiles": "false",
+            "cache-schema": "true",
+            "extracted_orders": "SELECT CAST(order_id AS VARCHAR) AS order_id, CAST(user_id AS VARCHAR) AS user_id, CAST(amount AS DOUBLE) AS amount, CAST(created_at AS VARCHAR) AS created_at FROM FLOWFILE WHERE order_id IS NOT NULL AND user_id IS NOT NULL AND amount IS NOT NULL AND created_at IS NOT NULL"
+          },
+          "autoTerminatedRelationships": [
+            "original",
+            "failure"
+          ],
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "0 sec",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 25,
+          "concurrentlySchedulableTaskCount": 2,
+          "scheduledState": "RUNNING",
+          "retryCount": 10,
+          "retriedRelationships": [],
+          "backoffMechanism": "PENALIZE_FLOWFILE",
+          "maxBackoffPeriod": "10 mins",
+          "componentType": "PROCESSOR"
+        },
+        {
+          "identifier": "proc-convert-record-001",
+          "name": "ConvertRecord - JSON to JSON normalized",
+          "type": "org.apache.nifi.processors.standard.ConvertRecord",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 900.0,
+            "y": 200.0
+          },
+          "properties": {
+            "record-reader": "cs-json-reader-001",
+            "record-writer": "cs-json-writer-001"
+          },
+          "autoTerminatedRelationships": [
+            "failure"
+          ],
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "0 sec",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 25,
+          "concurrentlySchedulableTaskCount": 2,
+          "scheduledState": "RUNNING",
+          "retryCount": 10,
+          "retriedRelationships": [],
+          "backoffMechanism": "PENALIZE_FLOWFILE",
+          "maxBackoffPeriod": "10 mins",
+          "componentType": "PROCESSOR"
+        },
+        {
+          "identifier": "proc-put-db-record-001",
+          "name": "PutDatabaseRecord - Insert into public.orders",
+          "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 1300.0,
+            "y": 200.0
+          },
+          "properties": {
+            "record-reader": "cs-json-reader-001",
+            "database-connection-pooling-service": "cs-dbcp-001",
+            "db-type": "PostgreSQL",
+            "statement-type": "INSERT",
+            "table-name": "public.orders",
+            "catalog-name": "",
+            "schema-name": "public",
+            "translate-field-names": "true",
+            "unmatched-field-behavior": "Ignore Unmatched Fields",
+            "unmatched-column-behavior": "Fail on Unmatched Columns",
+            "update-keys": "",
+            "field-containing-sql": "",
+            "allow-multiple-statements": "false",
+            "quote-identifiers": "false",
+            "quote-table-identifier": "false",
+            "query-timeout": "0 seconds",
+            "rollback-on-failure": "false",
+            "table-schema-cache-size": "100",
+            "max-batch-size": "1000"
+          },
+          "autoTerminatedRelationships": [
+            "success"
+          ],
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "0 sec",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 25,
+          "concurrentlySchedulableTaskCount": 2,
+          "scheduledState": "RUNNING",
+          "retryCount": 10,
+          "retriedRelationships": [],
+          "backoffMechanism": "PENALIZE_FLOWFILE",
+          "maxBackoffPeriod": "10 mins",
+          "componentType": "PROCESSOR"
+        },
+        {
+          "identifier": "proc-log-failure-001",
+          "name": "LogAttribute - Log DB Insert Failures",
+          "type": "org.apache.nifi.processors.standard.LogAttribute",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 1300.0,
+            "y": 450.0
+          },
+          "properties": {
+            "Log Level": "error",
+            "Log Payload": "true",
+            "Attributes to Log": "",
+            "Attributes to Ignore": "",
+            "Log prefix": "[DB-INSERT-FAILURE]",
+            "character-set": "UTF-8"
+          },
+          "autoTerminatedRelationships": [
+            "success"
+          ],
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "0 sec",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "scheduledState": "RUNNING",
+          "componentType": "PROCESSOR"
+        },
+        {
+          "identifier": "proc-log-parse-failure-001",
+          "name": "LogAttribute - Log Parse Failures",
+          "type": "org.apache.nifi.processors.standard.LogAttribute",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 100.0,
+            "y": 450.0
+          },
+          "properties": {
+            "Log Level": "warn",
+            "Log Payload": "true",
+            "Attributes to Log": "",
+            "Attributes to Ignore": "",
+            "Log prefix": "[KAFKA-PARSE-FAILURE]",
+            "character-set": "UTF-8"
+          },
+          "autoTerminatedRelationships": [
+            "success"
+          ],
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "schedulingPeriod": "0 sec",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "scheduledState": "RUNNING",
+          "componentType": "PROCESSOR"
+        }
+      ],
+      "connections": [
+        {
+          "identifier": "conn-001",
+          "name": "Kafka → QueryRecord (success)",
+          "source": {
+            "id": "proc-consume-kafka-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "ConsumeKafkaRecord_2_6 - orders.created"
+          },
+          "destination": {
+            "id": "proc-query-record-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "QueryRecord - Extract order fields"
+          },
+          "selectedRelationships": [
+            "success"
+          ],
+          "flowFileExpiration": "0 sec",
+          "backPressureDataSizeThreshold": "1 GB",
+          "backPressureObjectThreshold": 10000,
+          "labelIndex": 1,
+          "zIndex": 0,
+          "bendPoints": []
+        },
+        {
+          "identifier": "conn-002",
+          "name": "Kafka → LogAttribute (parse_failure)",
+          "source": {
+            "id": "proc-consume-kafka-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "ConsumeKafkaRecord_2_6 - orders.created"
+          },
+          "destination": {
+            "id": "proc-log-parse-failure-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "LogAttribute - Log Parse Failures"
+          },
+          "selectedRelationships": [
+            "parse.failure"
+          ],
+          "flowFileExpiration": "0 sec",
+          "backPressureDataSizeThreshold": "100 MB",
+          "backPressureObjectThreshold": 1000,
+          "labelIndex": 1,
+          "zIndex": 0,
+          "bendPoints": []
+        },
+        {
+          "identifier": "conn-003",
+          "name": "QueryRecord → ConvertRecord (extracted_orders)",
+          "source": {
+            "id": "proc-query-record-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "QueryRecord - Extract order fields"
+          },
+          "destination": {
+            "id": "proc-convert-record-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "ConvertRecord - JSON to JSON normalized"
+          },
+          "selectedRelationships": [
+            "extracted_orders"
+          ],
+          "flowFileExpiration": "0 sec",
+          "backPressureDataSizeThreshold": "1 GB",
+          "backPressureObjectThreshold": 10000,
+          "labelIndex": 1,
+          "zIndex": 0,
+          "bendPoints": []
+        },
+        {
+          "identifier": "conn-004",
+          "name": "ConvertRecord → PutDatabaseRecord (success)",
+          "source": {
+            "id": "proc-convert-record-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "ConvertRecord - JSON to JSON normalized"
+          },
+          "destination": {
+            "id": "proc-put-db-record-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "PutDatabaseRecord - Insert into public.orders"
+          },
+          "selectedRelationships": [
+            "success"
+          ],
+          "flowFileExpiration": "0 sec",
+          "backPressureDataSizeThreshold": "1 GB",
+          "backPressureObjectThreshold": 10000,
+          "labelIndex": 1,
+          "zIndex": 0,
+          "bendPoints": []
+        },
+        {
+          "identifier": "conn-005",
+          "name": "PutDatabaseRecord → LogAttribute (failure)",
+          "source": {
+            "id": "proc-put-db-record-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "PutDatabaseRecord - Insert into public.orders"
+          },
+          "destination": {
+            "id": "proc-log-failure-001",
+            "type": "PROCESSOR",
+            "groupId": "pg-root-001",
+            "name": "LogAttribute - Log DB Insert Failures"
+          },
+          "selectedRelationships": [
+            "failure"
+          ],
+          "flowFileExpiration": "0 sec",
+          "backPressureDataSizeThreshold": "100 MB",
+          "backPressureObjectThreshold": 1000,
+          "labelIndex": 1,
+          "zIndex": 0,
+          "bendPoints": []
+        }
+      ],
+      "labels": [
+        {
+          "identifier": "label-001",
+          "label": "STEP 1: Consume JSON records from Kafka topic orders.created",
+          "style": {
+            "background-color": "#e3f2fd",
+            "font-size": "14px",
+            "font-bold": "true"
+          },
+          "position": {
+            "x": 60.0,
+            "y": 100.0
+          },
+          "width": 380.0,
+          "height": 60.0,
+          "zIndex": 0
+        },
+        {
+          "identifier": "label-002",
+          "label": "STEP 2: Extract fields via SQL: order_id, user_id, amount, created_at",
+          "style": {
+            "background-color": "#e8f5e9",
+            "font-size": "14px",
+            "font-bold": "true"
+          },
+          "position": {
+            "x": 460.0,
+            "y": 100.0
+          },
+          "width": 420.0,
+          "height": 60.0,
+          "zIndex": 0
+        },
+        {
+          "identifier": "label-003",
+          "label": "STEP 3: Normalize records",
+          "style": {
+            "background-color": "#fff8e1",
+            "font-size": "14px",
+            "font-bold": "true"
+          },
+          "position": {
+            "x": 860.0,
+            "y": 100.0
+          },
+          "width": 220.0,
+          "height": 60.0,
+          "zIndex": 0
+        },
+        {
+          "identifier": "label-004",
+          "label": "STEP 4: INSERT into public.orders (PostgreSQL)",
+          "style": {
+            "background-color": "#fce4ec",
+            "font-size": "14px",
+            "font-bold": "true"
+          },
+          "position": {
+            "x": 1260.0,
+            "y": 100.0
+          },
+          "width": 360.0,
+          "height": 60.0,
+          "zIndex": 0
+        }
+      ],
+      "funnels": [],
+      "inputPorts": [],
+      "outputPorts": [],
+      "variables": {},
+      "parameterContextName": "Kafka-PostgreSQL Parameters",
+      "componentType": "PROCESS_GROUP",
+      "flowFileConcurrency": "UNBOUNDED",
+      "flowFileOutboundPolicy": "STREAM_WHEN_AVAILABLE"
+    }
+  ]
+}

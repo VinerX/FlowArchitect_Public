@@ -1,0 +1,31 @@
+
+================================================================
+Query  : ������� ����� ����� � https://api.exchangerate.host/latest � �������� ��...
+Mode   : 1 � Adapter (NL->YAML->JSON)
+Presets: [1000]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1000, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1000: openrouter qwen/qwen3.6-plus  [qwen/qwen3.6-plus] ---
+  [1/2] USER_QUERY  mode=1  preset=1000
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  ... waiting for YAML PIM (20s elapsed, timeout=300s)
+  ... waiting for YAML PIM (30s elapsed, timeout=300s)
+  ... waiting for YAML PIM (40s elapsed, timeout=300s)
+  [1/2] PIM ready  (801 chars, 43.28s)
+  [2/2] REQUEST_CONVERSION  mode=1  preset=1000
+  [2/2] NiFi JSON ready  (2 proc, 1 conn, 0.08s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 1429 in / 3063 out / 4492 total  |  cost: $0.004446
+  Result : [OK]  (77.3s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage4-dispersion-and-tc12\runs\currency-http-to-file__m1__p1000__a3__sp329ea448\raw_report.json

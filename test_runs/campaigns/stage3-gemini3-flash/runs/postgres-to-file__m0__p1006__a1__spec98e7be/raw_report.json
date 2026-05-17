@@ -1,0 +1,137 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:03:18.109375+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "revision": {
+          "version": 0
+        },
+        "component": {
+          "contents": {
+            "processors": [
+              {
+                "name": "QueryDatabaseTable",
+                "type": "org.apache.nifi.processors.standard.QueryDatabaseTable",
+                "config": {
+                  "schedulingPeriod": "60 sec",
+                  "properties": {
+                    "db-fetch-db-type": "PostgreSQL",
+                    "Database Connection Pool": "PostgreSQL_Pool",
+                    "Table Name": "orders",
+                    "Columns to Return": "*",
+                    "Maximum-value Columns": "id",
+                    "Output Format": "JSON"
+                  }
+                }
+              },
+              {
+                "name": "PutFile",
+                "type": "org.apache.nifi.processors.standard.PutFile",
+                "config": {
+                  "properties": {
+                    "Directory": "/data/output",
+                    "Conflict Resolution Strategy": "append"
+                  }
+                }
+              },
+              {
+                "name": "UpdateAttribute",
+                "type": "org.apache.nifi.processors.standard.UpdateAttribute",
+                "config": {
+                  "properties": {
+                    "filename": "orders_export.json"
+                  }
+                }
+              }
+            ],
+            "connections": [
+              {
+                "source": {
+                  "id": "QueryDatabaseTable",
+                  "type": "PROCESSOR"
+                },
+                "destination": {
+                  "id": "UpdateAttribute",
+                  "type": "PROCESSOR"
+                },
+                "selectedRelationships": [
+                  "success"
+                ]
+              },
+              {
+                "source": {
+                  "id": "UpdateAttribute",
+                  "type": "PROCESSOR"
+                },
+                "destination": {
+                  "id": "PutFile",
+                  "type": "PROCESSOR"
+                },
+                "selectedRelationships": [
+                  "success"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "2101b111-019e-1000-cf59-0110fe03b399",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 39.87,
+      "stage1_duration_sec": 5.51,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 139,
+      "completion_tokens": 482,
+      "total_tokens": 621,
+      "cost_usd": 0.001515,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 115,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 82,
+          "completion_tokens": 6,
+          "total_tokens": 88,
+          "duration_ms": 5250,
+          "cost_usd": 5.9e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 82,
+          "completion_tokens": 6,
+          "total_tokens": 88,
+          "duration_ms": 5250,
+          "cost_usd": 5.9e-05
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "run_id": "postgres-to-kafka__m3__p1006__a1__spec98e7be",
+  "case_id": "postgres-to-kafka",
+  "title": "PostgreSQL to Kafka",
+  "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 3,
+  "preset_id": 1006,
+  "stage_presets": {
+    "pim": 1006,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "postgres",
+      "kafka",
+      "level-2"
+    ],
+    "expected_behavior": "PENDING-записи публикуются в transactions.overdue.",
+    "manual_test_checklist": [
+      "Импортировать nifi.json.",
+      "Запустить поток.",
+      "Проверить сообщения через rpk topic consume transactions.overdue."
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-13T10:58:32.984152+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-13T11:13:35.599038+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-13T11:13:35.599038+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m3__p1006__a1__spec98e7be\\query.txt",
+    "--preset",
+    "1006",
+    "--mode",
+    "3",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage3-gemini3-flash\\runs\\postgres-to-kafka__m3__p1006__a1__spec98e7be\\raw_report.json",
+    "--pim-preset",
+    "1006",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 52.99,
+  "stage1_duration_sec": 18.75,
+  "stage2_duration_sec": 0.07,
+  "prompt_tokens": 1337,
+  "completion_tokens": 824,
+  "total_tokens": 2161,
+  "cost_usd": 0.00139,
+  "nifi_processor_count": 3,
+  "nifi_connection_count": 2,
+  "pim_source_count": 1,
+  "pim_step_count": 1,
+  "pim_sink_count": 1,
+  "session_id": 180,
+  "preset_id": 1002,
+  "preset_name": "openrouter minimax/minimax-m2.7",
+  "preset_model": "minimax/minimax-m2.7",
+  "llm_calls": [
+    {
+      "purpose": "pim_generation",
+      "provider": "common",
+      "model": "minimax/minimax-m2.7",
+      "prompt_tokens": 93,
+      "completion_tokens": 6,
+      "total_tokens": 99,
+      "duration_ms": 18313,
+      "cost_usd": 3.5e-05
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "pim_generation": {
+      "calls": 1,
+      "prompt_tokens": 93,
+      "completion_tokens": 6,
+      "total_tokens": 99,
+      "duration_ms": 18313,
+      "cost_usd": 3.5e-05
+    }
+  },
+  "nifi_import_success": true,
+  "nifi_error_count": 0,
+  "nifi_import_error": null
+}

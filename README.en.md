@@ -1,208 +1,213 @@
 # FlowArchitect
 
-**Diploma thesis** · HSE, Faculty of Informatics, Mathematics and Computer Science, 2026  
+**Diploma thesis** · HSE University, Faculty of Informatics, Mathematics and Computer Science, 2026  
 **Author:** Makarov Dmitry · **Supervisor:** Babkin Eduard Alexandrovich
 
----
+FlowArchitect is a PyQt6 desktop application for generating Apache NiFi ETL flows from natural-language descriptions. The main usage path is GUI-first: the user describes a pipeline in chat, reviews the intermediate YAML model, edits it if needed, and then converts it into NiFi JSON.
 
-## Overview
-
-FlowArchitect automates the creation of [Apache NiFi](https://nifi.apache.org/) ETL pipeline configurations from natural language descriptions using LLMs and Model-Driven Engineering (MDE).
-
-**Research hypothesis:** A two-stage approach (NL → YAML → NiFi JSON) produces fewer LLM hallucinations and better structural integrity than single-step direct generation (NL → JSON), because the intermediate YAML (Platform-Independent Model) separates semantic reasoning from structural complexity.
+Research hypothesis: the two-stage pipeline `NL → YAML → NiFi JSON` reduces LLM hallucinations and improves structural correctness compared with direct `NL → JSON` generation.
 
 ---
 
-## The MDA Pipeline
+## What The App Does
 
-Three generation modes are implemented and evaluated:
+- accepts ETL requirements in a chat interface;
+- generates a PIM model in YAML;
+- converts YAML into NiFi JSON in multiple modes;
+- lets the user inspect, edit, save, and import the result into NiFi;
+- stores session history and basic generation statistics.
 
-| Mode | Path | Description |
-|------|------|-------------|
-| **0 — Direct** | NL → LLM → NiFi JSON | Single call; highest hallucination risk |
-| **1 — Adapter** | NL → LLM → YAML → Rule-based adapter → NiFi JSON | Default mode; deterministic PIM→PSM conversion |
-| **2 — LLM-to-LLM** | NL → LLM → YAML → LLM → NiFi JSON | Two LLM calls; most flexible |
+## GUI-First Workflow
 
-**PIM (Platform-Independent Model):** YAML describing the pipeline abstractly — sources, processing steps, sinks, and links.  
-**PSM (Platform-Specific Model):** Apache NiFi JSON — processors, connections, UUIDs, process groups.
+1. The user describes the ETL task in chat.
+2. The LLM produces a PIM model shown in the YAML editor.
+3. The user adjusts YAML and fills placeholders if needed.
+4. The app generates NiFi JSON via the adapter or an LLM mode.
+5. The JSON can be saved or imported into NiFi from the UI.
+
+## Generation Modes
+
+| Mode | Path | Purpose |
+|------|------|---------|
+| `0 — Direct` | `NL → LLM → NiFi JSON` | single LLM call, highest hallucination risk |
+| `1 — Adapter` | `NL → LLM → YAML → Adapter → NiFi JSON` | main mode, deterministic PIM→PSM conversion |
+| `2 — LLM×2` | `NL → LLM → YAML → LLM → NiFi JSON` | flexible two-step generation |
+| `3 — Adapter+LLM` | `NL → LLM → YAML → Adapter → LLM corrector` | adapter output with LLM-based JSON correction |
+
+**PIM (Platform-Independent Model)** is a YAML description of sources, steps, sinks, and links.  
+**PSM (Platform-Specific Model)** is the resulting NiFi JSON with processors, connections, UUIDs, and process groups.
 
 ---
+
+## Application UI
+
+- **Chat panel** for user requests and service messages.
+- **Code editor** with `PIM — YAML` and `PSM — NiFi JSON` tabs.
+- **History panel** with sessions, rename/delete actions, and basic stats.
+- **Placeholder panel** for tracking unresolved `{{PLACEHOLDER}}` values.
+- **Settings / Stage Providers** for LLM provider selection per pipeline stage.
 
 ## Architecture
 
+```text
+User request in chat
+  → ChatController
+  → EventBus
+  → Orchestrator
+  → LLM: NL → PIM
+  → YAML shown in editor
+
+Generate NiFi Flow action
+  → EventBus
+  → Orchestrator
+  → YAML validation with Pydantic
+  → Adapter or LLM
+  → NiFi JSON shown in editor
+  → optional import into NiFi
 ```
-User Input (Chat)
-  → ChatController → EventBus → Orchestrator
-      → LLM (stage 1): NL → PIM (structured JSON/YAML)
-      → Display YAML in editor
 
-User clicks "Generate NiFi Flow"
-  → EventBus → Orchestrator
-      → Parse & validate YAML with Pydantic
-      → NiFiAdapter.convert(Flow) → NiFi JSON   [Mode 1]
-      → (or) LLM call → NiFi JSON               [Mode 2]
-      → Display JSON in editor
-```
-
-All components communicate through a thread-safe `EventBus` (weak-reference subscriber pattern). Controllers never call services directly.
-
----
-
-## Project Structure
-
-```
-FlowArchitect/
-├── src/
-│   ├── main.py                     # Entry point
-│   ├── adapters/
-│   │   └── nifi_adapter.py         # PIM → NiFi JSON (rule-based, auto-layout)
-│   ├── controllers/                # MVC: UI event handlers
-│   ├── core/
-│   │   ├── events.py               # Thread-safe EventBus
-│   │   └── event_defines.py        # Event name constants
-│   ├── domain/
-│   │   ├── pim_model.py            # Pydantic PIM schema (Flow, Resource, Step, Link)
-│   │   └── nifi_schema.py          # Pydantic NiFi schema
-│   ├── handlers/
-│   │   └── llm_engine.py           # LLM orchestration + provider routing
-│   ├── services/
-│   │   └── orchestrator.py         # Main MDA pipeline
-│   └── ui/                         # PyQt6 desktop GUI
-├── config/
-│   ├── api_presets.json.example    # Provider config template (copy & fill keys)
-│   ├── settings.json               # Runtime settings (theme, active preset)
-│   ├── PIM_structure.yaml          # Reference PIM schema example
-│   └── prompts/                    # LLM prompt templates
-│       ├── system_architect.txt    # NL → PIM generation prompt
-│       └── psm_nifi.txt            # YAML → NiFi (Mode 2) prompt
-├── tests/
-│   ├── unit/                       # Adapter unit tests (no API/NiFi needed)
-│   ├── integration/                # E2E tests (requires Gemini API + NiFi)
-│   └── fixtures/                   # PIM JSON fixtures for 4 ETL scenarios
-├── scripts/
-│   ├── run_adapter.py              # PIM → NiFi JSON (no LLM)
-│   ├── run_nl_test.py              # Full NL → NiFi test run
-│   ├── import_and_report.py        # Import to NiFi + capture validation errors
-│   └── full_pipeline.py            # PIM → adapter → import → report (one command)
-└── requirements.txt
-```
+Components communicate through a thread-safe `EventBus` instead of direct service calls.
 
 ---
 
 ## Quick Start
 
-### Prerequisites
+### Requirements
 
 - Python 3.11+
-- Apache NiFi 1.x or 2.x instance (for import tests only)
-- At least one LLM API key (Gemini, OpenAI, Groq, or any OpenAI-compatible endpoint)
+- at least one LLM API key;
+- Apache NiFi is only required for import and integration testing.
 
 ### Installation
 
-```bash
+```powershell
 git clone <repo-url>
 cd FlowArchitect
 
 python -m venv .venv
-# Windows:
-.venv\Scripts\activate
-# Linux/Mac:
-source .venv/bin/activate
-
+.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 ```
 
 ### Configuration
 
-```bash
-# Copy the example config and fill in your API keys
-cp config/api_presets.json.example config/api_presets.json
-# Edit config/api_presets.json — add your key(s)
+`config/api_presets.json` is already present in the repository. If you want a clean template, start from `config/api_presets.json.example` and fill in your provider keys and models.
+
+Check `config/settings.json` if you want to preconfigure theme, active preset, or NiFi settings.
+
+### Run The GUI
+
+```powershell
+python -m src.main
 ```
 
-### Run the application
+Typical usage:
 
-```bash
-cd src
-python main.py
-```
+1. Select a provider via `Provider` or `Settings`.
+2. Enter the task in chat.
+3. Review the generated YAML in the `PIM` tab.
+4. Run the desired JSON generation mode.
+5. Save the result or send it to NiFi with `→ NiFi`.
 
 ---
 
-## CLI Debug Tools (no GUI required)
+## Project Structure
 
-```bash
-# PIM YAML/JSON → NiFi JSON  (no LLM, no NiFi instance needed)
+```text
+src/
+  main.py                  # GUI entry point
+  controllers/             # UI event handlers
+  services/orchestrator.py # main MDA pipeline
+  adapters/nifi_adapter.py # rule-based PIM → NiFi JSON
+  domain/                  # Pydantic models for PIM and NiFi
+  handlers/llm_engine.py   # LLM calls and provider routing
+  ui/                      # PyQt6 interface
+
+config/
+  api_presets.json         # provider presets
+  settings.json            # runtime settings
+  prompts/                 # prompt templates
+  PIM_structure.yaml       # sample intermediate model
+
+tests/
+  unit/                    # adapter unit tests
+  integration/             # e2e and NiFi integration
+  fixtures/                # ready-made PIM scenarios
+
+scripts/
+  run_adapter.py
+  run_llm_fixture.py
+  import_and_report.py
+  full_pipeline.py
+```
+
+## Where To Start In Code
+
+- `src/services/orchestrator.py` for the full NL → PIM → PSM flow.
+- `src/adapters/nifi_adapter.py` for deterministic NiFi generation.
+- `src/domain/pim_model.py` for the intermediate schema.
+- `src/ui/main_window.py` for the main window layout.
+- `src/ui/code_editor.py` for generation modes, tabs, and NiFi import.
+
+---
+
+## CLI Scripts
+
+CLI support is secondary in this project. These scripts are mainly for adapter debugging, experiment replay, and integration checks without the GUI.
+
+```powershell
+# PIM JSON/YAML → NiFi JSON without an LLM
 python scripts/run_adapter.py tests/fixtures/kafka_to_postgres.json
 
-# Full automated test: NL description → NiFi import
-python scripts/run_nl_test.py --preset "Google" --case kafka-to-postgres
+# Replay a saved LLM response
+python scripts/run_llm_fixture.py --llm-response saved_llm_output.json --out result.json
 
-# Import NiFi JSON into a running NiFi, capture validation errors
+# Import JSON into NiFi and save an error report
 python scripts/import_and_report.py result.json --report errors.json
 
-# Full loop: PIM fixture → adapter → NiFi import → error report
+# Full fixture → adapter → import → report loop
 python scripts/full_pipeline.py tests/fixtures/kafka_to_postgres.json --report errors.json
 ```
 
-NiFi credentials are read from environment variables only:
+Detailed CLI workflow is documented in `docs/cli_testing.md`.
 
-```bash
-export NIFI_URL=https://localhost:8443
-export NIFI_USER=admin
-export NIFI_PASS=password
-```
+## Tests
 
----
+```powershell
+# unit tests without tokens or NiFi
+pytest tests/unit/test_adapter_unit.py -v
 
-## Running Tests
-
-```bash
-# Unit tests — no tokens, no NiFi needed
-pytest tests/unit/ -v
-
-# All tests
+# full test suite
 pytest tests/ -v
 
-# E2E integration (requires live Gemini API + running NiFi)
-set GEMINI_MODEL=gemini-2.0-flash    # Windows
+# integration tests
+$env:GEMINI_MODEL = "gemini-2.0-flash"
 pytest tests/integration/ -v -s
 ```
 
-**Test scenarios:**
-
-| Case | Description |
-|------|-------------|
-| `currency-http-to-file` | REST API → file |
-| `kafka-to-postgres` | Kafka → PostgreSQL |
-| `postgres-to-kafka` | PostgreSQL → Kafka |
-| `s3-to-hdfs` | S3 → HDFS |
-
-Integration tests auto-skip when NiFi or the LLM API is unavailable.
-
----
-
-## Evaluation Metrics
-
-| Metric | Description |
-|--------|-------------|
-| **PCT** (Platform Conformance Test) | Does generated JSON import into NiFi without errors? |
-| **Functional Correctness** | Does the imported flow execute the ETL task correctly? |
-| **Effort Reduction** | Time to deploy with generator vs. manual configuration |
-
----
+Main scenarios: `currency-http-to-file`, `kafka-to-postgres`, `postgres-to-kafka`, `s3-to-hdfs`.
 
 ## Tech Stack
 
-- **Python 3**, **PyQt6** — desktop GUI
-- **Pydantic** — strict schema validation for PIM and NiFi models
-- **PyYAML** — PIM serialization
-- **requests / openai SDK** — LLM API calls (no heavy frameworks, for thesis transparency)
-- **pytest** — unit + integration tests
-- Supported LLM providers: Google Gemini, OpenAI, Groq, Mistral, any OpenAI-compatible endpoint
+- Python 3.12
+- PyQt6
+- Pydantic 2
+- PyYAML
+- requests / openai SDK
+- pytest
 
----
+Supported providers include Google Gemini, OpenAI, Groq, and OpenAI-compatible endpoints.
+
+## Research Context
+
+The project formalizes and evaluates an MDE approach to Apache NiFi configuration generation. The key idea is to move semantic flow description into a smaller, editable YAML layer and handle NiFi JSON structural complexity separately.
+
+Evaluation metrics:
+
+- `PCT` — whether generated JSON imports into NiFi without errors;
+- functional correctness of the resulting flow;
+- effort reduction compared with manual configuration.
 
 ## License
 
-Academic project — HSE diploma thesis, 2026. Not licensed for commercial use.
+Academic project for an HSE diploma thesis. Not intended for commercial use.

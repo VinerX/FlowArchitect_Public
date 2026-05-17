@@ -1,0 +1,83 @@
+{
+  "id": "018d5a2b-0000-0000-0000-000000000000",
+  "parentGroupId": null,
+  "name": "Currency Rates Fetcher",
+  "comments": "Fetches latest exchange rates from exchangerate.host and saves to rates.json",
+  "position": {
+    "x": 0,
+    "y": 0
+  },
+  "processors": [
+    {
+      "id": "018d5a2b-0000-0000-0000-000000000001",
+      "name": "Fetch Exchange Rates",
+      "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+      "position": {
+        "x": 100,
+        "y": 100
+      },
+      "config": {
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "24 hours",
+        "executionNode": "ALL",
+        "properties": {
+          "Remote URL": "https://api.exchangerate.host/latest",
+          "HTTP Method": "GET",
+          "Accept": "application/json",
+          "SSL Context Service": "{{SSL_CONTEXT_SERVICE}}",
+          "Connection Timeout": "{{CONNECTION_TIMEOUT}}",
+          "Read Timeout": "{{READ_TIMEOUT}}"
+        },
+        "autoTerminatedRelationships": [],
+        "concurrentlySchedulableTaskCount": "1"
+      }
+    },
+    {
+      "id": "018d5a2b-0000-0000-0000-000000000002",
+      "name": "Save to JSON File",
+      "type": "org.apache.nifi.processors.standard.PutFile",
+      "position": {
+        "x": 400,
+        "y": 100
+      },
+      "config": {
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "properties": {
+          "Directory": "{{OUTPUT_DIRECTORY}}",
+          "Filename": "rates.json",
+          "Conflict Resolution Strategy": "replace",
+          "Create Missing Directories": "true",
+          "Permissions": "{{FILE_PERMISSIONS}}",
+          "Maximum File Size": "{{MAX_FILE_SIZE}}"
+        },
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ],
+        "concurrentlySchedulableTaskCount": "1"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "018d5a2b-0000-0000-0000-000000000003",
+      "name": "source_http_api to sink_file",
+      "source": {
+        "id": "018d5a2b-0000-0000-0000-000000000001",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "018d5a2b-0000-0000-0000-000000000002",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureObjectThreshold": 10000,
+      "backPressureDataSizeThreshold": "1 GB"
+    }
+  ]
+}

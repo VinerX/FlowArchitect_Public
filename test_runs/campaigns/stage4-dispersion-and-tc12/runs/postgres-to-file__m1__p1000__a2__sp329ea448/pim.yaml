@@ -1,0 +1,46 @@
+flow:
+  id: postgres_orders_to_json
+  name: PostgreSQL Orders to JSON Export
+  description: Periodically extracts new records from PostgreSQL public.orders and
+    saves them to a JSON file.
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 1 hour
+sources:
+- id: source_postgres
+  name: Read PostgreSQL Orders
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processing_elements:
+- id: process_incremental
+  name: Filter New Records
+  operation: Filter
+  config:
+    condition: created_at > {{LAST_SYNC_TIMESTAMP}}
+sinks:
+- id: sink_json_file
+  name: Write to JSON File
+  type: JSON File
+  location: /data/output/orders_export.json
+  connection:
+    properties:
+      format: json
+      mode: overwrite
+processed_data:
+- id: orders_json
+  format: json
+links:
+- from_id: source_postgres
+  to_id: process_incremental
+  data_ref: orders_json
+- from_id: process_incremental
+  to_id: sink_json_file
+  data_ref: orders_json

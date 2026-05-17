@@ -1,0 +1,109 @@
+{
+  "flowContents": {
+    "identifier": "kafka-to-postgres-flow",
+    "name": "Kafka to PostgreSQL",
+    "processors": [
+      {
+        "identifier": "consume-kafka",
+        "name": "ConsumeKafkaRecord_2_6",
+        "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafkaRecord_2_6",
+        "position": {
+          "x": 100,
+          "y": 100
+        },
+        "config": {
+          "properties": {
+            "bootstrap.servers": "localhost:9092",
+            "topic": "orders",
+            "group.id": "nifi-orders-consumer",
+            "record-reader": "json-reader-id",
+            "auto.offset.reset": "earliest"
+          },
+          "schedulingPeriod": "0 sec",
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "executionNode": "ALL",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "autoTerminatedRelationships": []
+        }
+      },
+      {
+        "identifier": "put-database",
+        "name": "PutDatabaseRecord",
+        "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+        "position": {
+          "x": 100,
+          "y": 300
+        },
+        "config": {
+          "properties": {
+            "record-reader": "json-reader-id",
+            "dbcp-connection-pool": "dbcp-pool-id",
+            "table-name": "orders",
+            "statement-type": "INSERT",
+            "translate-field-names": "true",
+            "unmatched-column-behavior": "IGNORE_UNMATCHED_COLUMNS"
+          },
+          "schedulingPeriod": "0 sec",
+          "schedulingStrategy": "TIMER_DRIVEN",
+          "executionNode": "ALL",
+          "penaltyDuration": "30 sec",
+          "yieldDuration": "1 sec",
+          "bulletinLevel": "WARN",
+          "runDurationMillis": 0,
+          "concurrentlySchedulableTaskCount": 1,
+          "autoTerminatedRelationships": [
+            "failure",
+            "retry"
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "conn-kafka-to-db",
+        "name": "Kafka to DB",
+        "source": {
+          "id": "consume-kafka",
+          "type": "PROCESSOR"
+        },
+        "destination": {
+          "id": "put-database",
+          "type": "PROCESSOR"
+        },
+        "selectedRelationships": [
+          "success"
+        ]
+      }
+    ],
+    "controllerServices": [
+      {
+        "identifier": "json-reader-id",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "properties": {
+          "schema-access-strategy": "infer-schema"
+        },
+        "state": "ENABLED"
+      },
+      {
+        "identifier": "dbcp-pool-id",
+        "name": "PostgreSQL DBCPConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "properties": {
+          "database-driver-class-name": "org.postgresql.Driver",
+          "database-connection-url": "jdbc:postgresql://localhost:5432/orders_db",
+          "database-user": "nifi_user",
+          "database-password": "nifi_password",
+          "max-wait-time": "500 millis",
+          "max-total-connections": "5",
+          "validation-query": "SELECT 1"
+        },
+        "state": "ENABLED"
+      }
+    ]
+  }
+}

@@ -1,0 +1,247 @@
+{
+  "id": "a1b2c3d4-0001-0000-0000-000000000000",
+  "name": "PostgreSQL Orders to JSON Export",
+  "comments": "Периодически выбирает новые записи из таблицы public.orders в PostgreSQL и сохраняет их в JSON-файл /data/output/orders_export.json",
+  "position": {
+    "x": 0,
+    "y": 0
+  },
+  "processGroups": [],
+  "remoteProcessGroups": [],
+  "labels": [],
+  "funnels": [],
+  "controllerServices": [
+    {
+      "id": "cs-0001-dbcp-0000-000000000001",
+      "name": "DBCPConnectionPool - PostgreSQL Orders",
+      "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+      "comments": "JDBC connection pool for PostgreSQL public.orders",
+      "properties": {
+        "Database Connection URL": "jdbc:postgresql://{{POSTGRES_HOST}}:{{POSTGRES_PORT}}/{{POSTGRES_DATABASE}}",
+        "Database Driver Class Name": "org.postgresql.Driver",
+        "database-driver-locations": "{{POSTGRES_JDBC_DRIVER_PATH}}",
+        "Database User": "{{POSTGRES_USERNAME}}",
+        "Password": "{{POSTGRES_PASSWORD}}",
+        "Max Wait Time": "500 millis",
+        "Max Total Connections": "8",
+        "Validation query": "SELECT 1"
+      },
+      "state": "ENABLED"
+    },
+    {
+      "id": "cs-0002-jsonreader-0000-000000000002",
+      "name": "JsonTreeReader",
+      "type": "org.apache.nifi.json.JsonTreeReader",
+      "comments": "Reads JSON records",
+      "properties": {
+        "schema-access-strategy": "infer-schema",
+        "schema-name": "${schema.name}"
+      },
+      "state": "ENABLED"
+    },
+    {
+      "id": "cs-0003-jsonwriter-0000-000000000003",
+      "name": "JsonRecordSetWriter",
+      "type": "org.apache.nifi.json.JsonRecordSetWriter",
+      "comments": "Writes records as JSON (one record per line, no pretty print)",
+      "properties": {
+        "schema-access-strategy": "inherit-record-schema",
+        "schema-name": "${schema.name}",
+        "Pretty Print JSON": "false",
+        "suppress-nulls": "never-suppress",
+        "output-grouping": "output-oneline"
+      },
+      "state": "ENABLED"
+    }
+  ],
+  "processors": [
+    {
+      "id": "proc-0001-querydb-0000-000000000010",
+      "name": "Read New Orders from PostgreSQL",
+      "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+      "comments": "Queries public.orders table for new records using watermark on created_at. Runs every 5 minutes.",
+      "position": {
+        "x": 200,
+        "y": 100
+      },
+      "config": {
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "5 min",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "properties": {
+          "dbcp-connection-pool": "cs-0001-dbcp-0000-000000000001",
+          "db-fetch-db-type": "PostgreSQL",
+          "db-fetch-table-name": "public.orders",
+          "db-fetch-column-names": "",
+          "db-fetch-where-clause": "",
+          "db-fetch-max-value-column-names": "created_at",
+          "db-fetch-initial-max-value": "{{LAST_PROCESSED_TIMESTAMP}}",
+          "db-fetch-fetch-size": "10000",
+          "db-fetch-max-rows": "0",
+          "db-fetch-normalize-table-name": "false",
+          "record-writer": "cs-0003-jsonwriter-0000-000000000003"
+        },
+        "autoTerminatedRelationships": []
+      }
+    },
+    {
+      "id": "proc-0002-queryrecord-0000-000000000020",
+      "name": "Filter New Records",
+      "type": "org.apache.nifi.processors.standard.QueryRecord",
+      "comments": "Filters records where created_at is greater than the last processed watermark timestamp.",
+      "position": {
+        "x": 200,
+        "y": 300
+      },
+      "config": {
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "properties": {
+          "record-reader": "cs-0002-jsonreader-0000-000000000002",
+          "record-writer": "cs-0003-jsonwriter-0000-000000000003",
+          "include-zero-record-flowfiles": "false",
+          "cache-schema": "true",
+          "filtered": "SELECT * FROM FLOWFILE WHERE created_at > CAST('{{LAST_PROCESSED_TIMESTAMP}}' AS TIMESTAMP)"
+        },
+        "autoTerminatedRelationships": [
+          "failure",
+          "original"
+        ]
+      }
+    },
+    {
+      "id": "proc-0003-convertrecord-0000-000000000030",
+      "name": "Convert to JSON",
+      "type": "org.apache.nifi.processors.standard.ConvertRecord",
+      "comments": "Converts tabular records to JSON format (no pretty print, UTF-8).",
+      "position": {
+        "x": 200,
+        "y": 500
+      },
+      "config": {
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "properties": {
+          "record-reader": "cs-0002-jsonreader-0000-000000000002",
+          "record-writer": "cs-0003-jsonwriter-0000-000000000003"
+        },
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      }
+    },
+    {
+      "id": "proc-0004-putfile-0000-000000000040",
+      "name": "Write to JSON File",
+      "type": "org.apache.nifi.processors.standard.PutFile",
+      "comments": "Appends JSON records to /data/output/orders_export.json with UTF-8 encoding.",
+      "position": {
+        "x": 200,
+        "y": 700
+      },
+      "config": {
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "properties": {
+          "Directory": "/data/output",
+          "Filename": "orders_export.json",
+          "Conflict Resolution Strategy": "append",
+          "Create Missing Directories": "true",
+          "Maximum File Count": "-1",
+          "Last Modified Time": "",
+          "Permissions": "",
+          "Owner": "",
+          "Group": ""
+        },
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "conn-0001-0000-0000-000000000100",
+      "name": "Read New Orders -> Filter New Records",
+      "source": {
+        "id": "proc-0001-querydb-0000-000000000010",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-0002-queryrecord-0000-000000000020",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": 10000,
+      "labelIndex": 1,
+      "zIndex": 0,
+      "bends": []
+    },
+    {
+      "id": "conn-0002-0000-0000-000000000200",
+      "name": "Filter New Records -> Convert to JSON",
+      "source": {
+        "id": "proc-0002-queryrecord-0000-000000000020",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-0003-convertrecord-0000-000000000030",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "filtered"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": 10000,
+      "labelIndex": 1,
+      "zIndex": 0,
+      "bends": []
+    },
+    {
+      "id": "conn-0003-0000-0000-000000000300",
+      "name": "Convert to JSON -> Write to JSON File",
+      "source": {
+        "id": "proc-0003-convertrecord-0000-000000000030",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-0004-putfile-0000-000000000040",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": 10000,
+      "labelIndex": 1,
+      "zIndex": 0,
+      "bends": []
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+flow:
+  id: kafka_orders_to_pg
+  name: Kafka Orders to PostgreSQL
+  description: Consume messages from Kafka topic orders.created, parse JSON, extract
+    specific fields, and insert into PostgreSQL table public.orders
+triggers:
+- id: trigger_event
+  type: event
+  condition: new message published to orders.created
+sources:
+- id: source_kafka
+  name: Read Kafka Topic
+  type: Kafka
+  location: orders.created
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_CONSUMER_GROUP}}'
+      security_protocol: '{{KAFKA_SECURITY_PROTOCOL}}'
+processing_elements:
+- id: process_parse_extract
+  name: Parse JSON and Extract Fields
+  operation: Extract
+  config:
+    format: json
+    fields:
+    - order_id
+    - user_id
+    - amount
+    - created_at
+sinks:
+- id: sink_postgres
+  name: Insert to PostgreSQL
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processed_data:
+- id: extracted_orders
+  format: tabular
+links:
+- from_id: source_kafka
+  to_id: process_parse_extract
+  data_ref: extracted_orders
+- from_id: process_parse_extract
+  to_id: sink_postgres
+  data_ref: extracted_orders

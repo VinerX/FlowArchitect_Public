@@ -1,0 +1,38 @@
+{
+  "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-11T16:57:42.460639+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: kafka_orders_to_postgres\n  name: Kafka Orders to PostgreSQL\n  description: Read JSON messages from Kafka topic orders, transform to table rows,\n    write to PostgreSQL\ntriggers:\n- id: trigger_on_message\n  type: event\n  condition: on new message in Kafka topic orders\nsources:\n- id: source_kafka_orders\n  name: Read orders from Kafka\n  type: Kafka\n  location: orders\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      group_id: '{{KAFKA_GROUP_ID}}'\n      topic: orders\nprocessing_elements:\n- id: process_json_to_row\n  name: Convert JSON to Table Row\n  operation: json_to_row\n  config:\n    mapping: '{{TABLE_MAPPING}}'\nsinks:\n- id: sink_postgres\n  name: Write to PostgreSQL\n  type: PostgreSQL\n  location: '{{TABLE_NAME}}'\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\nprocessed_data:\n- id: orders_json\n  format: json\n- id: orders_row\n  format: tabular\nlinks:\n- from_id: source_kafka_orders\n  to_id: process_json_to_row\n  data_ref: orders_json\n- from_id: process_json_to_row\n  to_id: sink_postgres\n  data_ref: orders_row",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for NiFi JSON",
+      "duration_sec": 353.91,
+      "stage1_duration_sec": 53.68,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1004,
+        "nifi_corrector": 1004
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

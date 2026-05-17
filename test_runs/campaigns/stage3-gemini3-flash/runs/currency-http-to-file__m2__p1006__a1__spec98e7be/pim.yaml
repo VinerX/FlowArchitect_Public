@@ -1,0 +1,35 @@
+flow:
+  id: exchange_rate_fetcher
+  name: Exchange Rate to JSON Flow
+  description: Fetches latest exchange rates from an API and saves them to a local
+    JSON file.
+triggers:
+- id: trigger_daily
+  type: schedule
+  condition: 0 0 * * *
+sources:
+- id: source_api
+  name: Exchange Rate API
+  type: HTTP_REST
+  location: https://api.exchangerate.host/latest
+  connection:
+    properties:
+      method: GET
+      auth_type: none
+processing_elements: []
+sinks:
+- id: sink_file
+  name: Local JSON File
+  type: File
+  location: /data/output/rates.json
+  connection:
+    properties:
+      format: json
+      write_mode: overwrite
+processed_data:
+- id: exchange_data
+  format: json
+links:
+- from_id: source_api
+  to_id: sink_file
+  data_ref: exchange_data

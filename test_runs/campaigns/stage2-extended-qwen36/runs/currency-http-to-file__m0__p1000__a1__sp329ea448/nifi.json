@@ -1,0 +1,146 @@
+{
+  "processGroupFlow": {
+    "id": "root",
+    "uri": "http://localhost:8080/nifi-api/process-groups/root/flow",
+    "processGroupFlow": {
+      "id": "root",
+      "parentGroupId": null,
+      "processGroup": {
+        "id": "root",
+        "parentGroupId": null,
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "name": "Exchange Rates Flow"
+      },
+      "processors": [
+        {
+          "id": "550e8400-e29b-41d4-a716-446655440000",
+          "parentGroupId": "root",
+          "position": {
+            "x": 200,
+            "y": 200
+          },
+          "config": {
+            "name": "InvokeHTTP",
+            "comments": "",
+            "schedulingPeriod": "0 sec",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "executionNode": "ALL",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [
+              "Failure",
+              "No Retry",
+              "Original",
+              "Retry"
+            ],
+            "properties": {
+              "HTTP Method": "GET",
+              "Remote URL": "https://api.exchangerate.host/latest",
+              "Connection Timeout": "5 secs",
+              "Read Timeout": "15 secs",
+              "Include Response Body": "true"
+            },
+            "propertyDescriptors": {
+              "HTTP Method": {
+                "displayName": "HTTP Method",
+                "identifiesControllerService": false,
+                "sensitive": false
+              },
+              "Remote URL": {
+                "displayName": "Remote URL",
+                "identifiesControllerService": false,
+                "sensitive": false
+              }
+            }
+          },
+          "style": {},
+          "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          }
+        },
+        {
+          "id": "660e8400-e29b-41d4-a716-446655440001",
+          "parentGroupId": "root",
+          "position": {
+            "x": 600,
+            "y": 200
+          },
+          "config": {
+            "name": "PutFile",
+            "comments": "",
+            "schedulingPeriod": "0 sec",
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "executionNode": "ALL",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [
+              "failure"
+            ],
+            "properties": {
+              "Directory": "/data/output",
+              "Conflict Resolution Strategy": "replace"
+            },
+            "propertyDescriptors": {
+              "Directory": {
+                "displayName": "Directory",
+                "identifiesControllerService": false,
+                "sensitive": false
+              },
+              "Conflict Resolution Strategy": {
+                "displayName": "Conflict Resolution Strategy",
+                "identifiesControllerService": false,
+                "sensitive": false
+              }
+            }
+          },
+          "style": {},
+          "type": "org.apache.nifi.processors.standard.PutFile",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          }
+        }
+      ],
+      "connections": [
+        {
+          "id": "770e8400-e29b-41d4-a716-446655440002",
+          "parentGroupId": "root",
+          "source": {
+            "id": "550e8400-e29b-41d4-a716-446655440000",
+            "type": "PROCESSOR",
+            "groupId": "root",
+            "name": "InvokeHTTP"
+          },
+          "destination": {
+            "id": "660e8400-e29b-41d4-a716-446655440001",
+            "type": "PROCESSOR",
+            "groupId": "root",
+            "name": "PutFile"
+          },
+          "selectedRelationships": [
+            "Response"
+          ],
+          "backPressureObjectThreshold": 10000,
+          "backPressureDataSizeThreshold": "1 GB",
+          "flowFileExpiration": "0 sec",
+          "labelIndex": 0,
+          "zIndex": 0,
+          "name": "InvokeHTTP to PutFile"
+        }
+      ]
+    }
+  }
+}

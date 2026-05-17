@@ -1,0 +1,38 @@
+{
+  "query": "Считывай сообщения из Kafka topic orders.created, парси JSON, извлекай поля order_id, user_id, amount, created_at и вставляй строки в таблицу public.orders в PostgreSQL.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T17:32:27.670905+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: flow-1\n  name: Example Flow\n  description: A sample PIMFlow\ntriggers:\n- id: trigger-1\n  type: manual\n  condition: User initiates the process\nsources:\n- id: source-1\n  name: Input Data Source\n  type: database\n  location: db://user_data/records\nprocessing_elements:\n- id: processing-1\n  name: Data Transformation\n  operation: transform\n  config:\n    fields:\n    - name\n    - email\n    action: cleanse\nsinks:\n- id: sink-1\n  name: Output Data Sink\n  type: file\n  location: s3://processed-data/output.csv\nprocessed_data:\n- id: data-1\n  format: csv\nlinks:\n- from_id: source-1\n  to_id: processing-1\n  data_ref: data-1\n- from_id: processing-1\n  to_id: sink-1\n  data_ref: data-1",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for NiFi JSON",
+      "duration_sec": 350.54,
+      "stage1_duration_sec": 50.32,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

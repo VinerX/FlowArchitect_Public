@@ -1,0 +1,27 @@
+flow:
+  id: exchange_rates_pipeline
+  name: Exchange Rates Fetcher
+  description: Fetches latest exchange rates from exchangerate.host and saves them
+    to a JSON file
+triggers:
+- id: trigger_daily
+  type: schedule
+  condition: daily
+sources:
+- id: source_api
+  name: Fetch Exchange Rates
+  type: HTTP
+  location: https://api.exchangerate.host/latest
+processing_elements: []
+sinks:
+- id: sink_file
+  name: Save to File
+  type: File
+  location: rates.json
+processed_data:
+- id: rates_json
+  format: json
+links:
+- from_id: source_api
+  to_id: sink_file
+  data_ref: rates_json

@@ -1,0 +1,38 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T16:18:23.744949+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: exchange_rates_pipeline\n  name: Exchange Rates Pipeline\n  description: Fetch currency exchange rates from API and save to file\ntriggers:\n- id: trigger_main\n  type: schedule\n  condition: every day\nsources:\n- id: source_api\n  name: Exchange Rate API\n  type: HTTP\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\nprocessing_elements: []\nsinks:\n- id: sink_file\n  name: Save to File\n  type: File\n  location: /data/output/rates.json\nprocessed_data:\n- id: rates_json\n  format: json\nlinks:\n- from_id: source_api\n  to_id: sink_file\n  data_ref: rates_json",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for NiFi JSON",
+      "duration_sec": 322.82,
+      "stage1_duration_sec": 22.58,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 0,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

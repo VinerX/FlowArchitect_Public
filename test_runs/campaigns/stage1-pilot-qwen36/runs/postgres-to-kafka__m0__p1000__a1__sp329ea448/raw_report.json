@@ -1,0 +1,168 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-11T11:50:22.438172+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "root-pg",
+          "name": "root",
+          "processGroups": [
+            {
+              "identifier": "pg-main",
+              "name": "PostgreSQL to Kafka",
+              "processors": [
+                {
+                  "identifier": "proc-query",
+                  "name": "QueryDatabaseTableRecord",
+                  "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+                  "position": {
+                    "x": 100,
+                    "y": 100
+                  },
+                  "config": {
+                    "schedulingPeriod": "1 min",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "properties": {
+                      "Database Connection Pooling Service": "cs-dbcp",
+                      "Table Name": "your_table_name",
+                      "Maximum-value Columns": "id",
+                      "Record Writer": "cs-json-writer",
+                      "Stateful Variables Initial Value": "0"
+                    },
+                    "autoTerminatedRelationships": [
+                      "failure"
+                    ]
+                  }
+                },
+                {
+                  "identifier": "proc-kafka",
+                  "name": "PublishKafka_2_6",
+                  "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+                  "position": {
+                    "x": 100,
+                    "y": 300
+                  },
+                  "config": {
+                    "schedulingPeriod": "0 sec",
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "properties": {
+                      "Kafka Brokers": "localhost:9092",
+                      "Topic Name": "analytics.events",
+                      "Use Transactions": "false",
+                      "Message Delimiter": "\\n"
+                    },
+                    "autoTerminatedRelationships": [
+                      "failure",
+                      "success"
+                    ]
+                  }
+                }
+              ],
+              "connections": [
+                {
+                  "identifier": "conn-1",
+                  "source": {
+                    "id": "proc-query",
+                    "groupId": "pg-main"
+                  },
+                  "destination": {
+                    "id": "proc-kafka",
+                    "groupId": "pg-main"
+                  },
+                  "selectedRelationships": [
+                    "success"
+                  ],
+                  "name": "query to kafka"
+                }
+              ]
+            }
+          ]
+        },
+        "controllerServices": [
+          {
+            "identifier": "cs-dbcp",
+            "name": "PostgreSQL DBCPConnectionPool",
+            "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+            "properties": {
+              "Database Connection URL": "jdbc:postgresql://localhost:5432/your_database",
+              "Database Driver Class Name": "org.postgresql.Driver",
+              "Database User": "your_username",
+              "Password": "your_password",
+              "Max Wait Time": "500 ms",
+              "Max Total Connections": "10",
+              "Validation-query": "SELECT 1"
+            },
+            "state": "ENABLED"
+          },
+          {
+            "identifier": "cs-json-writer",
+            "name": "JsonRecordSetWriter",
+            "type": "org.apache.nifi.json.JsonRecordSetWriter",
+            "properties": {
+              "Schema Access Strategy": "inferred-record",
+              "Schema Registry": null,
+              "Schema Write Strategy": "schema-name"
+            },
+            "state": "ENABLED"
+          }
+        ]
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details.",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 257.51,
+      "stage1_duration_sec": 241.44,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 126,
+      "completion_tokens": 13190,
+      "total_tokens": 13316,
+      "cost_usd": 0.017188,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 43,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 63,
+          "completion_tokens": 5564,
+          "total_tokens": 5627,
+          "duration_ms": 241125,
+          "cost_usd": 0.007254
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 63,
+          "completion_tokens": 5564,
+          "total_tokens": 5627,
+          "duration_ms": 241125,
+          "cost_usd": 0.007254
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

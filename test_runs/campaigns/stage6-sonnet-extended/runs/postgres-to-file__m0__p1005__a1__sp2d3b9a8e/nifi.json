@@ -1,0 +1,303 @@
+{
+  "flowController": {
+    "name": "PostgreSQL Orders to JSON File",
+    "comment": "Periodically fetch new records from PostgreSQL public.orders and save to JSON file"
+  },
+  "controllerServices": [
+    {
+      "identifier": "cs-001",
+      "name": "DBCPConnectionPool-PostgreSQL",
+      "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+      "properties": {
+        "Database Connection URL": "jdbc:postgresql://localhost:5432/your_database",
+        "Database Driver Class Name": "org.postgresql.Driver",
+        "database-driver-locations": "/opt/nifi/drivers/postgresql-42.6.0.jar",
+        "Database User": "your_pg_user",
+        "Password": "your_pg_password",
+        "Max Wait Time": "500 millis",
+        "Max Total Connections": "8",
+        "Validation query": "SELECT 1"
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "comment": "PostgreSQL JDBC Connection Pool"
+    },
+    {
+      "identifier": "cs-002",
+      "name": "JsonRecordSetWriter",
+      "type": "org.apache.nifi.json.JsonRecordSetWriter",
+      "properties": {
+        "Schema Write Strategy": "No Schema",
+        "Pretty Print JSON": "true",
+        "Output Grouping": "One Line Per Object",
+        "Suppress Null Values": "Never Suppress",
+        "schema-access-strategy": "inherit-record-schema"
+      },
+      "comment": "Writes records as JSON"
+    }
+  ],
+  "processors": [
+    {
+      "identifier": "proc-001",
+      "name": "QueryDatabaseTableRecord",
+      "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+      "comment": "Periodically query new records from public.orders using incremental loading",
+      "properties": {
+        "Database Connection Pooling Service": "cs-001",
+        "Database Type": "PostgreSQL",
+        "Table Name": "public.orders",
+        "Columns to Return": "",
+        "Additional WHERE clause": "",
+        "Maximum-value Columns": "id",
+        "Max Rows Per Flow File": "1000",
+        "Output Batch Size": "0",
+        "Fetch Size": "0",
+        "record-writer": "cs-002",
+        "Use Avro Logical Types": "false",
+        "Default Decimal Precision": "10",
+        "Default Decimal Scale": "0"
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "60 sec",
+      "executionNode": "ALL",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "autoTerminatedRelationships": []
+    },
+    {
+      "identifier": "proc-002",
+      "name": "MergeContent",
+      "type": "org.apache.nifi.processors.standard.MergeContent",
+      "comment": "Merge multiple FlowFiles into a single JSON array",
+      "properties": {
+        "Merge Strategy": "Bin-Packing Algorithm",
+        "Merge Format": "Binary Concatenation",
+        "Correlation Attribute Name": "",
+        "Minimum Number of Entries": "1",
+        "Maximum Number of Entries": "1000",
+        "Minimum Group Size": "0 B",
+        "Maximum Group Size": "10 MB",
+        "Max Bin Age": "30 sec",
+        "Maximum number of Bins": "5",
+        "Header File": "",
+        "Footer File": "",
+        "Demarcator File": "",
+        "Compression Level": "1",
+        "Keep Path": "false"
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "0 sec",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "autoTerminatedRelationships": [
+        "failure",
+        "original"
+      ]
+    },
+    {
+      "identifier": "proc-003",
+      "name": "UpdateAttribute-SetFilename",
+      "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+      "comment": "Set the target filename and directory for the output JSON file",
+      "properties": {
+        "filename": "orders_export.json",
+        "absolute.path": "/data/output/",
+        "mime.type": "application/json"
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "0 sec",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "autoTerminatedRelationships": []
+    },
+    {
+      "identifier": "proc-004",
+      "name": "PutFile",
+      "type": "org.apache.nifi.processors.standard.PutFile",
+      "comment": "Write the JSON content to /data/output/orders_export.json",
+      "properties": {
+        "Directory": "/data/output",
+        "Conflict Resolution Strategy": "replace",
+        "Create Missing Directories": "true",
+        "Maximum File Count": "-1",
+        "Last Modified Time": "",
+        "Permissions": "",
+        "Owner": "",
+        "Group": ""
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "0 sec",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "autoTerminatedRelationships": [
+        "success",
+        "failure"
+      ]
+    },
+    {
+      "identifier": "proc-005",
+      "name": "LogAttribute-Success",
+      "type": "org.apache.nifi.processors.standard.LogAttribute",
+      "comment": "Log successful file writes",
+      "properties": {
+        "Log Level": "INFO",
+        "Log Payload": "false",
+        "Attributes to Log": "filename,absolute.path,file.size",
+        "Attributes to Log by Regular Expression": "",
+        "Attributes to Ignore": "",
+        "Attributes to Ignore by Regular Expression": "",
+        "Log prefix": "[Orders Export SUCCESS] "
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "0 sec",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "autoTerminatedRelationships": [
+        "success"
+      ]
+    },
+    {
+      "identifier": "proc-006",
+      "name": "LogAttribute-Failure",
+      "type": "org.apache.nifi.processors.standard.LogAttribute",
+      "comment": "Log any failures for troubleshooting",
+      "properties": {
+        "Log Level": "ERROR",
+        "Log Payload": "true",
+        "Attributes to Log": "",
+        "Attributes to Log by Regular Expression": ".*",
+        "Attributes to Ignore": "",
+        "Attributes to Ignore by Regular Expression": "",
+        "Log prefix": "[Orders Export FAILURE] "
+      },
+      "schedulingStrategy": "TIMER_DRIVEN",
+      "schedulingPeriod": "0 sec",
+      "penaltyDuration": "30 sec",
+      "yieldDuration": "1 sec",
+      "autoTerminatedRelationships": [
+        "success"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "identifier": "conn-001",
+      "name": "QueryDatabaseTableRecord -> MergeContent",
+      "source": {
+        "id": "proc-001",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-002",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": "10000",
+      "labelIndex": 1,
+      "zIndex": 0
+    },
+    {
+      "identifier": "conn-002",
+      "name": "QueryDatabaseTableRecord -> LogAttribute-Failure (failure)",
+      "source": {
+        "id": "proc-001",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-006",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "failure"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": "10000",
+      "labelIndex": 1,
+      "zIndex": 0
+    },
+    {
+      "identifier": "conn-003",
+      "name": "MergeContent -> UpdateAttribute-SetFilename (merged)",
+      "source": {
+        "id": "proc-002",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-003",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "merged"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": "10000",
+      "labelIndex": 1,
+      "zIndex": 0
+    },
+    {
+      "identifier": "conn-004",
+      "name": "UpdateAttribute-SetFilename -> PutFile",
+      "source": {
+        "id": "proc-003",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-004",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": "10000",
+      "labelIndex": 1,
+      "zIndex": 0
+    },
+    {
+      "identifier": "conn-005",
+      "name": "PutFile -> LogAttribute-Success (success)",
+      "source": {
+        "id": "proc-004",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-005",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "success"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": "10000",
+      "labelIndex": 1,
+      "zIndex": 0
+    },
+    {
+      "identifier": "conn-006",
+      "name": "PutFile -> LogAttribute-Failure (failure)",
+      "source": {
+        "id": "proc-004",
+        "type": "PROCESSOR"
+      },
+      "destination": {
+        "id": "proc-006",
+        "type": "PROCESSOR"
+      },
+      "selectedRelationships": [
+        "failure"
+      ],
+      "flowFileExpiration": "0 sec",
+      "backPressureDataSizeThreshold": "1 GB",
+      "backPressureObjectThreshold": "10000",
+      "labelIndex": 1,
+      "zIndex": 0
+    }
+  ]
+}

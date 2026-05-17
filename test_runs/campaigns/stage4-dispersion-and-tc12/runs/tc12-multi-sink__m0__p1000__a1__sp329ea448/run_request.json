@@ -1,0 +1,62 @@
+{
+  "run_id": "tc12-multi-sink__m0__p1000__a1__sp329ea448",
+  "case_id": "tc12-multi-sink",
+  "title": "Multi-Sink Complex Pipeline (TC-12)",
+  "query": "Забирай данные о транзакциях из REST API банка https://api.bank.example.com/transactions каждые 30 секунд, фильтруй транзакции на сумму более 100000 рублей, обогащай данные информацией о клиенте из PostgreSQL-таблицы public.clients по полю client_id, результат публикуй в Kafka-топик high_value_transactions и параллельно сохраняй в S3 бакет compliance-archive с партиционированием по дате.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 0,
+  "preset_id": 1000,
+  "stage_presets": {
+    "pim": 1000,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": false,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "boundary",
+      "multi-sink",
+      "level-4"
+    ],
+    "expected_behavior": "Полный конвейер с HTTP-источником, фильтрацией, enrichment из PG и двумя стоками (Kafka + S3 с партиционированием).\n"
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-13T15:22:47.530289+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-13T15:36:03.238898+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-13T15:36:03.238898+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m0__p1000__a1__sp329ea448\\query.txt",
+    "--preset",
+    "1000",
+    "--mode",
+    "0",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage4-dispersion-and-tc12\\runs\\tc12-multi-sink__m0__p1000__a1__sp329ea448\\raw_report.json",
+    "--pim-preset",
+    "1000",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

@@ -1,0 +1,95 @@
+{
+  "identifier": "7f8e9a1b-2c3d-4e5f-6a7b-8c9d0e1f2a3b",
+  "name": "Kafka to DB and Kafka Flow",
+  "componentType": "PROCESS_GROUP",
+  "processors": [
+    {
+      "identifier": "consume-kafka",
+      "name": "ConsumeKafka_2_6",
+      "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafka_2_6",
+      "properties": {
+        "bootstrap.servers": "localhost:9092",
+        "topic": "events.all",
+        "group.id": "nifi-consumer-group",
+        "honor.transactions": "false"
+      }
+    },
+    {
+      "identifier": "route-by-type",
+      "name": "RouteOnAttribute",
+      "type": "org.apache.nifi.processors.standard.RouteOnAttribute",
+      "properties": {
+        "Routing Strategy": "Route to Property name",
+        "purchase": "${type:equals('purchase')}",
+        "refund": "${type:equals('refund')}"
+      }
+    },
+    {
+      "identifier": "extract-type",
+      "name": "EvaluateJsonPath",
+      "type": "org.apache.nifi.processors.standard.EvaluateJsonPath",
+      "properties": {
+        "Destination": "flowfile-attribute",
+        "type": "$.type"
+      }
+    },
+    {
+      "identifier": "put-postgres-purchases",
+      "name": "PutDatabaseRecord_Purchases",
+      "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+      "properties": {
+        "Database Connection Pool": "PostgreSQL_Pool",
+        "Statement Type": "INSERT",
+        "Table Name": "purchases",
+        "Record Reader": "JSONTreeReader"
+      }
+    },
+    {
+      "identifier": "put-postgres-refunds",
+      "name": "PutDatabaseRecord_Refunds",
+      "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+      "properties": {
+        "Database Connection Pool": "PostgreSQL_Pool",
+        "Statement Type": "INSERT",
+        "Table Name": "refunds",
+        "Record Reader": "JSONTreeReader"
+      }
+    },
+    {
+      "identifier": "publish-unknown",
+      "name": "PublishKafka_2_6",
+      "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+      "properties": {
+        "bootstrap.servers": "localhost:9092",
+        "topic": "events.unknown"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "source": "consume-kafka",
+      "destination": "extract-type",
+      "relationship": "success"
+    },
+    {
+      "source": "extract-type",
+      "destination": "route-by-type",
+      "relationship": "matched"
+    },
+    {
+      "source": "route-by-type",
+      "destination": "put-postgres-purchases",
+      "relationship": "purchase"
+    },
+    {
+      "source": "route-by-type",
+      "destination": "put-postgres-refunds",
+      "relationship": "refund"
+    },
+    {
+      "source": "route-by-type",
+      "destination": "publish-unknown",
+      "relationship": "unmatched"
+    }
+  ]
+}

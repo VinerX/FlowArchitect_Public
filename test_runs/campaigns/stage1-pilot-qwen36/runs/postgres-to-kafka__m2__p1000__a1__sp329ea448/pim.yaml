@@ -1,0 +1,46 @@
+flow:
+  id: pg_kafka_periodic_sync
+  name: PostgreSQL to Kafka Periodic Sync
+  description: Periodically extracts new records from PostgreSQL and publishes them
+    to Kafka topic analytics.events in JSON format.
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 10 minutes
+sources:
+- id: source_postgres
+  name: Read from PostgreSQL
+  type: PostgreSQL
+  location: '{{PG_TABLE_NAME}}'
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processing_elements:
+- id: process_transform
+  name: Filter New Records & Format JSON
+  operation: Transform
+  config:
+    incremental_logic: select_new_records
+    output_format: json
+sinks:
+- id: sink_kafka
+  name: Publish to Kafka
+  type: Kafka
+  location: analytics.events
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+processed_data:
+- id: events_json
+  format: json
+links:
+- from_id: source_postgres
+  to_id: process_transform
+  data_ref: events_json
+- from_id: process_transform
+  to_id: sink_kafka
+  data_ref: events_json

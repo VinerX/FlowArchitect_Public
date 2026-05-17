@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 260.71,
+  "stage1_duration_sec": 244.51,
+  "stage2_duration_sec": null,
+  "prompt_tokens": 154,
+  "completion_tokens": 13380,
+  "total_tokens": 13534,
+  "cost_usd": 0.017444,
+  "nifi_processor_count": 4,
+  "nifi_connection_count": 3,
+  "pim_source_count": null,
+  "pim_step_count": null,
+  "pim_sink_count": null,
+  "session_id": 81,
+  "preset_id": 1000,
+  "preset_name": "openrouter qwen/qwen3.6-plus",
+  "preset_model": "qwen/qwen3.6-plus",
+  "llm_calls": [
+    {
+      "purpose": "direct",
+      "provider": "common",
+      "model": "qwen/qwen3.6-plus",
+      "prompt_tokens": 77,
+      "completion_tokens": 6207,
+      "total_tokens": 6284,
+      "duration_ms": 244141,
+      "cost_usd": 0.008094
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "direct": {
+      "calls": 1,
+      "prompt_tokens": 77,
+      "completion_tokens": 6207,
+      "total_tokens": 6284,
+      "duration_ms": 244141,
+      "cost_usd": 0.008094
+    }
+  },
+  "nifi_import_success": false,
+  "nifi_error_count": 0,
+  "nifi_import_error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details."
+}

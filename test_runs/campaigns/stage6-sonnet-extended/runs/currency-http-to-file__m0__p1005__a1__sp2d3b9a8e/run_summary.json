@@ -1,0 +1,45 @@
+{
+  "success": true,
+  "error": null,
+  "duration_sec": 65.38,
+  "stage1_duration_sec": 49.4,
+  "stage2_duration_sec": null,
+  "prompt_tokens": 172,
+  "completion_tokens": 5185,
+  "total_tokens": 5357,
+  "cost_usd": 0.078291,
+  "nifi_processor_count": 6,
+  "nifi_connection_count": 6,
+  "pim_source_count": null,
+  "pim_step_count": null,
+  "pim_sink_count": null,
+  "session_id": 207,
+  "preset_id": 1005,
+  "preset_name": "openrouter sonnet 4.6",
+  "preset_model": "anthropic/claude-sonnet-4.6",
+  "llm_calls": [
+    {
+      "purpose": "direct",
+      "provider": "common",
+      "model": "anthropic/claude-sonnet-4.6",
+      "prompt_tokens": 101,
+      "completion_tokens": 10,
+      "total_tokens": 111,
+      "duration_ms": 49063,
+      "cost_usd": 0.000453
+    }
+  ],
+  "llm_usage_by_purpose": {
+    "direct": {
+      "calls": 1,
+      "prompt_tokens": 101,
+      "completion_tokens": 10,
+      "total_tokens": 111,
+      "duration_ms": 49063,
+      "cost_usd": 0.000453
+    }
+  },
+  "nifi_import_success": false,
+  "nifi_error_count": 0,
+  "nifi_import_error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details."
+}

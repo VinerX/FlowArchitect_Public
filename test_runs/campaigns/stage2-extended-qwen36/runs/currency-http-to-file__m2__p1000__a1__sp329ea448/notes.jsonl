@@ -1,0 +1,1 @@
+{"timestamp": "2026-05-12T18:49:56.089293+00:00", "author": "agent", "kind": "status_change_note", "text": "Mode 2 во всех остальных кейсах падает по timeout; закрываем без повтора чтобы не жечь токены", "run_id": "currency-http-to-file__m2__p1000__a1__sp329ea448"}

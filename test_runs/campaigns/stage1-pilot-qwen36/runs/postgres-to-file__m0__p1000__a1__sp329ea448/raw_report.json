@@ -1,0 +1,168 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл orders_export.json.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-11T10:59:35.299894+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flow": {
+          "processGroups": [
+            {
+              "id": "pg-export-orders",
+              "name": "PostgreSQL to JSON Export",
+              "position": {
+                "x": 0,
+                "y": 0
+              },
+              "processors": [
+                {
+                  "id": "proc-query-db",
+                  "name": "QueryDatabaseTableRecord",
+                  "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+                  "position": {
+                    "x": 100,
+                    "y": 100
+                  },
+                  "config": {
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "schedulingPeriod": "5 min",
+                    "properties": {
+                      "database-connection-pooling-service": "dbcp-pool",
+                      "table-name": "public.orders",
+                      "maximum-value-columns": "id",
+                      "record-writer": "json-writer",
+                      "statefully-track": "true"
+                    },
+                    "autoTerminatedRelationships": []
+                  }
+                },
+                {
+                  "id": "proc-put-file",
+                  "name": "PutFile",
+                  "type": "org.apache.nifi.processors.standard.PutFile",
+                  "position": {
+                    "x": 100,
+                    "y": 300
+                  },
+                  "config": {
+                    "schedulingStrategy": "TIMER_DRIVEN",
+                    "schedulingPeriod": "0 sec",
+                    "properties": {
+                      "Directory": "./output",
+                      "Conflict Resolution Strategy": "replace",
+                      "Filename": "orders_export.json"
+                    },
+                    "autoTerminatedRelationships": [
+                      "success",
+                      "failure"
+                    ]
+                  }
+                }
+              ],
+              "connections": [
+                {
+                  "id": "conn-query-to-file",
+                  "name": "Query to File",
+                  "source": {
+                    "id": "proc-query-db",
+                    "type": "PROCESSOR",
+                    "groupId": "pg-export-orders"
+                  },
+                  "destination": {
+                    "id": "proc-put-file",
+                    "type": "PROCESSOR",
+                    "groupId": "pg-export-orders"
+                  },
+                  "selectedRelationships": [
+                    "success"
+                  ],
+                  "backPressureObjectThreshold": 10000,
+                  "backPressureDataSizeThreshold": "1 GB"
+                }
+              ],
+              "controllerServices": [
+                {
+                  "id": "dbcp-pool",
+                  "name": "PostgreSQL DBCPConnectionPool",
+                  "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+                  "properties": {
+                    "Database Driver Location": "",
+                    "Database Driver Class Name": "org.postgresql.Driver",
+                    "Database Connection URL": "jdbc:postgresql://localhost:5432/mydb",
+                    "Database User": "postgres",
+                    "Password": "postgres"
+                  },
+                  "state": "ENABLED"
+                },
+                {
+                  "id": "json-writer",
+                  "name": "JsonRecordSetWriter",
+                  "type": "org.apache.nifi.json.JsonRecordSetWriter",
+                  "properties": {
+                    "Schema Access Strategy": "Inherit Record Schema"
+                  },
+                  "state": "ENABLED"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "16b2fb54-019e-1000-5804-293af666a978",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 131.89,
+      "stage1_duration_sec": 97.98,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 159,
+      "completion_tokens": 6206,
+      "total_tokens": 6365,
+      "cost_usd": 0.008119,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 39,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 93,
+          "completion_tokens": 874,
+          "total_tokens": 967,
+          "duration_ms": 97671,
+          "cost_usd": 0.001166
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 93,
+          "completion_tokens": 874,
+          "total_tokens": 967,
+          "duration_ms": 97671,
+          "cost_usd": 0.001166
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

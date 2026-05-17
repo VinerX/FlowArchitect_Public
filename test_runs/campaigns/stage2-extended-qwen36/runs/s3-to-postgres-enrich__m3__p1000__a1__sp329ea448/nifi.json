@@ -1,0 +1,223 @@
+{
+  "flowContents": {
+    "identifier": "6cea7e3a-14bd-49fc-a1ea-803cd5a8ce8f",
+    "name": "S3 Raw Logs to PostgreSQL Event Log",
+    "comments": "Hourly pipeline to read JSON files from S3, add processed_at timestamp, and load into PostgreSQL.",
+    "processors": [
+      {
+        "identifier": "0ba05c39-a05b-4fdd-8ee0-8e3e34162b16",
+        "name": "Read S3 JSON Logs",
+        "comments": "Generated from PIM source 'source_s3_logs' (S3)",
+        "type": "org.apache.nifi.processors.aws.s3.FetchS3Object",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-aws-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Bucket": "raw-logs",
+          "Object Key": "${filename}",
+          "Region": "{{AWS_REGION}}",
+          "bucket": "raw-logs",
+          "aws_access_key_id": "{{AWS_ACCESS_KEY_ID}}",
+          "aws_secret_access_key": "{{AWS_SECRET_ACCESS_KEY}}",
+          "region": "{{AWS_REGION}}"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      },
+      {
+        "identifier": "1b396379-ff7b-4fdd-8004-200570f63f1a",
+        "name": "Add processed_at Field",
+        "comments": "Generated from PIM processing element 'process_add_timestamp' (Transform)",
+        "type": "org.apache.nifi.processors.standard.UpdateRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 460.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Record Writer": "ea60d2d2-b985-42b2-8ce9-721a5a1f373c",
+          "Record Reader": "d7bf99f8-0927-494e-8025-447b84090ed6",
+          "add_field": "processed_at",
+          "value": "${now()}"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure"
+        ]
+      },
+      {
+        "identifier": "941741c6-2107-4311-904c-3d35dde8f33b",
+        "name": "Write to PostgreSQL",
+        "comments": "Generated from PIM sink 'sink_postgres' (PostgreSQL)",
+        "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Table Name": "public.event_log",
+          "Statement Type": "INSERT",
+          "Database Connection Pooling Service": "e77e1a55-62ae-420d-bcf6-a452e4405561",
+          "Record Reader": "d7bf99f8-0927-494e-8025-447b84090ed6"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure",
+          "retry"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "79941653-3c6f-4993-83c0-00d8e3dec7b0",
+        "name": "Read S3 JSON Logs -> Add processed_at Field",
+        "comments": "logs_json",
+        "source": {
+          "id": "0ba05c39-a05b-4fdd-8ee0-8e3e34162b16",
+          "groupId": "6cea7e3a-14bd-49fc-a1ea-803cd5a8ce8f",
+          "type": "PROCESSOR",
+          "name": "Read S3 JSON Logs"
+        },
+        "destination": {
+          "id": "1b396379-ff7b-4fdd-8004-200570f63f1a",
+          "groupId": "6cea7e3a-14bd-49fc-a1ea-803cd5a8ce8f",
+          "type": "PROCESSOR",
+          "name": "Add processed_at Field"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      },
+      {
+        "identifier": "5d882b0e-1076-4d81-9407-5c05fc23810a",
+        "name": "Add processed_at Field -> Write to PostgreSQL",
+        "comments": "logs_json",
+        "source": {
+          "id": "1b396379-ff7b-4fdd-8004-200570f63f1a",
+          "groupId": "6cea7e3a-14bd-49fc-a1ea-803cd5a8ce8f",
+          "type": "PROCESSOR",
+          "name": "Add processed_at Field"
+        },
+        "destination": {
+          "id": "941741c6-2107-4311-904c-3d35dde8f33b",
+          "groupId": "6cea7e3a-14bd-49fc-a1ea-803cd5a8ce8f",
+          "type": "PROCESSOR",
+          "name": "Write to PostgreSQL"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": [
+      {
+        "identifier": "e77e1a55-62ae-420d-bcf6-a452e4405561",
+        "name": "DatabaseConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-dbcp-service-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database User": "{{DB_USERNAME}}",
+          "Password": "{{DB_PASSWORD}}"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "d7bf99f8-0927-494e-8025-447b84090ed6",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Access Strategy": "Infer Schema"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "ea60d2d2-b985-42b2-8ce9-721a5a1f373c",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Write Strategy": "Do Not Write Schema"
+        },
+        "propertyDescriptors": {}
+      }
+    ]
+  }
+}

@@ -1,0 +1,62 @@
+flow:
+  id: kafka_orders_to_postgres
+  name: Kafka Orders to PostgreSQL Pipeline
+  description: Read orders.created topic from Kafka, parse JSON, extract fields and
+    insert into PostgreSQL public.orders table
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: continuous
+sources:
+- id: source_kafka
+  name: Kafka Orders Source
+  type: Kafka
+  location: orders.created
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: orders_to_postgres_group
+      auto_offset_reset: earliest
+processing_elements:
+- id: parse_json
+  name: Parse JSON Message
+  operation: ParseJSON
+  config: {}
+- id: extract_fields
+  name: Extract Order Fields
+  operation: SelectFields
+  config:
+    fields:
+    - order_id
+    - user_id
+    - amount
+    - created_at
+sinks:
+- id: sink_postgres
+  name: PostgreSQL Orders Sink
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processed_data:
+- id: raw_message
+  format: string
+- id: parsed_order
+  format: json
+- id: order_record
+  format: row
+links:
+- from_id: source_kafka
+  to_id: parse_json
+  data_ref: raw_message
+- from_id: parse_json
+  to_id: extract_fields
+  data_ref: parsed_order
+- from_id: extract_fields
+  to_id: sink_postgres
+  data_ref: order_record

@@ -1,0 +1,98 @@
+[37mINFO     [settings_manager.py:36]       | Settings loaded successfully.[0m
+[37mINFO     [api_preset_manager.py:270]    | [ApiPresetsManager] initialized[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'session.list_updated'[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'chat_user_message_saved'[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'chat_new_message'[0m
+[37mINFO     [provider_manager.py:26]       | Registered 3 providers: ['openai', 'gemini', 'common'][0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 1/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'etl_pim_generated'[0m
+[37mINFO     [provider_manager.py:26]       | Registered 3 providers: ['openai', 'gemini', 'common'][0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 1/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[37mINFO     [placeholder_manager.py:211]   | PlaceholderManager: loaded 2 global entries[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'chat_new_message'[0m
+[37mINFO     [provider_manager.py:26]       | Registered 3 providers: ['openai', 'gemini', 'common'][0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 1/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'session.name_updated'[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'session.list_updated'[0m
+[31mERROR    [llm_request_runner.py:95]     | Attempt 1 timed out after 120.0s.[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'on_failed_attempt_for_response'[0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 2/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[31mERROR    [llm_request_runner.py:97]     | Error during generation attempt 2: Response ended prematurely[0m
+Traceback (most recent call last):
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\models.py", line 820, in generate
+    yield from self.raw.stream(chunk_size, decode_content=True)
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\response.py", line 1250, in stream
+    yield from self.read_chunked(amt, decode_content=decode_content)
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\response.py", line 1418, in read_chunked
+    self._update_chunk_length()
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\urllib3\response.py", line 1344, in _update_chunk_length
+    raise ProtocolError("Response ended prematurely") from None
+urllib3.exceptions.ProtocolError: Response ended prematurely
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "F:\Education\Diplom\FlowArchitect\src\managers\llm_request_runner.py", line 87, in run
+    response_text = self._call_with_timeout(
+                    ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\src\managers\llm_request_runner.py", line 111, in _call_with_timeout
+    return future.result(timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\concurrent\futures\_base.py", line 456, in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Program Files\Python312\Lib\concurrent\futures\_base.py", line 401, in __get_result
+    raise self._exception
+  File "C:\Program Files\Python312\Lib\concurrent\futures\thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\src\managers\provider_manager.py", line 79, in generate
+    return provider.generate(req)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\src\handlers\llm_providers\openai_http_base.py", line 125, in generate
+    resp = self._request(req, payload)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\src\handlers\llm_providers\openai_http_base.py", line 108, in _request
+    return requests.post(req.api_url, headers=headers, json=payload, stream=req.stream, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\sessions.py", line 746, in send
+    r.content
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\models.py", line 902, in content
+    self._content = b"".join(self.iter_content(CONTENT_CHUNK_SIZE)) or b""
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "F:\Education\Diplom\FlowArchitect\.venv\Lib\site-packages\requests\models.py", line 822, in generate
+    raise ChunkedEncodingError(e)
+requests.exceptions.ChunkedEncodingError: Response ended prematurely
+[33mWARNING  [events.py:102]                | No subscribers for event 'on_failed_attempt_for_response'[0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 3/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[31mERROR    [llm_request_runner.py:95]     | Attempt 3 timed out after 120.0s.[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'on_failed_attempt_for_response'[0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 4/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+[31mERROR    [llm_request_runner.py:95]     | Attempt 4 timed out after 120.0s.[0m
+[33mWARNING  [events.py:102]                | No subscribers for event 'on_failed_attempt_for_response'[0m
+[37mINFO     [llm_request_runner.py:64]     | Generation attempt 5/5[0m
+[37mINFO     [__init__.py:15]               | ��������� ��������� � ����: SavedMessages/last_attempt_log\combined_messages.json[0m
+[37mINFO     [provider_manager.py:75]       | Using provider: common | protocol=openai_compatible_default | dialect=openai_chat_completions[0m
+
+Campaign runner timeout expired.

@@ -1,0 +1,51 @@
+flow:
+  id: kafka_pg_orders_etl
+  name: Kafka to PostgreSQL Orders ETL
+  description: Reads messages from Kafka topic orders.created, parses JSON, extracts
+    key fields, and inserts them into PostgreSQL table public.orders
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 1 minute
+sources:
+- id: source_kafka
+  name: Read Kafka Topic
+  type: Kafka
+  location: orders.created
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_GROUP_ID}}'
+processing_elements:
+- id: process_extract_fields
+  name: Parse JSON and Extract Fields
+  operation: Extract
+  config:
+    fields:
+    - order_id
+    - user_id
+    - amount
+    - created_at
+    input_format: json
+sinks:
+- id: sink_postgres
+  name: Insert into PostgreSQL
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DATABASE_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+processed_data:
+- id: parsed_orders
+  format: json
+links:
+- from_id: source_kafka
+  to_id: process_extract_fields
+  data_ref: parsed_orders
+- from_id: process_extract_fields
+  to_id: sink_postgres
+  data_ref: parsed_orders

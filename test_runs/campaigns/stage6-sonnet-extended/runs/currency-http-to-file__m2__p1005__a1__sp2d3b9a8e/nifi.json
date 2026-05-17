@@ -1,0 +1,340 @@
+{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "name": "Exchange Rates Pipeline",
+  "comments": "Fetch latest currency exchange rates from exchangerate.host API and save the result to a local JSON file",
+  "position": {
+    "x": 0,
+    "y": 0
+  },
+  "processGroupFlow": {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "uri": "http://localhost:8080/nifi-api/flow/process-groups/a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "breadcrumb": {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "name": "Exchange Rates Pipeline"
+    },
+    "flow": {
+      "processGroups": [],
+      "remoteProcessGroups": [],
+      "processors": [
+        {
+          "id": "11111111-1111-1111-1111-111111111101",
+          "name": "Fetch Exchange Rates",
+          "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+          "position": {
+            "x": 200,
+            "y": 200
+          },
+          "config": {
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "1 hour",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [
+              "No Retry",
+              "Retry",
+              "Failure"
+            ],
+            "properties": {
+              "HTTP Method": "GET",
+              "HTTP URL": "https://api.exchangerate.host/latest",
+              "Request Headers": "{}",
+              "Connection Timeout": "30 sec",
+              "Read Timeout": "30 sec",
+              "SSL Context Service": null,
+              "Proxy Host": null,
+              "Proxy Port": null,
+              "Content-Type": "application/json",
+              "Send Message Body": "false",
+              "Response Body Ignored": "false",
+              "Put Response Body In Attribute": null,
+              "Max Length To Put In Attribute": "256",
+              "Digest Authentication": "false",
+              "Always Output Response": "false",
+              "Add Response Headers to Request": "false",
+              "Use Chunked Encoding": "false",
+              "Penalize on \"No Retry\"": "false",
+              "Follow Redirects": "true"
+            }
+          }
+        },
+        {
+          "id": "11111111-1111-1111-1111-111111111102",
+          "name": "Parse API Response",
+          "type": "org.apache.nifi.processors.standard.EvaluateJsonPath",
+          "position": {
+            "x": 500,
+            "y": 200
+          },
+          "config": {
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [
+              "failure",
+              "unmatched"
+            ],
+            "properties": {
+              "Destination": "flowfile-attribute",
+              "Return Type": "auto-detect",
+              "Path Not Found Behavior": "ignore",
+              "Null Value Representation": "empty string",
+              "json.base": "$.base",
+              "json.date": "$.date",
+              "json.rates": "$.rates",
+              "json.success": "$.success"
+            }
+          }
+        },
+        {
+          "id": "11111111-1111-1111-1111-111111111103",
+          "name": "Transform Rates Data",
+          "type": "org.apache.nifi.processors.standard.UpdateAttribute",
+          "position": {
+            "x": 800,
+            "y": 200
+          },
+          "config": {
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [],
+            "properties": {
+              "fetched_at": "${now():format('yyyy-MM-dd\\'T\\'HH:mm:ssZ')}",
+              "mime.type": "application/json"
+            }
+          }
+        },
+        {
+          "id": "11111111-1111-1111-1111-111111111104",
+          "name": "Build Output JSON",
+          "type": "org.apache.nifi.processors.standard.ReplaceText",
+          "position": {
+            "x": 1100,
+            "y": 200
+          },
+          "config": {
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [
+              "failure"
+            ],
+            "properties": {
+              "Replacement Strategy": "Always Replace",
+              "Replacement Value": "{\n  \"base\": \"${json.base}\",\n  \"date\": \"${json.date}\",\n  \"rates\": ${json.rates},\n  \"fetched_at\": \"${fetched_at}\"\n}",
+              "Evaluation Mode": "Entire text",
+              "Line-by-Line Evaluation Mode": "All",
+              "Maximum Buffer Size": "1 MB",
+              "Character Set": "UTF-8"
+            }
+          }
+        },
+        {
+          "id": "11111111-1111-1111-1111-111111111105",
+          "name": "Write to JSON File",
+          "type": "org.apache.nifi.processors.standard.PutFile",
+          "position": {
+            "x": 1400,
+            "y": 200
+          },
+          "config": {
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "0 sec",
+            "penaltyDuration": "30 sec",
+            "yieldDuration": "1 sec",
+            "bulletinLevel": "WARN",
+            "runDurationMillis": 0,
+            "concurrentlySchedulableTaskCount": 1,
+            "autoTerminatedRelationships": [
+              "failure"
+            ],
+            "properties": {
+              "Directory": "/data/output",
+              "Conflict Resolution Strategy": "replace",
+              "Create Missing Directories": "true",
+              "Maximum File Count": "-1",
+              "Last Modified Time": null,
+              "Permissions": null,
+              "Owner": null,
+              "Group": null,
+              "filename": "rates.json"
+            }
+          }
+        }
+      ],
+      "connections": [
+        {
+          "id": "cccccccc-cccc-cccc-cccc-cccccccccc01",
+          "name": "Fetch Exchange Rates -> Parse API Response",
+          "source": {
+            "id": "11111111-1111-1111-1111-111111111101",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "11111111-1111-1111-1111-111111111102",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "Response"
+          ],
+          "flowFileExpiration": "0 sec",
+          "backPressureDataSizeThreshold": "1 GB",
+          "backPressureObjectThreshold": 10000,
+          "labelIndex": 1,
+          "zIndex": 0,
+          "bends": []
+        },
+        {
+          "id": "cccccccc-cccc-cccc-cccc-cccccccccc02",
+          "name": "Parse API Response -> Transform Rates Data",
+          "source": {
+            "id": "11111111-1111-1111-1111-111111111102",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "11111111-1111-1111-1111-111111111103",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "matched"
+          ],
+          "flowFileExpiration": "0 sec",
+          "backPressureDataSizeThreshold": "1 GB",
+          "backPressureObjectThreshold": 10000,
+          "labelIndex": 1,
+          "zIndex": 0,
+          "bends": []
+        },
+        {
+          "id": "cccccccc-cccc-cccc-cccc-cccccccccc03",
+          "name": "Transform Rates Data -> Build Output JSON",
+          "source": {
+            "id": "11111111-1111-1111-1111-111111111103",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "11111111-1111-1111-1111-111111111104",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "success"
+          ],
+          "flowFileExpiration": "0 sec",
+          "backPressureDataSizeThreshold": "1 GB",
+          "backPressureObjectThreshold": 10000,
+          "labelIndex": 1,
+          "zIndex": 0,
+          "bends": []
+        },
+        {
+          "id": "cccccccc-cccc-cccc-cccc-cccccccccc04",
+          "name": "Build Output JSON -> Write to JSON File",
+          "source": {
+            "id": "11111111-1111-1111-1111-111111111104",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "11111111-1111-1111-1111-111111111105",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "success"
+          ],
+          "flowFileExpiration": "0 sec",
+          "backPressureDataSizeThreshold": "1 GB",
+          "backPressureObjectThreshold": 10000,
+          "labelIndex": 1,
+          "zIndex": 0,
+          "bends": []
+        }
+      ],
+      "labels": [
+        {
+          "id": "llllllll-llll-llll-llll-llllllllll01",
+          "label": "STEP 1: HTTP Source\nScheduled every 1 hour.\nFetches exchange rates from exchangerate.host.",
+          "position": {
+            "x": 140,
+            "y": 100
+          },
+          "width": 320,
+          "height": 80,
+          "style": {
+            "background-color": "#ddeeff"
+          }
+        },
+        {
+          "id": "llllllll-llll-llll-llll-llllllllll02",
+          "label": "STEP 2: Parse JSON\nExtracts base, date, rates fields\nfrom the HTTP response body.",
+          "position": {
+            "x": 440,
+            "y": 100
+          },
+          "width": 320,
+          "height": 80,
+          "style": {
+            "background-color": "#ddeeff"
+          }
+        },
+        {
+          "id": "llllllll-llll-llll-llll-llllllllll03",
+          "label": "STEP 3: Add Timestamp\nAdds fetched_at attribute\nwith current timestamp.",
+          "position": {
+            "x": 740,
+            "y": 100
+          },
+          "width": 320,
+          "height": 80,
+          "style": {
+            "background-color": "#ddeeff"
+          }
+        },
+        {
+          "id": "llllllll-llll-llll-llll-llllllllll04",
+          "label": "STEP 4: Build JSON Body\nReplaces FlowFile content with\nformatted JSON including fetched_at.",
+          "position": {
+            "x": 1040,
+            "y": 100
+          },
+          "width": 320,
+          "height": 80,
+          "style": {
+            "background-color": "#ddeeff"
+          }
+        },
+        {
+          "id": "llllllll-llll-llll-llll-llllllllll05",
+          "label": "STEP 5: File Sink\nWrites rates.json to /data/output.\nOverwrites existing file.",
+          "position": {
+            "x": 1340,
+            "y": 100
+          },
+          "width": 320,
+          "height": 80,
+          "style": {
+            "background-color": "#ddeeff"
+          }
+        }
+      ],
+      "funnels": [],
+      "inputPorts": [],
+      "outputPorts": []
+    }
+  },
+  "controllerServices": []
+}

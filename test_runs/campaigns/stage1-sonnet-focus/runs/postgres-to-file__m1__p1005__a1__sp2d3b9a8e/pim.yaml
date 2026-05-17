@@ -1,0 +1,58 @@
+flow:
+  id: orders_pg_to_json
+  name: PostgreSQL Orders to JSON Export
+  description: Периодически выбирает новые записи из таблицы public.orders в PostgreSQL
+    и сохраняет их в файл orders_export.json
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 5 minutes
+sources:
+- id: source_postgres
+  name: Read New Orders from PostgreSQL
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{PG_HOST}}'
+      port: '{{PG_PORT}}'
+      database: '{{PG_DATABASE}}'
+      username: '{{PG_USERNAME}}'
+      password: '{{PG_PASSWORD}}'
+      query: SELECT * FROM public.orders WHERE created_at > {{LAST_PROCESSED_TIMESTAMP}}
+processing_elements:
+- id: process_track_watermark
+  name: Track Last Processed Timestamp
+  operation: Watermark
+  config:
+    timestamp_field: created_at
+    state_key: last_processed_timestamp
+- id: process_serialize_json
+  name: Serialize Records to JSON
+  operation: Serialize
+  config:
+    format: json
+    pretty_print: 'true'
+sinks:
+- id: sink_json_file
+  name: Write to orders_export.json
+  type: File
+  location: orders_export.json
+  connection:
+    properties:
+      path: '{{OUTPUT_FILE_PATH}}'
+      filename: orders_export.json
+      write_mode: overwrite
+processed_data:
+- id: orders_records
+  format: json
+links:
+- from_id: source_postgres
+  to_id: process_track_watermark
+  data_ref: orders_records
+- from_id: process_track_watermark
+  to_id: process_serialize_json
+  data_ref: orders_records
+- from_id: process_serialize_json
+  to_id: sink_json_file
+  data_ref: orders_records

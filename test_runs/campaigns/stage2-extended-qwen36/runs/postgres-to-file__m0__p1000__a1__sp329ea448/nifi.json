@@ -1,0 +1,133 @@
+{
+  "flow": {
+    "processGroups": [
+      {
+        "id": "pg-postgresql-json-export",
+        "component": {
+          "name": "PostgreSQL Orders Export",
+          "processors": [
+            {
+              "id": "proc-query",
+              "component": {
+                "name": "QueryDatabaseTableRecord",
+                "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+                "state": "STOPPED",
+                "schedulingPeriod": "1 min",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "properties": {
+                  "Database Connection Pooling Service": "cs-dbcp",
+                  "Table Name": "public.orders",
+                  "Maximum-value Columns": "id",
+                  "Record Writer": "cs-json-writer",
+                  "Stateful Variables Initial Value": "0"
+                },
+                "autoTerminatedRelationships": []
+              }
+            },
+            {
+              "id": "proc-update-attr",
+              "component": {
+                "name": "UpdateAttribute",
+                "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+                "state": "STOPPED",
+                "schedulingPeriod": "0 sec",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "properties": {
+                  "filename": "orders_export.json"
+                },
+                "autoTerminatedRelationships": []
+              }
+            },
+            {
+              "id": "proc-put-file",
+              "component": {
+                "name": "PutFile",
+                "type": "org.apache.nifi.processors.standard.PutFile",
+                "state": "STOPPED",
+                "schedulingPeriod": "0 sec",
+                "schedulingStrategy": "TIMER_DRIVEN",
+                "properties": {
+                  "Directory": "/data/output",
+                  "Conflict Resolution Strategy": "replace",
+                  "Create Missing Directories": "true"
+                },
+                "autoTerminatedRelationships": [
+                  "success",
+                  "failure"
+                ]
+              }
+            }
+          ],
+          "connections": [
+            {
+              "id": "conn-1",
+              "component": {
+                "name": "Query -> UpdateAttribute",
+                "source": {
+                  "id": "proc-query",
+                  "type": "PROCESSOR",
+                  "groupId": "pg-postgresql-json-export"
+                },
+                "destination": {
+                  "id": "proc-update-attr",
+                  "type": "PROCESSOR",
+                  "groupId": "pg-postgresql-json-export"
+                },
+                "selectedRelationships": [
+                  "success"
+                ]
+              }
+            },
+            {
+              "id": "conn-2",
+              "component": {
+                "name": "UpdateAttribute -> PutFile",
+                "source": {
+                  "id": "proc-update-attr",
+                  "type": "PROCESSOR",
+                  "groupId": "pg-postgresql-json-export"
+                },
+                "destination": {
+                  "id": "proc-put-file",
+                  "type": "PROCESSOR",
+                  "groupId": "pg-postgresql-json-export"
+                },
+                "selectedRelationships": [
+                  "success"
+                ]
+              }
+            }
+          ],
+          "controllerServices": [
+            {
+              "id": "cs-dbcp",
+              "component": {
+                "name": "DBCPConnectionPool",
+                "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+                "state": "ENABLED",
+                "properties": {
+                  "Database Connection URL": "jdbc:postgresql://localhost:5432/your_database",
+                  "Database Driver Class Name": "org.postgresql.Driver",
+                  "Database User": "your_username",
+                  "Password": "your_password"
+                }
+              }
+            },
+            {
+              "id": "cs-json-writer",
+              "component": {
+                "name": "JsonRecordSetWriter",
+                "type": "org.apache.nifi.json.JsonRecordSetWriter",
+                "state": "ENABLED",
+                "properties": {
+                  "Schema Access Strategy": "Infer Schema",
+                  "Pretty Print JSON": "true"
+                }
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

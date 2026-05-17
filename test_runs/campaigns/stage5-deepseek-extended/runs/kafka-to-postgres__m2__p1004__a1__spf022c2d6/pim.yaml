@@ -1,0 +1,37 @@
+flow:
+  id: flow-1
+  name: Example Flow
+  description: A sample PIMFlow
+triggers:
+- id: trigger-1
+  type: manual
+  condition: User initiates the process
+sources:
+- id: source-1
+  name: Input Data Source
+  type: database
+  location: db://user_data/records
+processing_elements:
+- id: processing-1
+  name: Data Transformation
+  operation: transform
+  config:
+    fields:
+    - name
+    - email
+    action: cleanse
+sinks:
+- id: sink-1
+  name: Output Data Sink
+  type: file
+  location: s3://processed-data/output.csv
+processed_data:
+- id: data-1
+  format: csv
+links:
+- from_id: source-1
+  to_id: processing-1
+  data_ref: data-1
+- from_id: processing-1
+  to_id: sink-1
+  data_ref: data-1

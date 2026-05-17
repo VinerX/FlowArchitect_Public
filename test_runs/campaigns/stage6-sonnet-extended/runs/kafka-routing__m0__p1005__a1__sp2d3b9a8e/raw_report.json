@@ -1,0 +1,644 @@
+{
+  "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-14T18:15:28.313892+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "flow-kafka-router-001",
+          "name": "Kafka Events Router",
+          "comments": "Routes Kafka messages by type field to PostgreSQL or Kafka",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "labels": [],
+          "funnels": [
+            {
+              "identifier": "funnel-success",
+              "position": {
+                "x": 1300,
+                "y": 100
+              },
+              "comments": "Successful outputs termination point"
+            },
+            {
+              "identifier": "funnel-failure",
+              "position": {
+                "x": 1300,
+                "y": 300
+              },
+              "comments": "Failed outputs — connect to error handling or LogMessage processor as needed"
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "conn-consume-to-evaluate",
+              "name": "",
+              "source": {
+                "id": "proc-consume-kafka",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "proc-evaluate-json",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-evaluate-to-route",
+              "name": "",
+              "source": {
+                "id": "proc-evaluate-json",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "proc-route-on-attr",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "matched",
+                "unmatched"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-route-purchase-to-pg",
+              "name": "purchase -> PostgreSQL purchases",
+              "source": {
+                "id": "proc-route-on-attr",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "proc-put-db-purchase",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "purchase"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-route-refund-to-pg",
+              "name": "refund -> PostgreSQL refunds",
+              "source": {
+                "id": "proc-route-on-attr",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "proc-put-db-refund",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "refund"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-route-unmatched-to-kafka",
+              "name": "unknown -> Kafka events.unknown",
+              "source": {
+                "id": "proc-route-on-attr",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "proc-publish-kafka-unknown",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "unmatched"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-purchase-success-term",
+              "name": "",
+              "source": {
+                "id": "proc-put-db-purchase",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "funnel-success",
+                "type": "FUNNEL"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-refund-success-term",
+              "name": "",
+              "source": {
+                "id": "proc-put-db-refund",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "funnel-success",
+                "type": "FUNNEL"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-kafka-unknown-success-term",
+              "name": "",
+              "source": {
+                "id": "proc-publish-kafka-unknown",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "funnel-success",
+                "type": "FUNNEL"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-purchase-failure",
+              "name": "",
+              "source": {
+                "id": "proc-put-db-purchase",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "funnel-failure",
+                "type": "FUNNEL"
+              },
+              "selectedRelationships": [
+                "failure",
+                "retry"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-refund-failure",
+              "name": "",
+              "source": {
+                "id": "proc-put-db-refund",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "funnel-failure",
+                "type": "FUNNEL"
+              },
+              "selectedRelationships": [
+                "failure",
+                "retry"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "identifier": "conn-kafka-unknown-failure",
+              "name": "",
+              "source": {
+                "id": "proc-publish-kafka-unknown",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "funnel-failure",
+                "type": "FUNNEL"
+              },
+              "selectedRelationships": [
+                "failure"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            }
+          ],
+          "processors": [
+            {
+              "identifier": "proc-consume-kafka",
+              "name": "ConsumeKafkaRecord_2_6 — events.all",
+              "type": "org.apache.nifi.processors.kafka.pubsub.ConsumeKafkaRecord_2_6",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-2-6-nar",
+                "version": "1.23.0"
+              },
+              "position": {
+                "x": 100,
+                "y": 100
+              },
+              "style": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [],
+              "comments": "Reads messages from Kafka topic events.all",
+              "properties": {
+                "bootstrap.servers": "localhost:9092",
+                "topic": "events.all",
+                "topic_type": "names",
+                "group.id": "nifi-events-router",
+                "auto.offset.reset": "latest",
+                "key-attribute-encoding": "utf-8",
+                "message-demarcator": "",
+                "separate-by-key": "false",
+                "security.protocol": "PLAINTEXT",
+                "sasl.mechanism": "GSSAPI",
+                "kerberos-credentials-service": "",
+                "record-reader": "service-json-reader",
+                "record-writer": "service-json-writer",
+                "honor-transactions": "true",
+                "commit-offsets": "true",
+                "max.poll.records": "10000",
+                "max-uncommit-offset-wait": "1 sec",
+                "Communications Timeout": "60 secs"
+              }
+            },
+            {
+              "identifier": "proc-evaluate-json",
+              "name": "EvaluateJsonPath — extract type",
+              "type": "org.apache.nifi.processors.standard.EvaluateJsonPath",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "1.23.0"
+              },
+              "position": {
+                "x": 400,
+                "y": 100
+              },
+              "style": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [],
+              "comments": "Extracts the 'type' field from JSON body into FlowFile attribute",
+              "properties": {
+                "Destination": "flowfile-attribute",
+                "Return Type": "auto-detect",
+                "Path Not Found Behavior": "warn",
+                "Null Value Representation": "empty string",
+                "event.type": "$.type"
+              }
+            },
+            {
+              "identifier": "proc-route-on-attr",
+              "name": "RouteOnAttribute — by event.type",
+              "type": "org.apache.nifi.processors.standard.RouteOnAttribute",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "1.23.0"
+              },
+              "position": {
+                "x": 700,
+                "y": 100
+              },
+              "style": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [],
+              "comments": "Routes to 'purchase', 'refund', or 'unmatched' based on event.type attribute",
+              "properties": {
+                "Routing Strategy": "Route to 'matched' if all match",
+                "purchase": "${event.type:equals('purchase')}",
+                "refund": "${event.type:equals('refund')}"
+              }
+            },
+            {
+              "identifier": "proc-put-db-purchase",
+              "name": "PutDatabaseRecord — purchases",
+              "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "1.23.0"
+              },
+              "position": {
+                "x": 1000,
+                "y": -100
+              },
+              "style": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [],
+              "comments": "Inserts purchase events into PostgreSQL table 'purchases'",
+              "properties": {
+                "record-reader": "service-json-reader",
+                "database-connection-pool": "service-postgres-dbcp",
+                "statement-type": "INSERT",
+                "schema-name": "public",
+                "table-name": "purchases",
+                "translate-field-names": "true",
+                "unmatched-field-behavior": "Ignore Unmatched Fields",
+                "unmatched-column-behavior": "Warn on Unmatched Columns",
+                "update-keys": "",
+                "field-containing-sql": "",
+                "allow-multiple-statements": "false",
+                "quote-identifiers": "false",
+                "query-timeout": "0 seconds",
+                "rollback-on-failure": "false",
+                "table-schema-cache-size": "10",
+                "max-batch-size": "1000"
+              }
+            },
+            {
+              "identifier": "proc-put-db-refund",
+              "name": "PutDatabaseRecord — refunds",
+              "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "1.23.0"
+              },
+              "position": {
+                "x": 1000,
+                "y": 100
+              },
+              "style": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [],
+              "comments": "Inserts refund events into PostgreSQL table 'refunds'",
+              "properties": {
+                "record-reader": "service-json-reader",
+                "database-connection-pool": "service-postgres-dbcp",
+                "statement-type": "INSERT",
+                "schema-name": "public",
+                "table-name": "refunds",
+                "translate-field-names": "true",
+                "unmatched-field-behavior": "Ignore Unmatched Fields",
+                "unmatched-column-behavior": "Warn on Unmatched Columns",
+                "update-keys": "",
+                "field-containing-sql": "",
+                "allow-multiple-statements": "false",
+                "quote-identifiers": "false",
+                "query-timeout": "0 seconds",
+                "rollback-on-failure": "false",
+                "table-schema-cache-size": "10",
+                "max-batch-size": "1000"
+              }
+            },
+            {
+              "identifier": "proc-publish-kafka-unknown",
+              "name": "PublishKafkaRecord_2_6 — events.unknown",
+              "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord_2_6",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-kafka-2-6-nar",
+                "version": "1.23.0"
+              },
+              "position": {
+                "x": 1000,
+                "y": 300
+              },
+              "style": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [],
+              "comments": "Publishes unmatched events to Kafka topic events.unknown",
+              "properties": {
+                "bootstrap.servers": "localhost:9092",
+                "topic": "events.unknown",
+                "record-reader": "service-json-reader",
+                "record-writer": "service-json-writer",
+                "security.protocol": "PLAINTEXT",
+                "sasl.mechanism": "GSSAPI",
+                "kerberos-credentials-service": "",
+                "use-transactions": "true",
+                "transactional-id-prefix": "",
+                "acks": "all",
+                "compression.type": "none",
+                "max.request.size": "1048576",
+                "message-demarcator": "",
+                "partition-class": "org.apache.nifi.processors.kafka.pubsub.Partitioners$RoundRobinPartitioner",
+                "partition": "",
+                "key": "",
+                "key-attribute-encoding": "utf-8",
+                "delivery.timeout.ms": "120000",
+                "request.timeout.ms": "30000"
+              }
+            }
+          ],
+          "controllerServices": [
+            {
+              "identifier": "service-json-reader",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "1.23.0"
+              },
+              "comments": "Reads JSON records from FlowFile content",
+              "properties": {
+                "schema-access-strategy": "infer-schema",
+                "schema-registry": "",
+                "schema-name": "${schema.name}",
+                "schema-version": "",
+                "schema-branch": "",
+                "schema-text": "",
+                "date-format": "yyyy-MM-dd",
+                "time-format": "HH:mm:ss",
+                "timestamp-format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+              }
+            },
+            {
+              "identifier": "service-json-writer",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "1.23.0"
+              },
+              "comments": "Writes JSON records to FlowFile content",
+              "properties": {
+                "schema-write-strategy": "no-schema",
+                "schema-access-strategy": "inherit-record-schema",
+                "schema-registry": "",
+                "schema-name": "${schema.name}",
+                "schema-version": "",
+                "schema-branch": "",
+                "schema-text": "",
+                "output-grouping": "output-oneline",
+                "suppress-nulls": "never-suppress",
+                "pretty-print-json": "false",
+                "date-format": "yyyy-MM-dd",
+                "time-format": "HH:mm:ss",
+                "timestamp-format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+              }
+            },
+            {
+              "identifier": "service-postgres-dbcp",
+              "name": "DBCPConnectionPool — PostgreSQL",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-dbcp-service-nar",
+                "version": "1.23.0"
+              },
+              "comments": "PostgreSQL connection pool — update URL, user, password before use",
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://localhost:5432/mydb",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "database-driver-locations": "/opt/nifi/extra-libs/postgresql-42.6.0.jar",
+                "Database User": "nifi_user",
+                "Password": "nifi_password",
+                "Max Wait Time": "500 millis",
+                "Max Total Connections": "8",
+                "Min Idle Connections": "0",
+                "Max Idle Connections": "8",
+                "Max Connection Lifetime": "-1",
+                "Eviction Run Period": "-1",
+                "Min Evictable Idle Time": "30 mins",
+                "Soft Min Evictable Idle Time": "-1",
+                "kerberos-credentials-service": "",
+                "kerberos-user-service": "",
+                "Kerberos Principal": "",
+                "Kerberos Keytab": "",
+                "Validation query": "SELECT 1"
+              }
+            }
+          ]
+        },
+        "parameterContexts": [],
+        "flowEncodingVersion": "1.0"
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "NiFi unreachable: Cannot connect to https://localhost:8443",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 58.34,
+      "stage1_duration_sec": 53.93,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 242,
+      "completion_tokens": 5723,
+      "total_tokens": 5965,
+      "cost_usd": 0.086571,
+      "nifi_processor_count": 6,
+      "nifi_connection_count": 11,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 228,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 136,
+          "completion_tokens": 9,
+          "total_tokens": 145,
+          "duration_ms": 53485,
+          "cost_usd": 0.000543
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 136,
+          "completion_tokens": 9,
+          "total_tokens": 145,
+          "duration_ms": 53485,
+          "cost_usd": 0.000543
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

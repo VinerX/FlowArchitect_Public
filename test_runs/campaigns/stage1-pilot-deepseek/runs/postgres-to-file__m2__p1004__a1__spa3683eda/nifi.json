@@ -1,0 +1,102 @@
+{
+  "id": "c7a1e2b9-4f8e-4a2b-a9d3-123456789abc",
+  "name": "Orders Export to JSON",
+  "position": {
+    "x": 0,
+    "y": 0
+  },
+  "version": 1,
+  "processors": [
+    {
+      "id": "d4f5a678-90ab-cdef-1234-567890abcdef",
+      "name": "Read from PostgreSQL",
+      "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "properties": {
+        "Database Connection Pooling Service": "3b2e5a7d-9f8c-4e6a-b1c3-7890123456de",
+        "Table Name": "public.orders",
+        "Maximum-value Columns": "",
+        "Output Batch Size": "10000",
+        "Record Writer": "5c8e1a2b-9d0f-4a7c-8e3f-6543210987ab"
+      },
+      "schedulingPeriod": "{{SCHEDULE_INTERVAL}}",
+      "schedulingStrategy": "TIMER_DRIVEN"
+    },
+    {
+      "id": "e8f7a6b5-4c3d-2e1f-0987-6ab5c4d3e2f1",
+      "name": "Filter New Records",
+      "type": "org.apache.nifi.processors.standard.QueryRecord",
+      "position": {
+        "x": 400,
+        "y": 0
+      },
+      "properties": {
+        "Record Reader": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+        "Record Writer": "5c8e1a2b-9d0f-4a7c-8e3f-6543210987ab",
+        "Record SQL": "SELECT * FROM FLOWFILE WHERE {{NEW_RECORDS_CONDITION}}"
+      }
+    },
+    {
+      "id": "f0e9d8c7-b6a5-4e3d-2c1b-0a98b7c6d5e4",
+      "name": "Write to JSON File",
+      "type": "org.apache.nifi.processors.standard.PutFile",
+      "position": {
+        "x": 800,
+        "y": 0
+      },
+      "properties": {
+        "Directory": "{{OUTPUT_DIRECTORY}}",
+        "Conflict Resolution Strategy": "fail",
+        "Create Missing Directories": "true"
+      }
+    }
+  ],
+  "connections": [
+    {
+      "id": "a1b2c3d4-e5f6-7a8b-9c0d-1e2f3a4b5c6d",
+      "name": "success",
+      "sourceId": "d4f5a678-90ab-cdef-1234-567890abcdef",
+      "sourceRelationship": "success",
+      "destinationId": "e8f7a6b5-4c3d-2e1f-0987-6ab5c4d3e2f1"
+    },
+    {
+      "id": "b2c3d4e5-f6a7-8b9c-0d1e-2f3a4b5c6d7e",
+      "name": "success",
+      "sourceId": "e8f7a6b5-4c3d-2e1f-0987-6ab5c4d3e2f1",
+      "sourceRelationship": "success",
+      "destinationId": "f0e9d8c7-b6a5-4e3d-2c1b-0a98b7c6d5e4"
+    }
+  ],
+  "controllerServices": [
+    {
+      "id": "3b2e5a7d-9f8c-4e6a-b1c3-7890123456de",
+      "name": "DBCPConnectionPool",
+      "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+      "properties": {
+        "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+        "Database Driver Class Name": "org.postgresql.Driver",
+        "Database User": "{{DB_USER}}",
+        "Password": "{{DB_PASSWORD}}"
+      }
+    },
+    {
+      "id": "1a2b3c4d-5e6f-7a8b-9c0d-1e2f3a4b5c6d",
+      "name": "JsonTreeReader",
+      "type": "org.apache.nifi.json.JsonTreeReader",
+      "properties": {
+        "Schema Access Strategy": "infer-schema"
+      }
+    },
+    {
+      "id": "5c8e1a2b-9d0f-4a7c-8e3f-6543210987ab",
+      "name": "JsonRecordSetWriter",
+      "type": "org.apache.nifi.json.JsonRecordSetWriter",
+      "properties": {
+        "Schema Write Strategy": "no-schema"
+      }
+    }
+  ]
+}

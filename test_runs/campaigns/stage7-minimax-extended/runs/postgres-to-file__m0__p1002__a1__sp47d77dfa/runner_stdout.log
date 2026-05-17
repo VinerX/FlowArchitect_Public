@@ -1,0 +1,29 @@
+
+================================================================
+Query  : ������������ ������� ����� ������ �� PostgreSQL public.orders � ��������...
+Mode   : 0 � Direct (NL->JSON)
+Presets: [1002]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1002, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1002: openrouter minimax/minimax-m2.7  [minimax/minimax-m2.7] ---
+  [1/2] USER_QUERY  mode=0  preset=1002
+  ... waiting for NiFi JSON (10s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (20s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (30s elapsed, timeout=300s)
+  ... waiting for NiFi JSON (40s elapsed, timeout=300s)
+  [2/2] NiFi JSON ready  (0 proc, 0 conn, Nones)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 167 in / 1009 out / 1176 total  |  cost: $0.001261
+  Result : [OK]  (78.41s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage7-minimax-extended\runs\postgres-to-file__m0__p1002__a1__sp47d77dfa\raw_report.json

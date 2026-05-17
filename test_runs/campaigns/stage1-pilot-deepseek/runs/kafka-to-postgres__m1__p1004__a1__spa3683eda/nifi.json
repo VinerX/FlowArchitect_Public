@@ -1,0 +1,234 @@
+{
+  "flowContents": {
+    "identifier": "ef1c9ce3-8213-47da-b798-88da5ad048ce",
+    "name": "JSON to PostgreSQL",
+    "comments": "Read JSON messages from Kafka topic orders, transform to rows, and write to PostgreSQL table",
+    "processors": [
+      {
+        "identifier": "28b3c2f7-4a40-40f5-b439-4f3a5ea9194f",
+        "name": "Read Orders from Kafka",
+        "comments": "Generated from PIM source 'source_kafka_orders' (Kafka)",
+        "type": "org.apache.nifi.kafka.processors.ConsumeKafka",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Topics": "orders",
+          "Topic Format": "names",
+          "Group ID": "pim_json_to_pg",
+          "Processing Strategy": "RECORD",
+          "Output Strategy": "USE_VALUE",
+          "Kafka Connection Service": "92e4e98d-54e5-44a1-8ced-36bb11b239dc",
+          "Record Writer": "78bdac75-a162-49f3-86c3-2d66f5bd6f46",
+          "Record Reader": "fb99f47a-089e-4d3e-83d7-92ccd52e2cf4"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "parse failure"
+        ]
+      },
+      {
+        "identifier": "03a6d8fc-dd0d-44aa-815a-3bf57c749886",
+        "name": "Convert JSON to Table Rows",
+        "comments": "Generated from PIM processing element 'process_json_to_rows' (json_to_relational)",
+        "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-update-attribute-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 460.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "table_schema": "{{TABLE_SCHEMA}}"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": []
+      },
+      {
+        "identifier": "adb798b7-d6bc-4778-a63a-98d170aa69ec",
+        "name": "Write to PostgreSQL",
+        "comments": "Generated from PIM sink 'sink_postgres' (PostgreSQL)",
+        "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Table Name": "public.{{TABLE_NAME}}",
+          "Statement Type": "INSERT",
+          "Database Connection Pooling Service": "9309ac35-dab4-4d6e-8956-27c974a0ff3a",
+          "Record Reader": "fb99f47a-089e-4d3e-83d7-92ccd52e2cf4"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure",
+          "retry"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "4941786d-4d26-4e50-a076-f15b065a92e8",
+        "name": "Read Orders from Kafka -> Convert JSON to Table Rows",
+        "comments": "orders_json",
+        "source": {
+          "id": "28b3c2f7-4a40-40f5-b439-4f3a5ea9194f",
+          "groupId": "ef1c9ce3-8213-47da-b798-88da5ad048ce",
+          "type": "PROCESSOR",
+          "name": "Read Orders from Kafka"
+        },
+        "destination": {
+          "id": "03a6d8fc-dd0d-44aa-815a-3bf57c749886",
+          "groupId": "ef1c9ce3-8213-47da-b798-88da5ad048ce",
+          "type": "PROCESSOR",
+          "name": "Convert JSON to Table Rows"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      },
+      {
+        "identifier": "9cb2c7d5-ad13-4aa3-acef-da8957140b1f",
+        "name": "Convert JSON to Table Rows -> Write to PostgreSQL",
+        "comments": "orders_json",
+        "source": {
+          "id": "03a6d8fc-dd0d-44aa-815a-3bf57c749886",
+          "groupId": "ef1c9ce3-8213-47da-b798-88da5ad048ce",
+          "type": "PROCESSOR",
+          "name": "Convert JSON to Table Rows"
+        },
+        "destination": {
+          "id": "adb798b7-d6bc-4778-a63a-98d170aa69ec",
+          "groupId": "ef1c9ce3-8213-47da-b798-88da5ad048ce",
+          "type": "PROCESSOR",
+          "name": "Write to PostgreSQL"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": [
+      {
+        "identifier": "9309ac35-dab4-4d6e-8956-27c974a0ff3a",
+        "name": "DatabaseConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-dbcp-service-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database User": "{{DB_USER}}",
+          "Password": "{{DB_PASSWORD}}"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "92e4e98d-54e5-44a1-8ced-36bb11b239dc",
+        "name": "KafkaConnectionService",
+        "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-kafka-3-service-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "bootstrap.servers": "{{KAFKA_BROKERS}}",
+          "security.protocol": "PLAINTEXT"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "fb99f47a-089e-4d3e-83d7-92ccd52e2cf4",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Access Strategy": "Infer Schema"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "78bdac75-a162-49f3-86c3-2d66f5bd6f46",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Write Strategy": "Do Not Write Schema"
+        },
+        "propertyDescriptors": {}
+      }
+    ]
+  }
+}

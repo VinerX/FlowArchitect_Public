@@ -1,0 +1,272 @@
+{
+  "content": {
+    "flow": {
+      "id": "pending_transactions_to_kafka",
+      "name": "Pending Transactions to Kafka",
+      "description": "Read PENDING transactions from PostgreSQL, convert to JSON, publish to Kafka topic"
+    }
+  },
+  "metadata": {
+    "version": "1.0",
+    "generated": "auto"
+  },
+  "processGroup": {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Pending Transactions to Kafka",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "controllerServices": [
+      {
+        "id": "dbcp-001-uuid-placeholder",
+        "name": "PostgreSQL Connection Pool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database Driver Location": "{{DB_DRIVER_LOCATION}}",
+          "Database User": "{{DB_USERNAME}}",
+          "Password": "{{DB_PASSWORD}}"
+        },
+        "scheduledState": "ENABLED"
+      },
+      {
+        "id": "kafka-conn-001-uuid-placeholder",
+        "name": "Kafka Connection Service",
+        "type": "org.apache.nifi.kafka.connect.Kafka3ConnectionService",
+        "properties": {
+          "Bootstrap Servers": "{{KAFKA_BROKERS}}",
+          "Kerberos Keytab": "{{KAFKA_KEYTAB}}",
+          "Kerberos Principal": "{{KAFKA_PRINCIPAL}}",
+          "Security Protocol": "{{KAFKA_SECURITY_PROTOCOL}}"
+        },
+        "scheduledState": "ENABLED"
+      },
+      {
+        "id": "json-reader-001-uuid-placeholder",
+        "name": "JSON Tree Reader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "properties": {
+          "Schema Access Strategy": "Use 'Schema Text' Property",
+          "Schema Text": "${schema.text}",
+          "Date Format": "yyyy-MM-dd",
+          "Time Format": "HH:mm:ss",
+          "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        },
+        "scheduledState": "ENABLED"
+      },
+      {
+        "id": "json-reader-002-uuid-placeholder",
+        "name": "JSON Tree Reader (Filtered)",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "properties": {
+          "Schema Access Strategy": "Use 'Schema Text' Property",
+          "Schema Text": "${schema.text}",
+          "Date Format": "yyyy-MM-dd",
+          "Time Format": "HH:mm:ss",
+          "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        },
+        "scheduledState": "ENABLED"
+      },
+      {
+        "id": "json-writer-001-uuid-placeholder",
+        "name": "JSON Record Set Writer",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "properties": {
+          "Schema Access Strategy": "Use 'Schema Text' Property",
+          "Schema Text": "${schema.text}",
+          "Date Format": "yyyy-MM-dd",
+          "Time Format": "HH:mm:ss",
+          "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+          "Pretty Print JSON": "true"
+        },
+        "scheduledState": "ENABLED"
+      },
+      {
+        "id": "json-writer-002-uuid-placeholder",
+        "name": "JSON Record Set Writer (Converted)",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "properties": {
+          "Schema Access Strategy": "Inherit Record Schema",
+          "Date Format": "yyyy-MM-dd",
+          "Time Format": "HH:mm:ss",
+          "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+          "Pretty Print JSON": "true"
+        },
+        "scheduledState": "ENABLED"
+      },
+      {
+        "id": "kafka-writer-001-uuid-placeholder",
+        "name": "Kafka Record Set Writer",
+        "type": "org.apache.nifi.kafka.recordset.KafkaRecordSetWriter",
+        "properties": {
+          "Record Writer": "json-writer-002-uuid-placeholder",
+          "Topic": "transactions.overdue"
+        },
+        "scheduledState": "ENABLED"
+      }
+    ],
+    "processors": [
+      {
+        "id": "source-postgres-uuid-placeholder",
+        "name": "Read Pending Transactions",
+        "type": "org.apache.nifi.processors.kafka.pubsub.QueryDatabaseTableRecord",
+        "position": {
+          "x": 100,
+          "y": 200
+        },
+        "properties": {
+          "dbcp-service": "dbcp-001-uuid-placeholder",
+          "table-name": "transactions",
+          "columns-to-return": "",
+          "Maximum Batch Size": "1000",
+          "Fetch Size": "100",
+          "Record Writer": "json-writer-001-uuid-placeholder",
+          "State Storage": "${nifi_state_path}",
+          "Partition Count": "1"
+        },
+        "scheduledState": "RUNNING",
+        "inputRequirement": "INPUT_REQUIRED"
+      },
+      {
+        "id": "filter-pending-uuid-placeholder",
+        "name": "Filter Pending Status",
+        "type": "org.apache.nifi.processors.record.UpdateRecord",
+        "position": {
+          "x": 400,
+          "y": 200
+        },
+        "properties": {
+          "record-reader": "json-reader-001-uuid-placeholder",
+          "record-writer": "json-writer-001-uuid-placeholder",
+          "Replacement Value Strategy": "literal",
+          "status": "PENDING"
+        },
+        "propertyDescriptors": {
+          "status": {
+            "value": "PENDING",
+            "sensitive": false
+          }
+        },
+        "scheduledState": "RUNNING",
+        "inputRequirement": "INPUT_REQUIRED"
+      },
+      {
+        "id": "to-json-uuid-placeholder",
+        "name": "Convert to JSON",
+        "type": "org.apache.nifi.processors.record.UpdateRecord",
+        "position": {
+          "x": 700,
+          "y": 200
+        },
+        "properties": {
+          "record-reader": "json-reader-002-uuid-placeholder",
+          "record-writer": "json-writer-002-uuid-placeholder",
+          "Replacement Value Strategy": "literal"
+        },
+        "scheduledState": "RUNNING",
+        "inputRequirement": "INPUT_REQUIRED"
+      },
+      {
+        "id": "sink-kafka-uuid-placeholder",
+        "name": "Publish to Kafka",
+        "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord",
+        "position": {
+          "x": 1000,
+          "y": 200
+        },
+        "properties": {
+          "kafka-controllerservice": "kafka-conn-001-uuid-placeholder",
+          "topic": "transactions.overdue",
+          "record-reader": "json-reader-002-uuid-placeholder",
+          "record-writer": "kafka-writer-001-uuid-placeholder",
+          "Use Transactions": "false",
+          "Attributes Header Regex": "",
+          "Message Header Encoding": "UTF-8",
+          "Rollback On Failure": "false"
+        },
+        "scheduledState": "RUNNING",
+        "inputRequirement": "INPUT_REQUIRED"
+      }
+    ],
+    "connections": [
+      {
+        "id": "conn-source-filter-uuid-placeholder",
+        "name": "Source to Filter",
+        "sourceId": "source-postgres-uuid-placeholder",
+        "destinationId": "filter-pending-uuid-placeholder",
+        "relationship": "success",
+        "position": {
+          "x": 250,
+          "y": 200
+        },
+        "flowfileExpiration": "0 sec",
+        "backPressureObjectCount": "10000",
+        "backPressureDataSize": "1 GB"
+      },
+      {
+        "id": "conn-filter-json-uuid-placeholder",
+        "name": "Filter to JSON",
+        "sourceId": "filter-pending-uuid-placeholder",
+        "destinationId": "to-json-uuid-placeholder",
+        "relationship": "success",
+        "position": {
+          "x": 550,
+          "y": 200
+        },
+        "flowfileExpiration": "0 sec",
+        "backPressureObjectCount": "10000",
+        "backPressureDataSize": "1 GB"
+      },
+      {
+        "id": "conn-json-sink-uuid-placeholder",
+        "name": "JSON to Kafka",
+        "sourceId": "to-json-uuid-placeholder",
+        "destinationId": "sink-kafka-uuid-placeholder",
+        "relationship": "success",
+        "position": {
+          "x": 850,
+          "y": 200
+        },
+        "flowfileExpiration": "0 sec",
+        "backPressureObjectCount": "10000",
+        "backPressureDataSize": "1 GB"
+      }
+    ],
+    "labels": [],
+    "funnels": [],
+    "remoteProcessGroups": [],
+    "variableRegistry": [
+      {
+        "context": "Default",
+        "variables": [
+          {
+            "name": "DB_HOST",
+            "value": "{{DB_HOST}}"
+          },
+          {
+            "name": "DB_PORT",
+            "value": "{{DB_PORT}}"
+          },
+          {
+            "name": "DATABASE_NAME",
+            "value": "{{DATABASE_NAME}}"
+          },
+          {
+            "name": "DB_USERNAME",
+            "value": "{{DB_USERNAME}}"
+          },
+          {
+            "name": "DB_PASSWORD",
+            "value": "{{DB_PASSWORD}}"
+          },
+          {
+            "name": "KAFKA_BROKERS",
+            "value": "{{KAFKA_BROKERS}}"
+          }
+        ]
+      }
+    ]
+  }
+}

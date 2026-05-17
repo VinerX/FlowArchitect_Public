@@ -1,0 +1,225 @@
+{
+  "query": "Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй их в JSON-файл /data/output/orders_export.json.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T11:05:29.690150+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: postgres_to_json_export\n  name: PostgreSQL to JSON Export Flow\n  description: Periodically selects new records from PostgreSQL public.orders and\n    saves them to a JSON file.\ntriggers:\n- id: trigger_periodic\n  type: schedule\n  condition: every 1 hour\nsources:\n- id: src_postgres_orders\n  name: PostgreSQL Orders Table\n  type: PostgreSQL\n  location: public.orders\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DB_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\n      incremental_column: '{{INCREMENTAL_COL_ID}}'\nprocessing_elements:\n- id: proc_format_json\n  name: Format to JSON\n  operation: Format\n  config:\n    format: json\nsinks:\n- id: sink_json_file\n  name: Local JSON File\n  type: File\n  location: /data/output/orders_export.json\n  connection:\n    properties:\n      write_mode: append\nprocessed_data:\n- id: order_record\n  format: json\nlinks:\n- from_id: src_postgres_orders\n  to_id: proc_format_json\n  data_ref: order_record\n- from_id: proc_format_json\n  to_id: sink_json_file\n  data_ref: order_record",
+      "nifi_json": {
+        "identifier": "7e38b3a0-1234-4a5b-8c9d-0123456789ab",
+        "name": "PostgreSQL to JSON Export Flow",
+        "componentType": "PROCESS_GROUP",
+        "contents": {
+          "processors": [
+            {
+              "identifier": "src_postgres_orders",
+              "name": "PostgreSQL Orders Table",
+              "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "1.23.2"
+              },
+              "position": {
+                "x": 300,
+                "y": 100
+              },
+              "properties": {
+                "Database Connection Pool": "db-connection-pool-service",
+                "db-fetch-db-type": "PostgreSQL",
+                "table-name": "public.orders",
+                "record-writer": "json-record-writer-service",
+                "maximum-value-columns": "{{INCREMENTAL_COL_ID}}"
+              },
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "3600 sec"
+            },
+            {
+              "identifier": "proc_format_json",
+              "name": "Format to JSON",
+              "type": "org.apache.nifi.processors.standard.ConvertRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "1.23.2"
+              },
+              "position": {
+                "x": 300,
+                "y": 350
+              },
+              "properties": {
+                "record-reader": "json-tree-reader-service",
+                "record-writer": "json-record-writer-service"
+              }
+            },
+            {
+              "identifier": "sink_json_file",
+              "name": "Local JSON File",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "1.23.2"
+              },
+              "position": {
+                "x": 300,
+                "y": 600
+              },
+              "properties": {
+                "Directory": "/data/output",
+                "Conflict Strategy": "append"
+              }
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "link-1",
+              "name": "order_record",
+              "source": {
+                "id": "src_postgres_orders",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "proc_format_json",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "success"
+              ]
+            },
+            {
+              "identifier": "link-2",
+              "name": "order_record",
+              "source": {
+                "id": "proc_format_json",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "sink_json_file",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "success"
+              ]
+            }
+          ],
+          "controllerServices": [
+            {
+              "identifier": "db-connection-pool-service",
+              "name": "DBCPConnectionPool",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-dbcp-service-nar",
+                "version": "1.23.2"
+              },
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database Driver Location(s)": "{{POSTGRES_DRIVER_PATH}}",
+                "Database User": "{{DB_USERNAME}}",
+                "Password": "{{DB_PASSWORD}}"
+              }
+            },
+            {
+              "identifier": "json-record-writer-service",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "1.23.2"
+              },
+              "properties": {
+                "output-grouping": "output-array"
+              }
+            },
+            {
+              "identifier": "json-tree-reader-service",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "1.23.2"
+              },
+              "properties": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "2103cc8e-019e-1000-1975-128794053ead",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 46.12,
+      "stage1_duration_sec": 4.71,
+      "stage2_duration_sec": 7.33,
+      "prompt_tokens": 2259,
+      "completion_tokens": 1865,
+      "total_tokens": 4124,
+      "cost_usd": 0.006724,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 117,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 1372,
+          "completion_tokens": 561,
+          "total_tokens": 1933,
+          "duration_ms": 4389,
+          "cost_usd": 0.002369
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 805,
+          "completion_tokens": 1298,
+          "total_tokens": 2103,
+          "duration_ms": 7125,
+          "cost_usd": 0.004296
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1372,
+          "completion_tokens": 561,
+          "total_tokens": 1933,
+          "duration_ms": 4389,
+          "cost_usd": 0.002369
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 805,
+          "completion_tokens": 1298,
+          "total_tokens": 2103,
+          "duration_ms": 7125,
+          "cost_usd": 0.004296
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

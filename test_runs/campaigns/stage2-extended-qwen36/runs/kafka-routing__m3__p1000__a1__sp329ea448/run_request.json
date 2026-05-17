@@ -1,0 +1,67 @@
+{
+  "run_id": "kafka-routing__m3__p1000__a1__sp329ea448",
+  "case_id": "kafka-routing",
+  "title": "Kafka Content-Based Routing (TC-07)",
+  "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 3,
+  "preset_id": 1000,
+  "stage_presets": {
+    "pim": 1000,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "kafka",
+      "routing",
+      "level-3"
+    ],
+    "expected_behavior": "Сообщения корректно маршрутизируются по полю type.",
+    "manual_test_checklist": [
+      "Импортировать nifi.json.",
+      "Опубликовать в events.all сообщения с type=purchase, refund, other.",
+      "Проверить заполнение purchases/refunds таблиц и топика events.unknown."
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-12T15:47:55.313802+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-12T18:17:21.373026+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-12T18:17:21.373026+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m3__p1000__a1__sp329ea448\\query.txt",
+    "--preset",
+    "1000",
+    "--mode",
+    "3",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage2-extended-qwen36\\runs\\kafka-routing__m3__p1000__a1__sp329ea448\\raw_report.json",
+    "--pim-preset",
+    "1000",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

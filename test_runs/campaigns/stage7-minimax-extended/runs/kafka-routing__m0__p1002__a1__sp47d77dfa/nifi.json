@@ -1,0 +1,127 @@
+{
+  "flow": {
+    "processors": [
+      {
+        "id": "consume-events",
+        "type": "ConsumeKafkaRecord_2_6",
+        "properties": {
+          "bootstrap.servers": "localhost:9092",
+          "topic": "events.all",
+          "group.id": "events-processor",
+          "record.reader": "json-reader",
+          "record.writer": "json-writer"
+        }
+      },
+      {
+        "id": "extract-type",
+        "type": "EvaluateJsonPath",
+        "properties": {
+          "destination": "flowfile-attribute",
+          "type": "$.type"
+        }
+      },
+      {
+        "id": "route-events",
+        "type": "RouteOnAttribute",
+        "properties": {
+          "purchase": "${type:equals('purchase')}",
+          "refund": "${type:equals('refund')}",
+          "unknown": "${type:equals('unknown')}"
+        }
+      },
+      {
+        "id": "purchase-reader",
+        "type": "JsonPathReader",
+        "properties": {
+          "schema.name": "purchase",
+          "schema.text": "{\"type\":\"record\",\"name\":\"purchase\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"type\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":\"double\"},{\"name\":\"customer_id\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]}"
+        }
+      },
+      {
+        "id": "refund-reader",
+        "type": "JsonPathReader",
+        "properties": {
+          "schema.name": "refund",
+          "schema.text": "{\"type\":\"record\",\"name\":\"refund\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"type\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":\"double\"},{\"name\":\"customer_id\",\"type\":\"string\"},{\"name\":\"reason\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]}"
+        }
+      },
+      {
+        "id": "put-purchases",
+        "type": "PutDatabaseRecord",
+        "properties": {
+          "database-driver-class-name": "org.postgresql.Driver",
+          "database-url": "jdbc:postgresql://localhost:5432/events",
+          "table-name": "purchases",
+          "record-reader": "purchase-reader"
+        }
+      },
+      {
+        "id": "put-refunds",
+        "type": "PutDatabaseRecord",
+        "properties": {
+          "database-driver-class-name": "org.postgresql.Driver",
+          "database-url": "jdbc:postgresql://localhost:5432/events",
+          "table-name": "refunds",
+          "record-reader": "refund-reader"
+        }
+      },
+      {
+        "id": "publish-unknown",
+        "type": "PublishKafkaRecord_2_6",
+        "properties": {
+          "bootstrap.servers": "localhost:9092",
+          "topic": "events.unknown",
+          "record.reader": "json-reader",
+          "record.writer": "json-writer"
+        }
+      }
+    ],
+    "controller-services": [
+      {
+        "id": "json-reader",
+        "type": "JsonPathReader",
+        "properties": {
+          "schema.name": "events",
+          "schema.text": "{\"type\":\"record\",\"name\":\"Event\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"type\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"},{\"name\":\"data\",\"type\":{\"type\":\"map\",\"values\":\"string\"}}]}"
+        }
+      },
+      {
+        "id": "json-writer",
+        "type": "JsonRecordSetWriter",
+        "properties": {
+          "schema.name": "events"
+        }
+      }
+    ],
+    "connections": [
+      {
+        "from": "consume-events",
+        "to": "extract-type",
+        "name": "consume-to-extract"
+      },
+      {
+        "from": "extract-type",
+        "to": "route-events",
+        "name": "extract-to-route"
+      },
+      {
+        "from": "route-events",
+        "to": "put-purchases",
+        "relationship": "purchase",
+        "name": "route-to-purchase"
+      },
+      {
+        "from": "route-events",
+        "to": "put-refunds",
+        "relationship": "refund",
+        "name": "route-to-refund"
+      },
+      {
+        "from": "route-events",
+        "to": "publish-unknown",
+        "relationship": "unknown",
+        "name": "route-to-unknown"
+      }
+    ]
+  }
+}

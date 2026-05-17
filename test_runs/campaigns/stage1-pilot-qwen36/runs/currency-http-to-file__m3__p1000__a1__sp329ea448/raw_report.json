@@ -1,0 +1,193 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+  "mode": 3,
+  "mode_name": "Adapter+LLM (NL->YAML->Adapter->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-03T13:48:02.012868+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: exchange_rates_pipeline\n  name: Exchange Rates Fetcher\n  description: Fetches latest exchange rates from exchangerate.host and saves them\n    to a JSON file\ntriggers:\n- id: trigger_daily\n  type: schedule\n  condition: daily\nsources:\n- id: source_api\n  name: Fetch Exchange Rates\n  type: HTTP\n  location: https://api.exchangerate.host/latest\nprocessing_elements: []\nsinks:\n- id: sink_file\n  name: Save to File\n  type: File\n  location: rates.json\nprocessed_data:\n- id: rates_json\n  format: json\nlinks:\n- from_id: source_api\n  to_id: sink_file\n  data_ref: rates_json",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "74122337-80eb-4272-aa58-ec2a78c54f31",
+          "name": "Exchange Rates Fetcher",
+          "comments": "Fetches latest exchange rates from exchangerate.host and saves them to a JSON file",
+          "processors": [
+            {
+              "identifier": "008abab1-74b1-4f6e-99ee-73d6afdba2c4",
+              "name": "Fetch Exchange Rates",
+              "comments": "Generated from PIM source 'source_api' (HTTP)",
+              "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "HTTP URL": "https://api.exchangerate.host/latest",
+                "HTTP Method": "GET"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "Original",
+                "Retry",
+                "No Retry",
+                "Failure"
+              ]
+            },
+            {
+              "identifier": "95043e36-70e5-4591-9e9b-2e8c6ae86c14",
+              "name": "Save to File",
+              "comments": "Generated from PIM sink 'sink_file' (File)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/tmp"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "91915bba-08df-4770-8947-d38e48b314db",
+              "name": "Fetch Exchange Rates -> Save to File",
+              "comments": "rates_json",
+              "source": {
+                "id": "008abab1-74b1-4f6e-99ee-73d6afdba2c4",
+                "groupId": "74122337-80eb-4272-aa58-ec2a78c54f31",
+                "type": "PROCESSOR",
+                "name": "Fetch Exchange Rates"
+              },
+              "destination": {
+                "id": "95043e36-70e5-4591-9e9b-2e8c6ae86c14",
+                "groupId": "74122337-80eb-4272-aa58-ec2a78c54f31",
+                "type": "PROCESSOR",
+                "name": "Save to File"
+              },
+              "selectedRelationships": [
+                "Response"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": []
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "ee1983b2-019d-1000-2bdd-25be24c00cf4",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 74.75,
+      "stage1_duration_sec": 42.05,
+      "stage2_duration_sec": 3.08,
+      "prompt_tokens": 3133,
+      "completion_tokens": 4620,
+      "total_tokens": 7753,
+      "cost_usd": 0.007024,
+      "nifi_processor_count": 2,
+      "nifi_connection_count": 1,
+      "pim_source_count": 1,
+      "pim_step_count": 0,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 27,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 1332,
+          "completion_tokens": 2227,
+          "total_tokens": 3559,
+          "duration_ms": 41625,
+          "cost_usd": 0.003328
+        },
+        {
+          "purpose": "nifi_correction",
+          "provider": "common",
+          "model": "google/gemini-2.5-flash-lite",
+          "prompt_tokens": 89,
+          "completion_tokens": 1220,
+          "total_tokens": 1309,
+          "duration_ms": 2906,
+          "cost_usd": 0.000497
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1332,
+          "completion_tokens": 2227,
+          "total_tokens": 3559,
+          "duration_ms": 41625,
+          "cost_usd": 0.003328
+        },
+        "nifi_correction": {
+          "calls": 1,
+          "prompt_tokens": 89,
+          "completion_tokens": 1220,
+          "total_tokens": 1309,
+          "duration_ms": 2906,
+          "cost_usd": 0.000497
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

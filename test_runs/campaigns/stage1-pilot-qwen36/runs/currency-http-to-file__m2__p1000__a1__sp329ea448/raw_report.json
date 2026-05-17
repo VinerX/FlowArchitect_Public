@@ -1,0 +1,164 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-03T13:57:35.605519+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: currency_rates_pipeline\n  name: Currency Rates Fetcher\n  description: Fetches latest exchange rates from exchangerate.host and saves to rates.json\ntriggers:\n- id: trigger_daily\n  type: schedule\n  condition: every 24 hours\nsources:\n- id: source_http_api\n  name: Fetch Exchange Rates\n  type: HTTP\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\n      accept: application/json\nprocessing_elements: []\nsinks:\n- id: sink_file\n  name: Save to JSON File\n  type: File\n  location: rates.json\n  connection:\n    properties:\n      base_directory: '{{OUTPUT_DIRECTORY}}'\nprocessed_data:\n- id: rates_json\n  format: json\nlinks:\n- from_id: source_http_api\n  to_id: sink_file\n  data_ref: rates_json",
+      "nifi_json": {
+        "id": "018d5a2b-0000-0000-0000-000000000000",
+        "parentGroupId": null,
+        "name": "Currency Rates Fetcher",
+        "comments": "Fetches latest exchange rates from exchangerate.host and saves to rates.json",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "processors": [
+          {
+            "id": "018d5a2b-0000-0000-0000-000000000001",
+            "name": "Fetch Exchange Rates",
+            "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+            "position": {
+              "x": 100,
+              "y": 100
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "24 hours",
+              "executionNode": "ALL",
+              "properties": {
+                "Remote URL": "https://api.exchangerate.host/latest",
+                "HTTP Method": "GET",
+                "Accept": "application/json",
+                "SSL Context Service": "{{SSL_CONTEXT_SERVICE}}",
+                "Connection Timeout": "{{CONNECTION_TIMEOUT}}",
+                "Read Timeout": "{{READ_TIMEOUT}}"
+              },
+              "autoTerminatedRelationships": [],
+              "concurrentlySchedulableTaskCount": "1"
+            }
+          },
+          {
+            "id": "018d5a2b-0000-0000-0000-000000000002",
+            "name": "Save to JSON File",
+            "type": "org.apache.nifi.processors.standard.PutFile",
+            "position": {
+              "x": 400,
+              "y": 100
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "properties": {
+                "Directory": "{{OUTPUT_DIRECTORY}}",
+                "Filename": "rates.json",
+                "Conflict Resolution Strategy": "replace",
+                "Create Missing Directories": "true",
+                "Permissions": "{{FILE_PERMISSIONS}}",
+                "Maximum File Size": "{{MAX_FILE_SIZE}}"
+              },
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ],
+              "concurrentlySchedulableTaskCount": "1"
+            }
+          }
+        ],
+        "connections": [
+          {
+            "id": "018d5a2b-0000-0000-0000-000000000003",
+            "name": "source_http_api to sink_file",
+            "source": {
+              "id": "018d5a2b-0000-0000-0000-000000000001",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "018d5a2b-0000-0000-0000-000000000002",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "flowFileExpiration": "0 sec",
+            "backPressureObjectThreshold": 10000,
+            "backPressureDataSizeThreshold": "1 GB"
+          }
+        ]
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details.",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 180.84,
+      "stage1_duration_sec": 46.88,
+      "stage2_duration_sec": 117.82,
+      "prompt_tokens": 2023,
+      "completion_tokens": 9881,
+      "total_tokens": 11904,
+      "cost_usd": 0.013503,
+      "nifi_processor_count": 2,
+      "nifi_connection_count": 1,
+      "pim_source_count": 1,
+      "pim_step_count": 0,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 28,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 1332,
+          "completion_tokens": 2493,
+          "total_tokens": 3825,
+          "duration_ms": 46468,
+          "cost_usd": 0.003674
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 602,
+          "completion_tokens": 6418,
+          "total_tokens": 7020,
+          "duration_ms": 117608,
+          "cost_usd": 0.008539
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1332,
+          "completion_tokens": 2493,
+          "total_tokens": 3825,
+          "duration_ms": 46468,
+          "cost_usd": 0.003674
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 602,
+          "completion_tokens": 6418,
+          "total_tokens": 7020,
+          "duration_ms": 117608,
+          "cost_usd": 0.008539
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

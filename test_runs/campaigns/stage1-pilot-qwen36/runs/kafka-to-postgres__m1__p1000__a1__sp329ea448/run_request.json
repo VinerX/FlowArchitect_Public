@@ -1,0 +1,195 @@
+{
+  "run_id": "kafka-to-postgres__m1__p1000__a1__sp329ea448",
+  "case_id": "kafka-to-postgres",
+  "title": "Kafka to PostgreSQL",
+  "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 1,
+  "preset_id": 1000,
+  "stage_presets": {
+    "pim": 1000,
+    "corrector": 1003
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "kafka",
+      "postgres",
+      "streaming"
+    ],
+    "expected_behavior": "Сообщения из Kafka появляются в таблице PostgreSQL после преобразования.",
+    "manual_test_checklist": [
+      "Импортировать полученный nifi.json в тестовый NiFi.",
+      "Проверить наличие всех обязательных процессоров и соединений.",
+      "Проверить, что схема потока соответствует задаче Kafka -> PostgreSQL."
+    ]
+  },
+  "status": "running",
+  "comment_count": 5,
+  "history": [
+    {
+      "timestamp": "2026-05-03T13:33:08.013873+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-03T14:33:26.652461+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    },
+    {
+      "timestamp": "2026-05-03T14:34:44.960678+00:00",
+      "status": "failed_import",
+      "reason": "runner_finished"
+    },
+    {
+      "timestamp": "2026-05-03T15:36:43.476054+00:00",
+      "status": "queued",
+      "reason": "manual_status_change"
+    },
+    {
+      "timestamp": "2026-05-03T15:36:48.443628+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    },
+    {
+      "timestamp": "2026-05-03T15:37:01.129915+00:00",
+      "status": "failed_generation",
+      "reason": "runner_finished"
+    },
+    {
+      "timestamp": "2026-05-03T15:37:26.853177+00:00",
+      "status": "queued",
+      "reason": "manual_status_change"
+    },
+    {
+      "timestamp": "2026-05-03T15:37:38.061262+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    },
+    {
+      "timestamp": "2026-05-03T15:38:56.619183+00:00",
+      "status": "failed_import",
+      "reason": "runner_finished"
+    },
+    {
+      "timestamp": "2026-05-03T15:39:13.372713+00:00",
+      "status": "queued",
+      "reason": "manual_status_change"
+    },
+    {
+      "timestamp": "2026-05-03T15:39:20.416697+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    },
+    {
+      "timestamp": "2026-05-03T15:40:22.522231+00:00",
+      "status": "failed_import",
+      "reason": "runner_finished"
+    },
+    {
+      "timestamp": "2026-05-03T15:41:02.368678+00:00",
+      "status": "queued",
+      "reason": "manual_status_change"
+    },
+    {
+      "timestamp": "2026-05-03T15:41:09.834593+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    },
+    {
+      "timestamp": "2026-05-03T15:42:36.441299+00:00",
+      "status": "failed_import",
+      "reason": "runner_finished"
+    },
+    {
+      "timestamp": "2026-05-03T15:43:19.319887+00:00",
+      "status": "queued",
+      "reason": "manual_status_change"
+    },
+    {
+      "timestamp": "2026-05-03T15:43:26.387041+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-03T15:43:26.387041+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\query.txt",
+    "--preset",
+    "1000",
+    "--mode",
+    "1",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\raw_report.json",
+    "--pim-preset",
+    "1000",
+    "--corrector-preset",
+    "1003",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960,
+  "finished_at": "2026-05-03T15:42:36.439298+00:00",
+  "exit_code": 0,
+  "report_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\raw_report.json",
+  "stdout_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\runner_stdout.log",
+  "stderr_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\runner_stderr.log",
+  "query_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\query.txt",
+  "result_summary": {
+    "success": true,
+    "error": null,
+    "duration_sec": 85.16,
+    "stage1_duration_sec": 48.0,
+    "stage2_duration_sec": 0.17,
+    "prompt_tokens": 1427,
+    "completion_tokens": 3629,
+    "total_tokens": 5056,
+    "cost_usd": 0.005181,
+    "nifi_processor_count": 3,
+    "nifi_connection_count": 2,
+    "pim_source_count": 1,
+    "pim_step_count": 1,
+    "pim_sink_count": 1,
+    "session_id": 36,
+    "preset_id": 1000,
+    "preset_name": "openrouter qwen/qwen3.6-plus",
+    "preset_model": "qwen/qwen3.6-plus",
+    "llm_calls": [
+      {
+        "purpose": "pim_generation",
+        "provider": "common",
+        "model": "qwen/qwen3.6-plus",
+        "prompt_tokens": 92,
+        "completion_tokens": 1075,
+        "total_tokens": 1167,
+        "duration_ms": 47702,
+        "cost_usd": 0.001427
+      }
+    ],
+    "llm_usage_by_purpose": {
+      "pim_generation": {
+        "calls": 1,
+        "prompt_tokens": 92,
+        "completion_tokens": 1075,
+        "total_tokens": 1167,
+        "duration_ms": 47702,
+        "cost_usd": 0.001427
+      }
+    },
+    "nifi_import_success": true,
+    "nifi_error_count": 3,
+    "nifi_import_error": null
+  },
+  "summary_path": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\run_summary.json",
+  "last_comment_at": "2026-05-03T15:43:19.319887+00:00"
+}

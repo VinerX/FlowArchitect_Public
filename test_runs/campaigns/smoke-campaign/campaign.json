@@ -1,0 +1,492 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-05-03T13:05:20.206106+00:00",
+  "updated_at": "2026-05-03T13:05:35.529788+00:00",
+  "campaign": {
+    "id": "smoke-campaign",
+    "title": "Глобальная серия валидации для ВКР",
+    "meta": {
+      "id": "thesis-global-validation-202605",
+      "title": "Глобальная серия валидации для ВКР",
+      "owner": "Дмитрий Макаров",
+      "objective": "Сравнить режимы 0, 1 и 3 на фиксированном наборе кейсов и собрать артефакты для анализа качества, устойчивости и экономии времени.\n",
+      "tags": [
+        "thesis",
+        "global-validation"
+      ]
+    },
+    "manifest_source": "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\_smoke_manifest.yaml"
+  },
+  "defaults": {
+    "presets": [
+      1000
+    ],
+    "modes": [
+      0,
+      1,
+      3
+    ],
+    "stage_presets": {
+      "pim": 1000,
+      "corrector": 1003
+    },
+    "repeat": 1,
+    "timeout_sec": 300,
+    "nifi_validate": true,
+    "manual_nifi_required": true,
+    "requires_user_input": false,
+    "stop_after_statuses": [
+      "needs_user_input",
+      "needs_nifi_manual_test"
+    ]
+  },
+  "run_order": [
+    "currency-http-to-file__m0__p1000__a1__sp329ea448",
+    "currency-http-to-file__m1__p1000__a1__sp329ea448",
+    "currency-http-to-file__m3__p1000__a1__sp329ea448",
+    "kafka-to-postgres__m0__p1000__a1__sp329ea448",
+    "kafka-to-postgres__m1__p1000__a1__sp329ea448",
+    "kafka-to-postgres__m3__p1000__a1__sp329ea448",
+    "postgres-to-kafka__m0__p1000__a1__sp329ea448",
+    "postgres-to-kafka__m1__p1000__a1__sp329ea448",
+    "postgres-to-kafka__m3__p1000__a1__sp329ea448",
+    "s3-to-hdfs__m0__p1000__a1__sp329ea448",
+    "s3-to-hdfs__m1__p1000__a1__sp329ea448",
+    "s3-to-hdfs__m3__p1000__a1__sp329ea448"
+  ],
+  "runs": {
+    "currency-http-to-file__m0__p1000__a1__sp329ea448": {
+      "run_id": "currency-http-to-file__m0__p1000__a1__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Получение курсов валют в файл",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline"
+        ],
+        "expected_behavior": "Файл rates.json должен обновляться по расписанию.",
+        "manual_test_checklist": [
+          "Импортировать сохраненный nifi.json в тестовый NiFi.",
+          "Проверить, что flow проходит валидацию и пишет файл."
+        ]
+      },
+      "status": "needs_user_input",
+      "comment_count": 2,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        },
+        {
+          "timestamp": "2026-05-03T13:05:35.522786+00:00",
+          "status": "needs_user_input",
+          "reason": "manual_status_change"
+        }
+      ],
+      "last_comment_at": "2026-05-03T13:05:35.528788+00:00"
+    },
+    "currency-http-to-file__m1__p1000__a1__sp329ea448": {
+      "run_id": "currency-http-to-file__m1__p1000__a1__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Получение курсов валют в файл",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline"
+        ],
+        "expected_behavior": "Файл rates.json должен обновляться по расписанию.",
+        "manual_test_checklist": [
+          "Импортировать сохраненный nifi.json в тестовый NiFi.",
+          "Проверить, что flow проходит валидацию и пишет файл."
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "currency-http-to-file__m3__p1000__a1__sp329ea448": {
+      "run_id": "currency-http-to-file__m3__p1000__a1__sp329ea448",
+      "case_id": "currency-http-to-file",
+      "title": "Получение курсов валют в файл",
+      "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "http",
+          "file",
+          "baseline"
+        ],
+        "expected_behavior": "Файл rates.json должен обновляться по расписанию.",
+        "manual_test_checklist": [
+          "Импортировать сохраненный nifi.json в тестовый NiFi.",
+          "Проверить, что flow проходит валидацию и пишет файл."
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "kafka-to-postgres__m0__p1000__a1__sp329ea448": {
+      "run_id": "kafka-to-postgres__m0__p1000__a1__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka в PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "streaming"
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "kafka-to-postgres__m1__p1000__a1__sp329ea448": {
+      "run_id": "kafka-to-postgres__m1__p1000__a1__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka в PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "streaming"
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "kafka-to-postgres__m3__p1000__a1__sp329ea448": {
+      "run_id": "kafka-to-postgres__m3__p1000__a1__sp329ea448",
+      "case_id": "kafka-to-postgres",
+      "title": "Kafka в PostgreSQL",
+      "query": "Считывай сообщения из Kafka topic orders, преобразуй JSON в строки таблицы и записывай их в PostgreSQL.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "kafka",
+          "postgres",
+          "streaming"
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "postgres-to-kafka__m0__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-kafka__m0__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL в Kafka",
+      "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "batch"
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "postgres-to-kafka__m1__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-kafka__m1__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL в Kafka",
+      "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "batch"
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "postgres-to-kafka__m3__p1000__a1__sp329ea448": {
+      "run_id": "postgres-to-kafka__m3__p1000__a1__sp329ea448",
+      "case_id": "postgres-to-kafka",
+      "title": "PostgreSQL в Kafka",
+      "query": "Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic analytics.events в формате JSON.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "postgres",
+          "kafka",
+          "batch"
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "s3-to-hdfs__m0__p1000__a1__sp329ea448": {
+      "run_id": "s3-to-hdfs__m0__p1000__a1__sp329ea448",
+      "case_id": "s3-to-hdfs",
+      "title": "S3 в HDFS",
+      "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 0,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "hdfs",
+          "file-transfer"
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "s3-to-hdfs__m1__p1000__a1__sp329ea448": {
+      "run_id": "s3-to-hdfs__m1__p1000__a1__sp329ea448",
+      "case_id": "s3-to-hdfs",
+      "title": "S3 в HDFS",
+      "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 1,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "hdfs",
+          "file-transfer"
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    },
+    "s3-to-hdfs__m3__p1000__a1__sp329ea448": {
+      "run_id": "s3-to-hdfs__m3__p1000__a1__sp329ea448",
+      "case_id": "s3-to-hdfs",
+      "title": "S3 в HDFS",
+      "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+      "query_file": null,
+      "attempt": 1,
+      "mode": 3,
+      "preset_id": 1000,
+      "stage_presets": {
+        "pim": 1000,
+        "corrector": 1003
+      },
+      "timeout_sec": 300,
+      "nifi_validate": true,
+      "manual_nifi_required": true,
+      "requires_user_input": false,
+      "extra_metadata": {
+        "tags": [
+          "s3",
+          "hdfs",
+          "file-transfer"
+        ]
+      },
+      "status": "queued",
+      "comment_count": 0,
+      "history": [
+        {
+          "timestamp": "2026-05-03T13:05:20.206106+00:00",
+          "status": "queued",
+          "reason": "campaign_init"
+        }
+      ]
+    }
+  },
+  "status_counts": {
+    "queued": 11,
+    "needs_user_input": 1
+  }
+}

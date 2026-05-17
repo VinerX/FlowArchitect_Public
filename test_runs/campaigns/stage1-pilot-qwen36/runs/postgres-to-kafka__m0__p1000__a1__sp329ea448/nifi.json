@@ -1,0 +1,105 @@
+{
+  "flowContents": {
+    "identifier": "root-pg",
+    "name": "root",
+    "processGroups": [
+      {
+        "identifier": "pg-main",
+        "name": "PostgreSQL to Kafka",
+        "processors": [
+          {
+            "identifier": "proc-query",
+            "name": "QueryDatabaseTableRecord",
+            "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+            "position": {
+              "x": 100,
+              "y": 100
+            },
+            "config": {
+              "schedulingPeriod": "1 min",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "properties": {
+                "Database Connection Pooling Service": "cs-dbcp",
+                "Table Name": "your_table_name",
+                "Maximum-value Columns": "id",
+                "Record Writer": "cs-json-writer",
+                "Stateful Variables Initial Value": "0"
+              },
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            }
+          },
+          {
+            "identifier": "proc-kafka",
+            "name": "PublishKafka_2_6",
+            "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6",
+            "position": {
+              "x": 100,
+              "y": 300
+            },
+            "config": {
+              "schedulingPeriod": "0 sec",
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "properties": {
+                "Kafka Brokers": "localhost:9092",
+                "Topic Name": "analytics.events",
+                "Use Transactions": "false",
+                "Message Delimiter": "\\n"
+              },
+              "autoTerminatedRelationships": [
+                "failure",
+                "success"
+              ]
+            }
+          }
+        ],
+        "connections": [
+          {
+            "identifier": "conn-1",
+            "source": {
+              "id": "proc-query",
+              "groupId": "pg-main"
+            },
+            "destination": {
+              "id": "proc-kafka",
+              "groupId": "pg-main"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "name": "query to kafka"
+          }
+        ]
+      }
+    ]
+  },
+  "controllerServices": [
+    {
+      "identifier": "cs-dbcp",
+      "name": "PostgreSQL DBCPConnectionPool",
+      "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+      "properties": {
+        "Database Connection URL": "jdbc:postgresql://localhost:5432/your_database",
+        "Database Driver Class Name": "org.postgresql.Driver",
+        "Database User": "your_username",
+        "Password": "your_password",
+        "Max Wait Time": "500 ms",
+        "Max Total Connections": "10",
+        "Validation-query": "SELECT 1"
+      },
+      "state": "ENABLED"
+    },
+    {
+      "identifier": "cs-json-writer",
+      "name": "JsonRecordSetWriter",
+      "type": "org.apache.nifi.json.JsonRecordSetWriter",
+      "properties": {
+        "Schema Access Strategy": "inferred-record",
+        "Schema Registry": null,
+        "Schema Write Strategy": "schema-name"
+      },
+      "state": "ENABLED"
+    }
+  ]
+}

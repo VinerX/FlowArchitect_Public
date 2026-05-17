@@ -1,0 +1,199 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T10:59:36.680393+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: exchange_rate_fetcher\n  name: Exchange Rate to JSON Flow\n  description: Fetches latest exchange rates from an API and saves them to a local\n    JSON file.\ntriggers:\n- id: trigger_daily\n  type: schedule\n  condition: 0 0 * * *\nsources:\n- id: source_api\n  name: Exchange Rate API\n  type: HTTP_REST\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\n      auth_type: none\nprocessing_elements: []\nsinks:\n- id: sink_file\n  name: Local JSON File\n  type: File\n  location: /data/output/rates.json\n  connection:\n    properties:\n      format: json\n      write_mode: overwrite\nprocessed_data:\n- id: exchange_data\n  format: json\nlinks:\n- from_id: source_api\n  to_id: sink_file\n  data_ref: exchange_data",
+      "nifi_json": {
+        "revision": {
+          "version": 0
+        },
+        "component": {
+          "id": "8937007c-0001-1000-0000-000000000000",
+          "name": "Exchange Rate to JSON Flow",
+          "description": "Fetches latest exchange rates from an API and saves them to a local JSON file.",
+          "contents": {
+            "processors": [
+              {
+                "id": "e1a1a1a1-0001-1000-0000-000000000001",
+                "name": "Exchange Rate API",
+                "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-standard-nar",
+                  "version": "1.23.2"
+                },
+                "position": {
+                  "x": 300.0,
+                  "y": 100.0
+                },
+                "config": {
+                  "schedulingStrategy": "CRON_DRIVEN",
+                  "schedulingPeriod": "0 0 * * *",
+                  "properties": {
+                    "HTTP Method": "GET",
+                    "Remote URL": "https://api.exchangerate.host/latest",
+                    "Connection Timeout": "5 secs",
+                    "Read Timeout": "15 secs"
+                  }
+                }
+              },
+              {
+                "id": "e2b2b2b2-0002-1000-0000-000000000002",
+                "name": "Local JSON File",
+                "type": "org.apache.nifi.processors.standard.PutFile",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-standard-nar",
+                  "version": "1.23.2"
+                },
+                "position": {
+                  "x": 300.0,
+                  "y": 400.0
+                },
+                "config": {
+                  "properties": {
+                    "Directory": "/data/output",
+                    "Conflict Resolution Strategy": "replace"
+                  }
+                }
+              },
+              {
+                "id": "e3c3c3c3-0003-1000-0000-000000000003",
+                "name": "Rename to rates.json",
+                "type": "org.apache.nifi.processors.standard.UpdateAttribute",
+                "bundle": {
+                  "group": "org.apache.nifi",
+                  "artifact": "nifi-update-attribute-nar",
+                  "version": "1.23.2"
+                },
+                "position": {
+                  "x": 300.0,
+                  "y": 250.0
+                },
+                "config": {
+                  "properties": {
+                    "filename": "rates.json"
+                  }
+                }
+              }
+            ],
+            "connections": [
+              {
+                "id": "c1d1d1d1-0004-1000-0000-000000000004",
+                "name": "API Success",
+                "source": {
+                  "id": "e1a1a1a1-0001-1000-0000-000000000001",
+                  "type": "PROCESSOR",
+                  "groupId": "8937007c-0001-1000-0000-000000000000",
+                  "name": "Exchange Rate API"
+                },
+                "destination": {
+                  "id": "e3c3c3c3-0003-1000-0000-000000000003",
+                  "type": "PROCESSOR",
+                  "groupId": "8937007c-0001-1000-0000-000000000000",
+                  "name": "Rename to rates.json"
+                },
+                "selectedRelationships": [
+                  "Response"
+                ]
+              },
+              {
+                "id": "c2e2e2e2-0005-1000-0000-000000000005",
+                "name": "Write to File",
+                "source": {
+                  "id": "e3c3c3c3-0003-1000-0000-000000000003",
+                  "type": "PROCESSOR",
+                  "groupId": "8937007c-0001-1000-0000-000000000000",
+                  "name": "Rename to rates.json"
+                },
+                "destination": {
+                  "id": "e2b2b2b2-0002-1000-0000-000000000002",
+                  "type": "PROCESSOR",
+                  "groupId": "8937007c-0001-1000-0000-000000000000",
+                  "name": "Local JSON File"
+                },
+                "selectedRelationships": [
+                  "success"
+                ]
+              }
+            ]
+          }
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "20feabe6-019e-1000-14e6-f3750cca82a6",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 63.41,
+      "stage1_duration_sec": 10.07,
+      "stage2_duration_sec": 8.56,
+      "prompt_tokens": 2146,
+      "completion_tokens": 1803,
+      "total_tokens": 3949,
+      "cost_usd": 0.006482,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": 1,
+      "pim_step_count": 0,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1006,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 109,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 1372,
+          "completion_tokens": 411,
+          "total_tokens": 1783,
+          "duration_ms": 9733,
+          "cost_usd": 0.001919
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "google/gemini-3-flash-preview",
+          "prompt_tokens": 692,
+          "completion_tokens": 1386,
+          "total_tokens": 2078,
+          "duration_ms": 7717,
+          "cost_usd": 0.004504
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1372,
+          "completion_tokens": 411,
+          "total_tokens": 1783,
+          "duration_ms": 9733,
+          "cost_usd": 0.001919
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 692,
+          "completion_tokens": 1386,
+          "total_tokens": 2078,
+          "duration_ms": 7717,
+          "cost_usd": 0.004504
+        }
+      },
+      "preset_id": 1006,
+      "preset_name": "openrouter gemini 3 flash",
+      "preset_model": "google/gemini-3-flash-preview"
+    }
+  ]
+}

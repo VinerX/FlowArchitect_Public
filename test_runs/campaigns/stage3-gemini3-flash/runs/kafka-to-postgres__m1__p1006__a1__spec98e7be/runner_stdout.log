@@ -1,0 +1,27 @@
+
+================================================================
+Query  : �������� ��������� �� Kafka topic orders.created, ����� JSON, �������� �...
+Mode   : 1 � Adapter (NL->YAML->JSON)
+Presets: [1006]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1006, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1006: openrouter gemini 3 flash  [google/gemini-3-flash-preview] ---
+  [1/2] USER_QUERY  mode=1  preset=1006
+  [1/2] PIM ready  (1210 chars, 4.55s)
+  [2/2] REQUEST_CONVERSION  mode=1  preset=1006
+  [2/2] NiFi JSON ready  (3 proc, 2 conn, 0.11s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 1476 in / 610 out / 2086 total  |  cost: $0.002568
+  Result : [OK]  (50.76s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage3-gemini3-flash\runs\kafka-to-postgres__m1__p1006__a1__spec98e7be\raw_report.json

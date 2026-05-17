@@ -1,0 +1,154 @@
+{
+  "revision": {
+    "version": 0
+  },
+  "component": {
+    "id": "786407e3-018d-1000-0000-000000000001",
+    "name": "Pending Transactions to Kafka",
+    "contents": {
+      "processGroups": [],
+      "processors": [
+        {
+          "id": "786407e3-018d-1000-0000-000000000002",
+          "name": "Read Pending Transactions",
+          "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 300,
+            "y": 100
+          },
+          "config": {
+            "schedulingStrategy": "TIMER_DRIVEN",
+            "schedulingPeriod": "1 min",
+            "properties": {
+              "Database Connection Pool": "786407e3-018d-1000-0000-000000000005",
+              "db-fetch-db-type": "PostgreSQL",
+              "table-name": "public.transactions",
+              "db-fetch-sql-query": "SELECT * FROM public.transactions WHERE status = 'PENDING'",
+              "record-writer": "786407e3-018d-1000-0000-000000000006"
+            }
+          }
+        },
+        {
+          "id": "786407e3-018d-1000-0000-000000000003",
+          "name": "Convert to JSON",
+          "type": "org.apache.nifi.processors.standard.ConvertRecord",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-standard-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 300,
+            "y": 350
+          },
+          "config": {
+            "properties": {
+              "record-reader": "786407e3-018d-1000-0000-000000000007",
+              "record-writer": "786407e3-018d-1000-0000-000000000006"
+            }
+          }
+        },
+        {
+          "id": "786407e3-018d-1000-0000-000000000004",
+          "name": "Publish to Kafka",
+          "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord_3_0",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-kafka-3-0-nar",
+            "version": "1.23.2"
+          },
+          "position": {
+            "x": 300,
+            "y": 600
+          },
+          "config": {
+            "properties": {
+              "bootstrap.servers": "{{KAFKA_BROKERS}}",
+              "topic": "transactions.overdue",
+              "record-reader": "786407e3-018d-1000-0000-000000000007",
+              "record-writer": "786407e3-018d-1000-0000-000000000006",
+              "client.id": "flow_producer_overdue"
+            }
+          }
+        }
+      ],
+      "connections": [
+        {
+          "id": "786407e3-018d-1000-0000-000000000008",
+          "source": {
+            "id": "786407e3-018d-1000-0000-000000000002",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "786407e3-018d-1000-0000-000000000003",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "success"
+          ]
+        },
+        {
+          "id": "786407e3-018d-1000-0000-000000000009",
+          "source": {
+            "id": "786407e3-018d-1000-0000-000000000003",
+            "type": "PROCESSOR"
+          },
+          "destination": {
+            "id": "786407e3-018d-1000-0000-000000000004",
+            "type": "PROCESSOR"
+          },
+          "selectedRelationships": [
+            "success"
+          ]
+        }
+      ],
+      "controllerServices": [
+        {
+          "id": "786407e3-018d-1000-0000-000000000005",
+          "name": "DBCPConnectionPool",
+          "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-dbcp-service-nar",
+            "version": "1.23.2"
+          },
+          "properties": {
+            "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+            "Database Driver Class Name": "org.postgresql.Driver",
+            "Database User": "{{DB_USER}}",
+            "Password": "{{DB_PASSWORD}}"
+          }
+        },
+        {
+          "id": "786407e3-018d-1000-0000-000000000006",
+          "name": "JsonRecordSetWriter",
+          "type": "org.apache.nifi.json.JsonRecordSetWriter",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-record-serialization-services-nar",
+            "version": "1.23.2"
+          },
+          "properties": {
+            "output-grouping": "output-array"
+          }
+        },
+        {
+          "id": "786407e3-018d-1000-0000-000000000007",
+          "name": "JsonTreeReader",
+          "type": "org.apache.nifi.json.JsonTreeReader",
+          "bundle": {
+            "group": "org.apache.nifi",
+            "artifact": "nifi-record-serialization-services-nar",
+            "version": "1.23.2"
+          },
+          "properties": {}
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,391 @@
+{
+  "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T20:24:59.374415+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flowContents": {
+          "componentType": "PROCESS_GROUP",
+          "identifier": "e3f1a2b4-c5d6-7890-abcd-ef1234567890",
+          "name": "Filter Completed Orders",
+          "position": {
+            "x": 0.0,
+            "y": 0.0
+          },
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "processors": [
+            {
+              "componentType": "PROCESSOR",
+              "identifier": "a1b2c3d4-e5f6-7890-abcd-111111111111",
+              "name": "GetFile - Read CSV from input directory",
+              "type": "org.apache.nifi.processors.standard.GetFile",
+              "position": {
+                "x": 200.0,
+                "y": 200.0
+              },
+              "properties": {
+                "Input Directory": "/data/input/orders/",
+                "File Filter": "[^\\.].*\\.csv",
+                "Keep Source File": "false",
+                "Recurse Subdirectories": "false",
+                "Polling Interval": "0 sec",
+                "Batch Size": "10",
+                "Ignore Hidden Files": "true"
+              },
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "10 sec",
+              "autoTerminatedRelationships": [],
+              "bulletinLevel": "WARN",
+              "style": {}
+            },
+            {
+              "componentType": "PROCESSOR",
+              "identifier": "b2c3d4e5-f6a7-8901-bcde-222222222222",
+              "name": "SplitRecord - Split CSV into individual rows",
+              "type": "org.apache.nifi.processors.standard.SplitRecord",
+              "position": {
+                "x": 500.0,
+                "y": 200.0
+              },
+              "properties": {
+                "Record Reader": "csv-reader",
+                "Record Writer": "csv-writer",
+                "Records Per Split": "1"
+              },
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "autoTerminatedRelationships": [
+                "original",
+                "failure"
+              ],
+              "bulletinLevel": "WARN",
+              "style": {}
+            },
+            {
+              "componentType": "PROCESSOR",
+              "identifier": "c3d4e5f6-a7b8-9012-cdef-333333333333",
+              "name": "RouteOnAttribute - Filter COMPLETED status",
+              "type": "org.apache.nifi.processors.standard.RouteOnAttribute",
+              "position": {
+                "x": 800.0,
+                "y": 200.0
+              },
+              "properties": {
+                "Routing Strategy": "Route to Property name",
+                "completed": "${status:equals('COMPLETED')}"
+              },
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "autoTerminatedRelationships": [
+                "unmatched"
+              ],
+              "bulletinLevel": "WARN",
+              "style": {}
+            },
+            {
+              "componentType": "PROCESSOR",
+              "identifier": "d4e5f6a7-b8c9-0123-defa-444444444444",
+              "name": "QueryRecord - Filter rows where status = COMPLETED",
+              "type": "org.apache.nifi.processors.standard.QueryRecord",
+              "position": {
+                "x": 500.0,
+                "y": 450.0
+              },
+              "properties": {
+                "Record Reader": "csv-reader",
+                "Record Writer": "csv-writer",
+                "Include Zero Record FlowFiles": "false",
+                "completed_orders": "SELECT * FROM FLOWFILE WHERE status = 'COMPLETED'"
+              },
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "autoTerminatedRelationships": [
+                "original",
+                "failure"
+              ],
+              "bulletinLevel": "WARN",
+              "style": {}
+            },
+            {
+              "componentType": "PROCESSOR",
+              "identifier": "e5f6a7b8-c9d0-1234-efab-555555555555",
+              "name": "MergeRecord - Merge filtered records",
+              "type": "org.apache.nifi.processors.standard.MergeRecord",
+              "position": {
+                "x": 800.0,
+                "y": 450.0
+              },
+              "properties": {
+                "Record Reader": "csv-reader",
+                "Record Writer": "csv-writer",
+                "Merge Strategy": "Bin-Packing Algorithm",
+                "Minimum Number of Records": "1",
+                "Maximum Number of Records": "10000",
+                "Maximum Bin Age": "10 sec",
+                "Minimum Bin Size": "0 B",
+                "Maximum Bin Size": "1 GB"
+              },
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "autoTerminatedRelationships": [
+                "original",
+                "failure"
+              ],
+              "bulletinLevel": "WARN",
+              "style": {}
+            },
+            {
+              "componentType": "PROCESSOR",
+              "identifier": "f6a7b8c9-d0e1-2345-fabc-666666666666",
+              "name": "PutFile - Write result to output file",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "position": {
+                "x": 1100.0,
+                "y": 450.0
+              },
+              "properties": {
+                "Directory": "/data/output/",
+                "Conflict Resolution Strategy": "replace",
+                "Create Missing Directories": "true",
+                "Maximum File Count": "-1",
+                "Last Modified Time": "",
+                "Permissions": "",
+                "Owner": "",
+                "Group": ""
+              },
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ],
+              "bulletinLevel": "WARN",
+              "style": {}
+            },
+            {
+              "componentType": "PROCESSOR",
+              "identifier": "a7b8c9d0-e1f2-3456-abcd-777777777777",
+              "name": "UpdateAttribute - Set output filename",
+              "type": "org.apache.nifi.processors.standard.UpdateAttribute",
+              "position": {
+                "x": 800.0,
+                "y": 650.0
+              },
+              "properties": {
+                "filename": "completed_orders.csv"
+              },
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "autoTerminatedRelationships": [],
+              "bulletinLevel": "WARN",
+              "style": {}
+            }
+          ],
+          "connections": [
+            {
+              "componentType": "CONNECTION",
+              "identifier": "conn-1111-1111-1111-111111111111",
+              "name": "",
+              "source": {
+                "id": "a1b2c3d4-e5f6-7890-abcd-111111111111",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "d4e5f6a7-b8c9-0123-defa-444444444444",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureDataSizeThreshold": "1 GB",
+              "backPressureObjectThreshold": 10000,
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "componentType": "CONNECTION",
+              "identifier": "conn-2222-2222-2222-222222222222",
+              "name": "",
+              "source": {
+                "id": "d4e5f6a7-b8c9-0123-defa-444444444444",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "e5f6a7b8-c9d0-1234-efab-555555555555",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "completed_orders"
+              ],
+              "backPressureDataSizeThreshold": "1 GB",
+              "backPressureObjectThreshold": 10000,
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "componentType": "CONNECTION",
+              "identifier": "conn-3333-3333-3333-333333333333",
+              "name": "",
+              "source": {
+                "id": "e5f6a7b8-c9d0-1234-efab-555555555555",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "a7b8c9d0-e1f2-3456-abcd-777777777777",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "merged"
+              ],
+              "backPressureDataSizeThreshold": "1 GB",
+              "backPressureObjectThreshold": 10000,
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            },
+            {
+              "componentType": "CONNECTION",
+              "identifier": "conn-4444-4444-4444-444444444444",
+              "name": "",
+              "source": {
+                "id": "a7b8c9d0-e1f2-3456-abcd-777777777777",
+                "type": "PROCESSOR"
+              },
+              "destination": {
+                "id": "f6a7b8c9-d0e1-2345-fabc-666666666666",
+                "type": "PROCESSOR"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureDataSizeThreshold": "1 GB",
+              "backPressureObjectThreshold": 10000,
+              "flowFileExpiration": "0 sec",
+              "prioritizers": [],
+              "bends": []
+            }
+          ],
+          "controllerServices": [
+            {
+              "componentType": "CONTROLLER_SERVICE",
+              "identifier": "cs-reader-1111-1111-111111111111",
+              "name": "csv-reader",
+              "type": "org.apache.nifi.csv.CSVReader",
+              "properties": {
+                "schema-access-strategy": "infer-schema",
+                "csv-format": "Default Excel",
+                "First Line Is Header": "true",
+                "Ignore CSV Header": "false",
+                "Quote Character": "\"",
+                "Escape Character": "\\",
+                "Comment Marker": "",
+                "Null String": "",
+                "Trim Fields": "true",
+                "charset": "UTF-8"
+              },
+              "bulletinLevel": "WARN"
+            },
+            {
+              "componentType": "CONTROLLER_SERVICE",
+              "identifier": "cs-writer-2222-2222-222222222222",
+              "name": "csv-writer",
+              "type": "org.apache.nifi.csv.CSVRecordSetWriter",
+              "properties": {
+                "schema-access-strategy": "inherit-record-schema",
+                "csv-format": "Default Excel",
+                "Include CSV Header Line": "true",
+                "Quote Character": "\"",
+                "Escape Character": "\\",
+                "Null String": "",
+                "Trim Fields": "true",
+                "charset": "UTF-8"
+              },
+              "bulletinLevel": "WARN"
+            }
+          ],
+          "labels": [
+            {
+              "componentType": "LABEL",
+              "identifier": "label-1111-1111-1111-111111111111",
+              "label": "PIPELINE: Read CSV → Filter status=COMPLETED → Write to /data/output/completed_orders.csv\n\nFlow:\n1. GetFile          — reads *.csv from /data/input/orders/\n2. QueryRecord      — SELECT * FROM FLOWFILE WHERE status = 'COMPLETED'\n3. MergeRecord      — merges filtered records into single file\n4. UpdateAttribute  — sets filename = completed_orders.csv\n5. PutFile          — writes to /data/output/completed_orders.csv\n\nController Services:\n- csv-reader  : CSVReader  (infer schema, header=true)\n- csv-writer  : CSVRecordSetWriter (include header)",
+              "position": {
+                "x": 200.0,
+                "y": 750.0
+              },
+              "width": 900.0,
+              "height": 200.0,
+              "style": {
+                "background-color": "#e8f4f8"
+              }
+            }
+          ],
+          "funnels": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "variables": {}
+        },
+        "parameterContexts": [],
+        "flowEncodingVersion": "1.0",
+        "comments": "ETL flow: filter CSV rows with status=COMPLETED and write to output file"
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "HTTP 500: An unexpected error has occurred. Please check the logs for additional details.",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 50.63,
+      "stage1_duration_sec": 34.67,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 196,
+      "completion_tokens": 3359,
+      "total_tokens": 3555,
+      "cost_usd": 0.050973,
+      "nifi_processor_count": 7,
+      "nifi_connection_count": 4,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 211,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 113,
+          "completion_tokens": 9,
+          "total_tokens": 122,
+          "duration_ms": 34359,
+          "cost_usd": 0.000474
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 113,
+          "completion_tokens": 9,
+          "total_tokens": 122,
+          "duration_ms": 34359,
+          "cost_usd": 0.000474
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

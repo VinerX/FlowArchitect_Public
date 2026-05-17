@@ -1,0 +1,64 @@
+campaign:
+  id: stage1-sonnet-focus
+  title: Этап 1 — фокусная проверка Sonnet 4.6
+  owner: Дмитрий Макаров
+  objective: 'Сравнить Sonnet 4.6 на двух наиболее показательных correction-sensitive
+    кейсах, чтобы понять, улучшает ли более сильная модель staged generation и semantic
+    correction по сравнению с Qwen и DeepSeek без запуска полной 20-run серии.
+
+    '
+  tags:
+  - thesis
+  - stage1
+  - sonnet
+  - focused
+defaults:
+  presets:
+  - 1005
+  modes:
+  - 1
+  - 3
+  stage_presets:
+    pim: 1005
+    corrector: 1005
+  repeat: 1
+  timeout_sec: 300
+  nifi_validate: true
+  manual_nifi_required: true
+  requires_user_input: false
+  stop_after_statuses:
+  - needs_user_input
+  - needs_nifi_manual_test
+cases:
+- id: postgres-to-file
+  title: PostgreSQL to File
+  query: 'Периодически выбирай новые записи из PostgreSQL public.orders и сохраняй
+    их в JSON-файл orders_export.json.
+
+    '
+  tags:
+  - postgres
+  - file
+  - functional
+  - correction-sensitive
+  expected_behavior: Записи из PostgreSQL public.orders экспортируются в JSON-файл.
+  manual_test_checklist:
+  - Импортировать полученный nifi.json в тестовый NiFi.
+  - Проверить, что source корректно читает public.orders из PostgreSQL.
+  - Проверить, что flow сохраняет результат в файл по явному пути.
+- id: postgres-to-kafka
+  title: PostgreSQL to Kafka
+  query: 'Периодически выбирай новые записи из PostgreSQL и публикуй их в Kafka topic
+    analytics.events в формате JSON.
+
+    '
+  tags:
+  - postgres
+  - kafka
+  - batch
+  - correction-sensitive
+  expected_behavior: Новые записи из PostgreSQL публикуются в Kafka topic analytics.events.
+  manual_test_checklist:
+  - Импортировать полученный nifi.json в тестовый NiFi.
+  - Проверить наличие корректного источника чтения из PostgreSQL.
+  - Проверить наличие корректной публикации в Kafka в формате JSON.

@@ -1,0 +1,38 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-12T15:53:15.211791+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: exchange_rates_pipeline\n  name: Currency Rates Fetcher\n  description: Fetches latest currency exchange rates from an external API and saves\n    them to a local JSON file.\ntriggers:\n- id: trigger_daily\n  type: schedule\n  condition: every day at 00:00 UTC\nsources:\n- id: source_api\n  name: Get Latest Rates\n  type: HTTP\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\n      timeout: 30s\nprocessing_elements: []\nsinks:\n- id: sink_file\n  name: Write Rates to File\n  type: File\n  location: /data/output/rates.json\nprocessed_data:\n- id: rates_json\n  format: json\nlinks:\n- from_id: source_api\n  to_id: sink_file\n  data_ref: rates_json",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for NiFi JSON",
+      "duration_sec": 351.2,
+      "stage1_duration_sec": 50.97,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 0,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

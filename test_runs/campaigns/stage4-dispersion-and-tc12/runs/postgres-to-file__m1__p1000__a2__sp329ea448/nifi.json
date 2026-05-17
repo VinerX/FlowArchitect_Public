@@ -1,0 +1,216 @@
+{
+  "flowContents": {
+    "identifier": "94203824-e502-4a64-b5af-2f494e639bbe",
+    "name": "PostgreSQL Orders to JSON Export",
+    "comments": "Periodically extracts new records from PostgreSQL public.orders and saves them to a JSON file.",
+    "processors": [
+      {
+        "identifier": "97c583ef-5743-4f13-abb5-2dc27e268f61",
+        "name": "Read PostgreSQL Orders",
+        "comments": "Generated from PIM source 'source_postgres' (PostgreSQL)",
+        "type": "org.apache.nifi.processors.standard.QueryDatabaseTableRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Table Name": "public.orders",
+          "Database Type": "PostgreSQL",
+          "Database Connection Pooling Service": "5378cbf0-d038-4a92-875f-3b5abdec2ee0",
+          "Record Writer": "ef7b43dd-7142-4a3e-9c17-f5a1f0f56c14"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "60 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": []
+      },
+      {
+        "identifier": "d211f4bd-c09b-4425-8b07-0dc9f5e08f9b",
+        "name": "Filter New Records",
+        "comments": "Generated from PIM processing element 'process_incremental' (Filter)",
+        "type": "org.apache.nifi.processors.standard.QueryRecord",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 460.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "filtered": "SELECT * FROM FLOWFILE WHERE created_at > {{LAST_SYNC_TIMESTAMP}}",
+          "Record Writer": "ef7b43dd-7142-4a3e-9c17-f5a1f0f56c14",
+          "Record Reader": "7ba3020a-42d1-41cf-8990-b895ea75090f"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "failure",
+          "original"
+        ]
+      },
+      {
+        "identifier": "6a312f82-33df-4450-9a19-690301c89cd4",
+        "name": "Write to JSON File",
+        "comments": "Generated from PIM sink 'sink_json_file' (JSON File)",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Directory": "/data/output",
+          "format": "json",
+          "mode": "overwrite"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "da82463a-b8d0-4d49-b17f-7f15a1a7d671",
+        "name": "Read PostgreSQL Orders -> Filter New Records",
+        "comments": "orders_json",
+        "source": {
+          "id": "97c583ef-5743-4f13-abb5-2dc27e268f61",
+          "groupId": "94203824-e502-4a64-b5af-2f494e639bbe",
+          "type": "PROCESSOR",
+          "name": "Read PostgreSQL Orders"
+        },
+        "destination": {
+          "id": "d211f4bd-c09b-4425-8b07-0dc9f5e08f9b",
+          "groupId": "94203824-e502-4a64-b5af-2f494e639bbe",
+          "type": "PROCESSOR",
+          "name": "Filter New Records"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      },
+      {
+        "identifier": "e199ae90-9c8c-4fee-a7a2-c392aa61c56c",
+        "name": "Filter New Records -> Write to JSON File",
+        "comments": "orders_json",
+        "source": {
+          "id": "d211f4bd-c09b-4425-8b07-0dc9f5e08f9b",
+          "groupId": "94203824-e502-4a64-b5af-2f494e639bbe",
+          "type": "PROCESSOR",
+          "name": "Filter New Records"
+        },
+        "destination": {
+          "id": "6a312f82-33df-4450-9a19-690301c89cd4",
+          "groupId": "94203824-e502-4a64-b5af-2f494e639bbe",
+          "type": "PROCESSOR",
+          "name": "Write to JSON File"
+        },
+        "selectedRelationships": [
+          "filtered"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": [
+      {
+        "identifier": "5378cbf0-d038-4a92-875f-3b5abdec2ee0",
+        "name": "DatabaseConnectionPool",
+        "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-dbcp-service-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DB_NAME}}",
+          "Database Driver Class Name": "org.postgresql.Driver",
+          "Database User": "{{DB_USERNAME}}",
+          "Password": "{{DB_PASSWORD}}"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "7ba3020a-42d1-41cf-8990-b895ea75090f",
+        "name": "JsonTreeReader",
+        "type": "org.apache.nifi.json.JsonTreeReader",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Access Strategy": "Infer Schema"
+        },
+        "propertyDescriptors": {}
+      },
+      {
+        "identifier": "ef7b43dd-7142-4a3e-9c17-f5a1f0f56c14",
+        "name": "JsonRecordSetWriter",
+        "type": "org.apache.nifi.json.JsonRecordSetWriter",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-record-serialization-services-nar",
+          "version": "2.7.2"
+        },
+        "properties": {
+          "Schema Write Strategy": "Do Not Write Schema"
+        },
+        "propertyDescriptors": {}
+      }
+    ]
+  }
+}

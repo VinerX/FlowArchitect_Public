@@ -1,0 +1,28 @@
+
+================================================================
+Query  : ������� ����� ����� � https://api.exchangerate.host/latest � �������� ��...
+Mode   : 2 � LLMx2 (NL->YAML->LLM->JSON)
+Presets: [1006]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1006, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1006: openrouter gemini 3 flash  [google/gemini-3-flash-preview] ---
+  [1/2] USER_QUERY  mode=2  preset=1006
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  [1/2] PIM ready  (747 chars, 10.07s)
+  [2/2] REQUEST_CONVERSION  mode=2  preset=1006
+  [2/2] NiFi JSON ready  (0 proc, 0 conn, 8.56s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 2146 in / 1803 out / 3949 total  |  cost: $0.006482
+  Result : [OK]  (63.41s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage3-gemini3-flash\runs\currency-http-to-file__m2__p1006__a1__spec98e7be\raw_report.json

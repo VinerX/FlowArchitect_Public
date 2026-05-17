@@ -1,0 +1,28 @@
+{
+  "pim_file": "test_runs\\campaigns\\stage1-pilot-qwen36\\runs\\kafka-to-postgres__m1__p1000__a1__sp329ea448\\pim.yaml",
+  "flow_name": "Kafka to PostgreSQL Orders Pipeline",
+  "adapter_processors": [
+    {
+      "name": "Read Kafka Orders",
+      "type": "ConsumeKafka"
+    },
+    {
+      "name": "Write to PostgreSQL",
+      "type": "PutDatabaseRecord"
+    }
+  ],
+  "import_ok": true,
+  "import_error": null,
+  "pg_id": "ee7abfcd-019d-1000-5078-cb9cdc8eadd0",
+  "validation_errors": [
+    {
+      "name": "Write to PostgreSQL",
+      "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+      "errors": [
+        "'Database Connection Pooling Service' validated against '5d7659aa-37b1-34f6-56b7-c3f4282ecc88' is invalid because Controller Service [Database Connection Pooling Service] Identifier [5d7659aa-37b1-34f6-56b7-c3f4282ecc88] state is Enabling"
+      ]
+    }
+  ],
+  "error_count": 1,
+  "summary": "1 validation error(s) across 1 processor(s)"
+}

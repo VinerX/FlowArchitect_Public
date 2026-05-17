@@ -1,0 +1,277 @@
+{
+  "query": "Читай CSV-файлы из директории /data/input/orders/, оставляй только строки где поле status равно COMPLETED, пиши результат в /data/output/completed_orders.csv.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T16:47:11.420537+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: filter_completed_orders\n  name: Filter Completed Orders from CSV\n  description: Read CSV files from /data/input/orders/, filter rows where status=COMPLETED,\n    output to /data/output/completed_orders.csv\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 5 minutes\nsources:\n- id: source_csv\n  name: Read CSV Files\n  type: CSV\n  location: /data/input/orders/\n  connection:\n    properties:\n      path: /data/input/orders/\n      file_pattern: '*.csv'\n      format: csv\nprocessing_elements:\n- id: filter_completed\n  name: Filter COMPLETED\n  operation: Filter\n  config:\n    condition: status == 'COMPLETED'\nsinks:\n- id: sink_csv\n  name: Write Completed Orders\n  type: CSV\n  location: /data/output/completed_orders.csv\n  connection:\n    properties:\n      path: /data/output/completed_orders.csv\n      format: csv\nprocessed_data:\n- id: csv_data\n  format: csv\nlinks:\n- from_id: source_csv\n  to_id: filter_completed\n  data_ref: csv_data\n- from_id: filter_completed\n  to_id: sink_csv\n  data_ref: csv_data",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "f5cf16c3-9e39-4386-864d-bc4cc8083970",
+          "name": "Filter Completed Orders from CSV",
+          "comments": "Read CSV files from /data/input/orders/, filter rows where status=COMPLETED, output to /data/output/completed_orders.csv",
+          "processors": [
+            {
+              "identifier": "0dd99e84-c514-4a0b-9477-8f675895d0d9",
+              "name": "Read CSV Files",
+              "comments": "Generated from PIM source 'source_csv' (CSV)",
+              "type": "org.apache.nifi.processors.standard.GenerateFlowFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "File Size": "0 B",
+                "path": "/data/input/orders/",
+                "file_pattern": "*.csv",
+                "format": "csv"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "60 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "0717087a-aca7-44cb-b4fa-a0c3ed3a310b",
+              "name": "Filter COMPLETED",
+              "comments": "Generated from PIM processing element 'filter_completed' (Filter)",
+              "type": "org.apache.nifi.processors.standard.QueryRecord",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "filtered": "SELECT * FROM FLOWFILE WHERE status == 'COMPLETED'",
+                "Record Writer": "aa0457eb-eba2-4f56-9510-0a64ad558ec5",
+                "Record Reader": "2bcd99e8-c75e-4436-b08e-7418d8197454"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "failure",
+                "original"
+              ]
+            },
+            {
+              "identifier": "ed05c504-c1a1-40bc-acad-9effba2a732d",
+              "name": "Write Completed Orders",
+              "comments": "Generated from PIM sink 'sink_csv' (CSV)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/output",
+                "format": "csv"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "b7a50849-87f4-4a60-86c7-330d87f0f3a4",
+              "name": "Read CSV Files -> Filter COMPLETED",
+              "comments": "csv_data",
+              "source": {
+                "id": "0dd99e84-c514-4a0b-9477-8f675895d0d9",
+                "groupId": "f5cf16c3-9e39-4386-864d-bc4cc8083970",
+                "type": "PROCESSOR",
+                "name": "Read CSV Files"
+              },
+              "destination": {
+                "id": "0717087a-aca7-44cb-b4fa-a0c3ed3a310b",
+                "groupId": "f5cf16c3-9e39-4386-864d-bc4cc8083970",
+                "type": "PROCESSOR",
+                "name": "Filter COMPLETED"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "4a39d184-9af0-4577-8121-7505d12719f9",
+              "name": "Filter COMPLETED -> Write Completed Orders",
+              "comments": "csv_data",
+              "source": {
+                "id": "0717087a-aca7-44cb-b4fa-a0c3ed3a310b",
+                "groupId": "f5cf16c3-9e39-4386-864d-bc4cc8083970",
+                "type": "PROCESSOR",
+                "name": "Filter COMPLETED"
+              },
+              "destination": {
+                "id": "ed05c504-c1a1-40bc-acad-9effba2a732d",
+                "groupId": "f5cf16c3-9e39-4386-864d-bc4cc8083970",
+                "type": "PROCESSOR",
+                "name": "Write Completed Orders"
+              },
+              "selectedRelationships": [
+                "filtered"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": [
+            {
+              "identifier": "2bcd99e8-c75e-4436-b08e-7418d8197454",
+              "name": "JsonTreeReader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Access Strategy": "Infer Schema"
+              },
+              "propertyDescriptors": {}
+            },
+            {
+              "identifier": "aa0457eb-eba2-4f56-9510-0a64ad558ec5",
+              "name": "JsonRecordSetWriter",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-record-serialization-services-nar",
+                "version": "2.7.2"
+              },
+              "properties": {
+                "Schema Write Strategy": "Do Not Write Schema"
+              },
+              "propertyDescriptors": {}
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "223d5b37-019e-1000-fbb7-7d41e45d4063",
+        "validation_errors": [
+          {
+            "name": "Filter COMPLETED",
+            "type": "org.apache.nifi.processors.standard.QueryRecord",
+            "errors": [
+              "'filtered' validated against 'SELECT * FROM FLOWFILE WHERE status == 'COMPLETED'' is invalid because Not a valid SQL Statement: Encountered \"= =\" at line 1, column 37.\r\nWas expecting one of:\r\n    <EOF> \r\n    \"EXCEPT\" ...\r\n    \"FETCH\" ...\r\n    \"GROUP\" ...\r\n    \"HAVING\" ...\r\n    \"INTERSECT\" ...\r\n    \"LIMIT\" ...\r\n    \"OFFSET\" ...\r\n    \"ORDER\" ...\r\n    \"QUALIFY\" ...\r\n    \"MINUS\" ...\r\n    \"UNION\" ...\r\n    \"WINDOW\" ...\r\n    \".\" ...\r\n    \"NOT\" ...\r\n    \"IN\" ...\r\n    \"<\" ...\r\n    \"<=\" ...\r\n    \">\" ...\r\n    \">=\" ...\r\n    \"=\" \"SOME\" ...\r\n    \"=\" \"ANY\" ...\r\n    \"=\" \"ALL\" ...\r\n    \"BETWEEN\" ...\r\n    \"LIKE\" ...\r\n    \"ILIKE\" ...\r\n    \"RLIKE\" ...\r\n    \"SIMILAR\" ...\r\n    \"=\" \"+\" ...\r\n    \"=\" \"-\" ...\r\n    \"=\" \"NOT\" ...\r\n    \"=\" \"EXISTS\" ...\r\n    \"=\" \"UNIQUE\" ...\r\n    \"=\" \"INTERVAL\" ...\r\n    \"=\" <UNSIGNED_INTEGER_LITERAL> ...\r\n    \"=\" <DECIMAL_NUMERIC_LITERAL> ...\r\n    \"=\" \"DECIMAL\" ...\r\n    \"=\" <APPROX_NUMERIC_LITERAL> ...\r\n    \"=\" <BINARY_STRING_LITERAL> ...\r\n    \"=\" <PREFIXED_STRING_LITERAL> ...\r\n    \"=\" <QUOTED_STRING> ...\r\n    \"=\" <UNICODE_STRING_LITERAL> ...\r\n    \"=\" <C_STYLE_ESCAPED_STRING_LITERAL> ...\r\n    \"=\" <BIG_QUERY_DOUBLE_QUOTED_STRING> ...\r\n    \"=\" <BIG_QUERY_QUOTED_STRING> ...\r\n    \"=\" \"TRUE\" ...\r\n    \"=\" \"FALSE\" ...\r\n    \"=\" \"UNKNOWN\" ...\r\n    \"=\" \"NULL\" ...\r\n    \"=\" <LBRACE_D> ...\r\n    \"=\" <LBRACE_T> ...\r\n    \"=\" <LBRACE_TS> ...\r\n    \"=\" \"DATE\" ...\r\n    \"=\" \"DATETIME\" ...\r\n    \"=\" \"TIME\" ...\r\n    \"=\" \"UUID\" ...\r\n    \"=\" \"TIMESTAMP\" ...\r\n    \"=\" \"?\" ...\r\n    \"=\" \"CAST\" ...\r\n    \"=\" \"SAFE_CAST\" ...\r\n    \"=\" \"TRY_CAST\" ...\r\n    \"=\" \"EXTRACT\" ...\r\n    \"=\" \"POSITION\" ...\r\n    \"=\" \"CONVERT\" ...\r\n    \"=\" \"TRANSLATE\" ...\r\n    \"=\" \"OVERLAY\" ...\r\n    \"=\" \"FLOOR\" ...\r\n    \"=\" \"CEIL\" ...\r\n    \"=\" \"CEILING\" ...\r\n    \"=\" \"SUBSTRING\" ...\r\n    \"=\" \"TRIM\" ...\r\n    \"=\" \"CLASSIFIER\" ...\r\n    \"=\" \"MATCH_NUMBER\" ...\r\n    \"=\" \"RUNNING\" ...\r\n    \"=\" \"PREV\" ...\r\n    \"=\" \"NEXT\" ...\r\n    \"=\" \"JSON_EXISTS\" ...\r\n    \"=\" \"JSON_VALUE\" ...\r\n    \"=\" \"JSON_QUERY\" ...\r\n    \"=\" \"JSON_OBJECT\" ...\r\n    \"=\" \"JSON_OBJECTAGG\" ...\r\n    \"=\" \"JSON_ARRAY\" ...\r\n    \"=\" \"JSON_ARRAYAGG\" ...\r\n    \"=\" <LBRACE_FN> ...\r\n    \"=\" \"MULTISET\" ...\r\n    \"=\" \"ARRAY\" ...\r\n    \"=\" \"PERIOD\" ...\r\n    \"=\" \"PERCENTILE_CONT\" ...\r\n    \"=\" \"PERCENTILE_DISC\" ...\r\n    \"=\" \"SPECIFIC\" ...\r\n    \"=\" <IDENTIFIER> ...\r\n    \"=\" <HYPHENATED_IDENTIFIER> ...\r\n    \"=\" <QUOTED_IDENTIFIER> ...\r\n    \"=\" <BACK_QUOTED_IDENTIFIER> ...\r\n    \"=\" <BIG_QUERY_BACK_QUOTED_IDENTIFIER> ...\r\n    \"=\" <BRACKET_QUOTED_IDENTIFIER> ...\r\n    \"=\" <UNICODE_QUOTED_IDENTIFIER> ...\r\n    \"=\" \"ABS\" ...\r\n    \"=\" \"AVG\" ...\r\n    \"=\" \"CARDINALITY\" ...\r\n    \"=\" \"CHAR\" ...\r\n    \"=\" \"CHAR_LENGTH\" ...\r\n    \"=\" \"CHARACTER_LENGTH\" ...\r\n    \"=\" \"COALESCE\" ...\r\n    \"=\" \"COLLECT\" ...\r\n    \"=\" \"COVAR_POP\" ...\r\n    \"=\" \"COVAR_SAMP\" ...\r\n    \"=\" \"CUME_DIST\" ...\r\n    \"=\" \"COUNT\" ...\r\n    \"=\" \"CURRENT_DATE\" ...\r\n    \"=\" \"CURRENT_TIME\" ...\r\n    \"=\" \"CURRENT_TIMESTAMP\" ...\r\n    \"=\" \"DENSE_RANK\" ...\r\n    \"=\" \"ELEMENT\" ...\r\n    \"=\" \"EVERY\" ...\r\n    \"=\" \"EXP\" ...\r\n    \"=\" \"FIRST_VALUE\" ...\r\n    \"=\" \"FUSION\" ...\r\n    \"=\" \"INTERSECTION\" ...\r\n    \"=\" \"GROUPING\" ...\r\n    \"=\" \"HOUR\" ...\r\n    \"=\" \"LAG\" ...\r\n    \"=\" \"LEAD\" ...\r\n    \"=\" \"LEFT\" ...\r\n    \"=\" \"LAST_VALUE\" ...\r\n    \"=\" \"LN\" ...\r\n    \"=\" \"LOCALTIME\" ...\r\n    \"=\" \"LOCALTIMESTAMP\" ...\r\n    \"=\" \"LOWER\" ...\r\n    \"=\" \"MAX\" ...\r\n    \"=\" \"MIN\" ...\r\n    \"=\" \"MINUTE\" ...\r\n    \"=\" \"MOD\" ...\r\n    \"=\" \"MONTH\" ...\r\n    \"=\" \"NTH_VALUE\" ...\r\n    \"=\" \"NTILE\" ...\r\n    \"=\" \"NULLIF\" ...\r\n    \"=\" \"OCTET_LENGTH\" ...\r\n    \"=\" \"PERCENT_RANK\" ...\r\n    \"=\" \"POWER\" ...\r\n    \"=\" \"RANK\" ...\r\n    \"=\" \"REGR_COUNT\" ...\r\n    \"=\" \"REGR_SXX\" ...\r\n    \"=\" \"REGR_SYY\" ...\r\n    \"=\" \"RIGHT\" ...\r\n    \"=\" \"ROW_NUMBER\" ...\r\n    \"=\" \"SECOND\" ...\r\n    \"=\" \"SQRT\" ...\r\n    \"=\" \"STDDEV_POP\" ...\r\n    \"=\" \"STDDEV_SAMP\" ...\r\n    \"=\" \"SUM\" ...\r\n    \"=\" \"UPPER\" ...\r\n    \"=\" \"TRUNCATE\" ...\r\n    \"=\" \"USER\" ...\r\n    \"=\" \"VAR_POP\" ...\r\n    \"=\" \"VAR_SAMP\" ...\r\n    \"=\" \"YEAR\" ...\r\n    \"=\" \"CURRENT_CATALOG\" ...\r\n    \"=\" \"CURRENT_DEFAULT_TRANSFORM_GROUP\" ...\r\n    \"=\" \"CURRENT_PATH\" ...\r\n    \"=\" \"CURRENT_ROLE\" ...\r\n    \"=\" \"CURRENT_SCHEMA\" ...\r\n    \"=\" \"CURRENT_USER\" ...\r\n    \"=\" \"SESSION_USER\" ...\r\n    \"=\" \"SYSTEM_USER\" ...\r\n    \"=\" \"NEW\" ...\r\n    \"=\" \"CASE\" ...\r\n    \"=\" \"CURRENT\" ...\r\n    \"=\" \"CURSOR\" ...\r\n    \"=\" \"ROW\" ...\r\n    \"=\" \"(\" ...\r\n    \"[\" ...\r\n    \"IS\" ...\r\n    \"FORMAT\" ...\r\n    \"(\" ...\r\n    "
+            ]
+          },
+          {
+            "name": "Write Completed Orders",
+            "type": "org.apache.nifi.processors.standard.PutFile",
+            "errors": [
+              "'format' validated against 'csv' is invalid because 'format' is not a supported property or has no Validator associated with it"
+            ]
+          }
+        ],
+        "error_count": 2,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 101.4,
+      "stage1_duration_sec": 59.74,
+      "stage2_duration_sec": 0.09,
+      "prompt_tokens": 1413,
+      "completion_tokens": 2064,
+      "total_tokens": 3477,
+      "cost_usd": 0.00241,
+      "nifi_processor_count": 3,
+      "nifi_connection_count": 2,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 156,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "deepseek/deepseek-v4-pro",
+          "prompt_tokens": 99,
+          "completion_tokens": 223,
+          "total_tokens": 322,
+          "duration_ms": 59328,
+          "cost_usd": 0.000237
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 99,
+          "completion_tokens": 223,
+          "total_tokens": 322,
+          "duration_ms": 59328,
+          "cost_usd": 0.000237
+        }
+      },
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

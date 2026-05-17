@@ -18,6 +18,7 @@ Component = DataSource | DataProcessingElement | DataSink
 # ---------------------------------------------------------------------------
 
 _BUNDLE_MAP: list[tuple[str, str]] = [
+    ("org.apache.nifi.kafka.processors",       "nifi-kafka-nar"),
     ("org.apache.nifi.processors.kafka",        "nifi-kafka-nar"),
     ("org.apache.nifi.processors.aws",          "nifi-aws-nar"),
     ("org.apache.nifi.processors.gcp",          "nifi-gcp-nar"),
@@ -48,6 +49,7 @@ _SERVICE_BUNDLE_MAP: dict[str, str] = {
     "org.apache.nifi.dbcp.HikariCPConnectionPool":           "nifi-hikari-dbcp-service-nar",
     "org.apache.nifi.json.JsonTreeReader":                   "nifi-record-serialization-services-nar",
     "org.apache.nifi.json.JsonRecordSetWriter":              "nifi-record-serialization-services-nar",
+    "org.apache.nifi.kafka.service.Kafka3ConnectionService": "nifi-kafka-3-service-nar",
     "org.apache.nifi.avro.AvroReader":                       "nifi-record-serialization-services-nar",
     "org.apache.nifi.avro.AvroRecordSetWriter":              "nifi-record-serialization-services-nar",
     "org.apache.nifi.csv.CSVReader":                         "nifi-record-serialization-services-nar",
@@ -80,7 +82,7 @@ def _resolve_bundle(processor_type: str, nifi_version: str) -> dict[str, str]:
 # Source type keyword -> NiFi processor fully-qualified class name
 _SOURCE_TYPE_MAP: list[tuple[list[str], str]] = [
     # Kafka
-    (["kafka"], "org.apache.nifi.processors.kafka.pubsub.ConsumeKafka_2_6"),
+    (["kafka"], "org.apache.nifi.kafka.processors.ConsumeKafka"),
     # Local filesystem
     (["file", "filesystem", "local", "directory"], "org.apache.nifi.processors.standard.GetFile"),
     # FTP / SFTP
@@ -133,7 +135,7 @@ _SOURCE_TYPE_MAP: list[tuple[list[str], str]] = [
 # Sink type keyword -> NiFi processor
 _SINK_TYPE_MAP: list[tuple[list[str], str]] = [
     # Kafka
-    (["kafka"], "org.apache.nifi.processors.kafka.pubsub.PublishKafka_2_6"),
+    (["kafka"], "org.apache.nifi.kafka.processors.PublishKafka"),
     # Local filesystem / structured file formats
     (["file", "filesystem", "local", "directory", "csv", "tsv", "json_file", "text"],
      "org.apache.nifi.processors.standard.PutFile"),
@@ -313,7 +315,7 @@ _OPERATION_MAP: list[tuple[list[str], str]] = [
      "org.apache.nifi.processors.standard.ConvertRecord"),
     # Transform (generic — JoltTransformJSON as good default for JSON pipelines)
     (["transform", "map", "reshape"],
-     "org.apache.nifi.processors.jolt.JoltTransformJSON"),
+     "org.apache.nifi.processors.standard.UpdateRecord"),
 ]
 
 
@@ -345,6 +347,7 @@ _RELATIONSHIP_MAP: dict[str, list[str]] = {
     "ConsumeAMQP": ["success"],
     "ConsumeJMS": ["success"],
     "ConsumeKafka_2_6": ["success"],
+    "ConsumeKafka": ["success", "parse failure"],
     "ConsumeKafkaRecord_2_6": ["success", "parse.failure"],
     "ConsumeGCPubSub": ["success"],
     "ConsumeAzureEventHub": ["success"],
@@ -376,6 +379,7 @@ _RELATIONSHIP_MAP: dict[str, list[str]] = {
     "PublishAMQP": ["success", "failure"],
     "PublishJMS": ["success", "failure"],
     "PublishKafka_2_6": ["success", "failure"],
+    "PublishKafka": ["success", "failure"],
     "PublishKafkaRecord_2_6": ["success", "failure"],
     "PublishGCPubSub": ["success", "failure"],
     "PutTCP": ["success", "failure"],
@@ -547,14 +551,15 @@ def _processor_class_suffix(processor_type: str) -> str:
 
 def _props_kafka_consumer(comp: Component, props: dict[str, str]) -> None:
     if isinstance(comp, DataSource):
-        props.setdefault("Kafka Brokers", _get_conn_prop(comp, "brokers", "{{KAFKA_BROKERS}}"))
-        props.setdefault("Topic Name(s)", comp.location)
+        props.setdefault("Topics", comp.location)
+        props.setdefault("Topic Format", "names")
         props.setdefault("Group ID", _get_conn_prop(comp, "group_id", "nifi-consumer-group"))
+        props.setdefault("Processing Strategy", "RECORD")
+        props.setdefault("Output Strategy", "USE_VALUE")
 
 
 def _props_kafka_producer(comp: Component, props: dict[str, str]) -> None:
     if isinstance(comp, DataSink):
-        props.setdefault("Kafka Brokers", _get_conn_prop(comp, "brokers", "{{KAFKA_BROKERS}}"))
         props.setdefault("Topic Name", comp.location)
 
 
@@ -1128,6 +1133,7 @@ def _props_noop(_comp: Component, _props: dict[str, str]) -> None:
 
 # Mapping: NiFi class name suffix -> property builder function
 _PROPERTY_BUILDERS: dict[str, Any] = {
+    "ConsumeKafka": _props_kafka_consumer,
     "ConsumeKafka_2_6": _props_kafka_consumer,
     "ConsumeKafkaRecord_2_6": _props_kafka_consumer,
     "GetFile": _props_get_file,
@@ -1185,6 +1191,7 @@ _PROPERTY_BUILDERS: dict[str, Any] = {
     "PutFile": _props_put_file,
     "PutSFTP": _props_sftp_put,
     "PutFTP": _props_ftp_put,
+    "PublishKafka": _props_kafka_producer,
     "PublishKafka_2_6": _props_kafka_producer,
     "PublishKafkaRecord_2_6": _props_kafka_producer,
     "LogAttribute": _props_noop,
@@ -1258,11 +1265,14 @@ _RECORD_WRITER_SUFFIXES: frozenset[str] = frozenset({
     "QueryRecord", "ConvertRecord", "UpdateRecord", "SplitRecord",
     "PartitionRecord", "ValidateRecord", "LookupRecord", "MergeRecord",
     "PutElasticsearchRecord", "PutMongoRecord", "PutAzureCosmosDBRecord",
+    "ConsumeKafka",
     "ConsumeKafkaRecord_2_6", "PublishKafkaRecord_2_6",
 })
 
 # Processors that read records and need a Record Reader service
 _RECORD_READER_SUFFIXES: frozenset[str] = frozenset({
+    "ConsumeKafka",
+    "ConsumeKafkaRecord_2_6",
     "PutDatabaseRecord",
     "QueryRecord",
     "ConvertRecord", "ValidateRecord", "LookupRecord", "MergeRecord",
@@ -1280,15 +1290,57 @@ _DB_CONNECTION_KEYS: frozenset[str] = frozenset({
 # These must NOT be passed through to NiFi as raw property names by the generic fallback,
 # because the builder translates them into proper NiFi properties (e.g. SQL statements).
 _BUILDER_CONSUMED_KEYS: dict[str, frozenset[str]] = {
+    "ConsumeKafka": frozenset({
+        "brokers", "bootstrap.servers", "bootstrap_servers",
+        "group_id", "group.id", "topic", "topics",
+        "security.protocol", "sasl.mechanism", "sasl.username", "sasl.password",
+    }),
+    "ConsumeKafka_2_6": frozenset({
+        "brokers", "bootstrap.servers", "bootstrap_servers",
+        "group_id", "group.id", "topic", "topics",
+        "security.protocol", "sasl.mechanism", "sasl.username", "sasl.password",
+    }),
+    "ConsumeKafkaRecord_2_6": frozenset({
+        "brokers", "bootstrap.servers", "bootstrap_servers",
+        "group_id", "group.id", "topic", "topics",
+        "security.protocol", "sasl.mechanism", "sasl.username", "sasl.password",
+    }),
     "ConvertRecord": frozenset({
         "output_format", "input_format", "format",
+    }),
+    "JoltTransformJSON": frozenset({
+        "dsl", "spec", "specification", "jolt_spec",
+        "output_format", "input_format", "format", "mapping_strategy",
     }),
     "PutFile": frozenset({
         "path", "write_mode", "filename", "file_name", "directory",
     }),
+    "PublishKafka": frozenset({
+        "brokers", "bootstrap.servers", "bootstrap_servers",
+        "topic", "topics",
+        "security.protocol", "sasl.mechanism", "sasl.username", "sasl.password",
+    }),
+    "PublishKafka_2_6": frozenset({
+        "brokers", "bootstrap.servers", "bootstrap_servers",
+        "topic", "topics",
+        "security.protocol", "sasl.mechanism", "sasl.username", "sasl.password",
+    }),
+    "PublishKafkaRecord_2_6": frozenset({
+        "brokers", "bootstrap.servers", "bootstrap_servers",
+        "topic", "topics",
+        "security.protocol", "sasl.mechanism", "sasl.username", "sasl.password",
+    }),
+    "PutDatabaseRecord": frozenset({
+        "table", "table_name", "statement_type",
+    }),
     "QueryRecord": frozenset({
         "filter", "where", "condition", "sql", "query",
         "sort_by", "order_by", "fields", "select", "limit",
+    }),
+    "UpdateRecord": frozenset({
+        "output_format", "input_format", "format",
+        "mapping_strategy", "field_mapping", "fields",
+        "transformation_type", "flatten_nested", "strategy",
     }),
 }
 
@@ -1347,6 +1399,27 @@ def _build_controller_services(plan: "dict[str, Any]", nifi_version: str) -> lis
             "propertyDescriptors": {},
         })
 
+    if "kafka_conn_id" in plan:
+        svc_type = "org.apache.nifi.kafka.service.Kafka3ConnectionService"
+        kafka_properties = {
+            "bootstrap.servers": plan.get("kafka_bootstrap_servers", "{{KAFKA_BROKERS}}"),
+            "security.protocol": plan.get("kafka_security_protocol", "PLAINTEXT"),
+        }
+        if plan.get("kafka_sasl_mechanism"):
+            kafka_properties["sasl.mechanism"] = plan["kafka_sasl_mechanism"]
+        if plan.get("kafka_sasl_username"):
+            kafka_properties["sasl.username"] = plan["kafka_sasl_username"]
+        if plan.get("kafka_sasl_password"):
+            kafka_properties["sasl.password"] = plan["kafka_sasl_password"]
+        services.append({
+            "identifier": plan["kafka_conn_id"],
+            "name": "KafkaConnectionService",
+            "type": svc_type,
+            "bundle": _resolve_service_bundle(svc_type, nifi_version),
+            "properties": kafka_properties,
+            "propertyDescriptors": {},
+        })
+
     if "json_reader_id" in plan:
         svc_type = "org.apache.nifi.json.JsonTreeReader"
         services.append({
@@ -1354,7 +1427,9 @@ def _build_controller_services(plan: "dict[str, Any]", nifi_version: str) -> lis
             "name": "JsonTreeReader",
             "type": svc_type,
             "bundle": _resolve_service_bundle(svc_type, nifi_version),
-            "properties": {},
+            "properties": {
+                "Schema Access Strategy": "Infer Schema",
+            },
             "propertyDescriptors": {},
         })
 
@@ -1365,7 +1440,9 @@ def _build_controller_services(plan: "dict[str, Any]", nifi_version: str) -> lis
             "name": "JsonRecordSetWriter",
             "type": svc_type,
             "bundle": _resolve_service_bundle(svc_type, nifi_version),
-            "properties": {},
+            "properties": {
+                "Schema Write Strategy": "Do Not Write Schema",
+            },
             "propertyDescriptors": {},
         })
 
@@ -1426,6 +1503,19 @@ class NiFiAdapter(BaseAdapter):
                     plan["db_driver"] = _get_driver_class(comp)
                     plan["db_user"] = _get_conn_prop(comp, "username", "${db.user}")
                     plan["db_password"] = _get_conn_prop(comp, "password", "${db.password}")
+
+            if suffix in {"ConsumeKafka", "PublishKafka"} and "kafka_conn_id" not in plan:
+                plan["kafka_conn_id"] = str(uuid4())
+                plan["kafka_bootstrap_servers"] = _get_conn_prop(
+                    comp, "bootstrap.servers",
+                    _get_conn_prop(comp, "brokers", "{{KAFKA_BROKERS}}"),
+                )
+                plan["kafka_security_protocol"] = _get_conn_prop(
+                    comp, "security.protocol", "PLAINTEXT",
+                )
+                plan["kafka_sasl_mechanism"] = _get_conn_prop(comp, "sasl.mechanism", "")
+                plan["kafka_sasl_username"] = _get_conn_prop(comp, "sasl.username", "")
+                plan["kafka_sasl_password"] = _get_conn_prop(comp, "sasl.password", "")
 
             if suffix in _RECORD_WRITER_SUFFIXES and "json_writer_id" not in plan:
                 plan["json_writer_id"] = str(uuid4())
@@ -1531,19 +1621,49 @@ class NiFiAdapter(BaseAdapter):
 
     def _is_transparent_processing_element(self, component: DataProcessingElement) -> bool:
         operation = component.operation.strip().lower().replace("-", "_").replace(" ", "_")
-        if not any(token in operation for token in ("parse_json", "parsejson", "parse")):
-            return False
 
         config_keys = {str(key).lower() for key in component.config.keys()}
-        if not config_keys.issubset(_TRANSPARENT_PARSE_CONFIG_KEYS):
-            return False
+        if any(token in operation for token in ("parse_json", "parsejson", "parse")):
+            if not config_keys.issubset(_TRANSPARENT_PARSE_CONFIG_KEYS):
+                return False
 
-        output_format = str(
-            component.config.get("output_format")
-            or component.config.get("format")
-            or "json"
-        ).strip().lower()
-        return output_format in {"json", "application/json"}
+            output_format = str(
+                component.config.get("output_format")
+                or component.config.get("format")
+                or "json"
+            ).strip().lower()
+            return output_format in {"json", "application/json"}
+
+        if any(token in operation for token in ("transform", "map", "reshape", "relational")):
+            if not config_keys.issubset({
+                "output_format", "input_format", "format", "mapping_strategy",
+                "transformation_type", "flatten_nested", "strategy",
+            }):
+                return False
+
+            input_format = str(
+                component.config.get("input_format")
+                or component.config.get("format")
+                or "json"
+            ).strip().lower()
+            output_format = str(component.config.get("output_format") or "").strip().lower()
+            transformation_type = str(
+                component.config.get("transformation_type") or component.config.get("strategy") or ""
+            ).strip().lower()
+            return (
+                input_format in {"json", "application/json"}
+                and (
+                    output_format in {"table_rows", "tabular", "records", "rows"}
+                    or transformation_type in {
+                        "json_to_table_rows",
+                        "flatten_and_cast",
+                        "json_to_table",
+                        "table_rows",
+                    }
+                )
+            )
+
+        return False
 
     def _rewire_links_around_transparent_nodes(
         self,
@@ -1792,6 +1912,9 @@ class NiFiAdapter(BaseAdapter):
             properties["Database Connection Pooling Service"] = cs_plan["dbcp_id"]
             # Remove any raw URL that the builder may have set (it belongs on the CS)
             properties.pop("Database Connection URL", None)
+
+        if suffix in {"ConsumeKafka", "PublishKafka"} and "kafka_conn_id" in cs_plan:
+            properties["Kafka Connection Service"] = cs_plan["kafka_conn_id"]
 
         if suffix in _RECORD_WRITER_SUFFIXES and "json_writer_id" in cs_plan:
             properties["Record Writer"] = cs_plan["json_writer_id"]

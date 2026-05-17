@@ -1,0 +1,24 @@
+
+================================================================
+Query  : ������� ����� ����� � https://api.exchangerate.host/latest � �������� ��...
+Mode   : 3 � Adapter+LLM (NL->YAML->Adapter->LLM->JSON)
+Presets: [1002]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1002, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1002: openrouter minimax/minimax-m2.7  [minimax/minimax-m2.7] ---
+  [1/2] USER_QUERY  mode=3  preset=1002
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  [1/2] PIM ready  (598 chars, 14.67s)
+  [2/2] REQUEST_CONVERSION  mode=3  preset=1002
+  Result : [FAIL] {'error': 'manual_trigger_warning', 'details': "Trigger(s) ['trigger_main'] have type 'manual'.\nThe flow will NOT start automatically in NiFi � someone must press Run in the NiFi UI.\nChange trigger type to 'schedule' or 'event' for production use."}  (14.7s)
+
+================================================================
+Results: 0/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage7-minimax-extended\runs\currency-http-to-file__m3__p1002__a1__sp47d77dfa\raw_report.json

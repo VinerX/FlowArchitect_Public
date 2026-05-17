@@ -1,0 +1,354 @@
+{
+  "query": "Читай из таблицы public.transactions записи со статусом PENDING, конвертируй в JSON, публикуй в Kafka-топик transactions.overdue.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T20:00:15.027449+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: pending_transactions_to_kafka\n  name: Pending Transactions to Kafka\n  description: Read PENDING transactions from PostgreSQL, convert to JSON, publish\n    to Kafka topic\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: every 5 minutes\nsources:\n- id: source_postgres\n  name: Read Pending Transactions\n  type: PostgreSQL\n  location: public.transactions\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\nprocessing_elements:\n- id: filter_pending\n  name: Filter Pending Status\n  operation: Filter\n  config:\n    condition: status = 'PENDING'\n- id: to_json\n  name: Convert to JSON\n  operation: ToJSON\n  config: {}\nsinks:\n- id: sink_kafka\n  name: Publish to Kafka\n  type: Kafka\n  location: transactions.overdue\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\nprocessed_data:\n- id: transactions_json\n  format: json\nlinks:\n- from_id: source_postgres\n  to_id: filter_pending\n  data_ref: transactions_json\n- from_id: filter_pending\n  to_id: to_json\n  data_ref: transactions_json\n- from_id: to_json\n  to_id: sink_kafka\n  data_ref: transactions_json",
+      "nifi_json": {
+        "content": {
+          "flow": {
+            "id": "pending_transactions_to_kafka",
+            "name": "Pending Transactions to Kafka",
+            "description": "Read PENDING transactions from PostgreSQL, convert to JSON, publish to Kafka topic"
+          }
+        },
+        "metadata": {
+          "version": "1.0",
+          "generated": "auto"
+        },
+        "processGroup": {
+          "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+          "name": "Pending Transactions to Kafka",
+          "position": {
+            "x": 0,
+            "y": 0
+          },
+          "controllerServices": [
+            {
+              "id": "dbcp-001-uuid-placeholder",
+              "name": "PostgreSQL Connection Pool",
+              "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+              "properties": {
+                "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+                "Database Driver Class Name": "org.postgresql.Driver",
+                "Database Driver Location": "{{DB_DRIVER_LOCATION}}",
+                "Database User": "{{DB_USERNAME}}",
+                "Password": "{{DB_PASSWORD}}"
+              },
+              "scheduledState": "ENABLED"
+            },
+            {
+              "id": "kafka-conn-001-uuid-placeholder",
+              "name": "Kafka Connection Service",
+              "type": "org.apache.nifi.kafka.connect.Kafka3ConnectionService",
+              "properties": {
+                "Bootstrap Servers": "{{KAFKA_BROKERS}}",
+                "Kerberos Keytab": "{{KAFKA_KEYTAB}}",
+                "Kerberos Principal": "{{KAFKA_PRINCIPAL}}",
+                "Security Protocol": "{{KAFKA_SECURITY_PROTOCOL}}"
+              },
+              "scheduledState": "ENABLED"
+            },
+            {
+              "id": "json-reader-001-uuid-placeholder",
+              "name": "JSON Tree Reader",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "properties": {
+                "Schema Access Strategy": "Use 'Schema Text' Property",
+                "Schema Text": "${schema.text}",
+                "Date Format": "yyyy-MM-dd",
+                "Time Format": "HH:mm:ss",
+                "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+              },
+              "scheduledState": "ENABLED"
+            },
+            {
+              "id": "json-reader-002-uuid-placeholder",
+              "name": "JSON Tree Reader (Filtered)",
+              "type": "org.apache.nifi.json.JsonTreeReader",
+              "properties": {
+                "Schema Access Strategy": "Use 'Schema Text' Property",
+                "Schema Text": "${schema.text}",
+                "Date Format": "yyyy-MM-dd",
+                "Time Format": "HH:mm:ss",
+                "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+              },
+              "scheduledState": "ENABLED"
+            },
+            {
+              "id": "json-writer-001-uuid-placeholder",
+              "name": "JSON Record Set Writer",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "properties": {
+                "Schema Access Strategy": "Use 'Schema Text' Property",
+                "Schema Text": "${schema.text}",
+                "Date Format": "yyyy-MM-dd",
+                "Time Format": "HH:mm:ss",
+                "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                "Pretty Print JSON": "true"
+              },
+              "scheduledState": "ENABLED"
+            },
+            {
+              "id": "json-writer-002-uuid-placeholder",
+              "name": "JSON Record Set Writer (Converted)",
+              "type": "org.apache.nifi.json.JsonRecordSetWriter",
+              "properties": {
+                "Schema Access Strategy": "Inherit Record Schema",
+                "Date Format": "yyyy-MM-dd",
+                "Time Format": "HH:mm:ss",
+                "Timestamp Format": "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
+                "Pretty Print JSON": "true"
+              },
+              "scheduledState": "ENABLED"
+            },
+            {
+              "id": "kafka-writer-001-uuid-placeholder",
+              "name": "Kafka Record Set Writer",
+              "type": "org.apache.nifi.kafka.recordset.KafkaRecordSetWriter",
+              "properties": {
+                "Record Writer": "json-writer-002-uuid-placeholder",
+                "Topic": "transactions.overdue"
+              },
+              "scheduledState": "ENABLED"
+            }
+          ],
+          "processors": [
+            {
+              "id": "source-postgres-uuid-placeholder",
+              "name": "Read Pending Transactions",
+              "type": "org.apache.nifi.processors.kafka.pubsub.QueryDatabaseTableRecord",
+              "position": {
+                "x": 100,
+                "y": 200
+              },
+              "properties": {
+                "dbcp-service": "dbcp-001-uuid-placeholder",
+                "table-name": "transactions",
+                "columns-to-return": "",
+                "Maximum Batch Size": "1000",
+                "Fetch Size": "100",
+                "Record Writer": "json-writer-001-uuid-placeholder",
+                "State Storage": "${nifi_state_path}",
+                "Partition Count": "1"
+              },
+              "scheduledState": "RUNNING",
+              "inputRequirement": "INPUT_REQUIRED"
+            },
+            {
+              "id": "filter-pending-uuid-placeholder",
+              "name": "Filter Pending Status",
+              "type": "org.apache.nifi.processors.record.UpdateRecord",
+              "position": {
+                "x": 400,
+                "y": 200
+              },
+              "properties": {
+                "record-reader": "json-reader-001-uuid-placeholder",
+                "record-writer": "json-writer-001-uuid-placeholder",
+                "Replacement Value Strategy": "literal",
+                "status": "PENDING"
+              },
+              "propertyDescriptors": {
+                "status": {
+                  "value": "PENDING",
+                  "sensitive": false
+                }
+              },
+              "scheduledState": "RUNNING",
+              "inputRequirement": "INPUT_REQUIRED"
+            },
+            {
+              "id": "to-json-uuid-placeholder",
+              "name": "Convert to JSON",
+              "type": "org.apache.nifi.processors.record.UpdateRecord",
+              "position": {
+                "x": 700,
+                "y": 200
+              },
+              "properties": {
+                "record-reader": "json-reader-002-uuid-placeholder",
+                "record-writer": "json-writer-002-uuid-placeholder",
+                "Replacement Value Strategy": "literal"
+              },
+              "scheduledState": "RUNNING",
+              "inputRequirement": "INPUT_REQUIRED"
+            },
+            {
+              "id": "sink-kafka-uuid-placeholder",
+              "name": "Publish to Kafka",
+              "type": "org.apache.nifi.processors.kafka.pubsub.PublishKafkaRecord",
+              "position": {
+                "x": 1000,
+                "y": 200
+              },
+              "properties": {
+                "kafka-controllerservice": "kafka-conn-001-uuid-placeholder",
+                "topic": "transactions.overdue",
+                "record-reader": "json-reader-002-uuid-placeholder",
+                "record-writer": "kafka-writer-001-uuid-placeholder",
+                "Use Transactions": "false",
+                "Attributes Header Regex": "",
+                "Message Header Encoding": "UTF-8",
+                "Rollback On Failure": "false"
+              },
+              "scheduledState": "RUNNING",
+              "inputRequirement": "INPUT_REQUIRED"
+            }
+          ],
+          "connections": [
+            {
+              "id": "conn-source-filter-uuid-placeholder",
+              "name": "Source to Filter",
+              "sourceId": "source-postgres-uuid-placeholder",
+              "destinationId": "filter-pending-uuid-placeholder",
+              "relationship": "success",
+              "position": {
+                "x": 250,
+                "y": 200
+              },
+              "flowfileExpiration": "0 sec",
+              "backPressureObjectCount": "10000",
+              "backPressureDataSize": "1 GB"
+            },
+            {
+              "id": "conn-filter-json-uuid-placeholder",
+              "name": "Filter to JSON",
+              "sourceId": "filter-pending-uuid-placeholder",
+              "destinationId": "to-json-uuid-placeholder",
+              "relationship": "success",
+              "position": {
+                "x": 550,
+                "y": 200
+              },
+              "flowfileExpiration": "0 sec",
+              "backPressureObjectCount": "10000",
+              "backPressureDataSize": "1 GB"
+            },
+            {
+              "id": "conn-json-sink-uuid-placeholder",
+              "name": "JSON to Kafka",
+              "sourceId": "to-json-uuid-placeholder",
+              "destinationId": "sink-kafka-uuid-placeholder",
+              "relationship": "success",
+              "position": {
+                "x": 850,
+                "y": 200
+              },
+              "flowfileExpiration": "0 sec",
+              "backPressureObjectCount": "10000",
+              "backPressureDataSize": "1 GB"
+            }
+          ],
+          "labels": [],
+          "funnels": [],
+          "remoteProcessGroups": [],
+          "variableRegistry": [
+            {
+              "context": "Default",
+              "variables": [
+                {
+                  "name": "DB_HOST",
+                  "value": "{{DB_HOST}}"
+                },
+                {
+                  "name": "DB_PORT",
+                  "value": "{{DB_PORT}}"
+                },
+                {
+                  "name": "DATABASE_NAME",
+                  "value": "{{DATABASE_NAME}}"
+                },
+                {
+                  "name": "DB_USERNAME",
+                  "value": "{{DB_USERNAME}}"
+                },
+                {
+                  "name": "DB_PASSWORD",
+                  "value": "{{DB_PASSWORD}}"
+                },
+                {
+                  "name": "KAFKA_BROKERS",
+                  "value": "{{KAFKA_BROKERS}}"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22ef0d9e-019e-1000-927c-b457eaa2a2f5",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 155.83,
+      "stage1_duration_sec": 17.97,
+      "stage2_duration_sec": 103.78,
+      "prompt_tokens": 2114,
+      "completion_tokens": 2768,
+      "total_tokens": 4882,
+      "cost_usd": 0.003956,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": 1,
+      "pim_step_count": 2,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 197,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 1249,
+          "completion_tokens": 607,
+          "total_tokens": 1856,
+          "duration_ms": 17594,
+          "cost_usd": 0.001103
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 763,
+          "completion_tokens": 2154,
+          "total_tokens": 2917,
+          "duration_ms": 103610,
+          "cost_usd": 0.002814
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1249,
+          "completion_tokens": 607,
+          "total_tokens": 1856,
+          "duration_ms": 17594,
+          "cost_usd": 0.001103
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 763,
+          "completion_tokens": 2154,
+          "total_tokens": 2917,
+          "duration_ms": 103610,
+          "cost_usd": 0.002814
+        }
+      },
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

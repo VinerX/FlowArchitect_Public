@@ -1,0 +1,112 @@
+{
+  "flowContents": {
+    "identifier": "8452cd57-d745-47ee-af0b-e077dd980bed",
+    "name": "Currency Rates Fetcher",
+    "comments": "Fetch latest exchange rates from API and save to a local JSON file",
+    "processors": [
+      {
+        "identifier": "291e5040-c8d7-4425-a4bd-a9e643b3d725",
+        "name": "Fetch Exchange Rates",
+        "comments": "Generated from PIM source 'source_exchange_rate_api' (HTTP)",
+        "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 80.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "HTTP URL": "https://api.exchangerate.host/latest",
+          "HTTP Method": "GET",
+          "method": "GET"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "Original",
+          "Retry",
+          "No Retry",
+          "Failure"
+        ]
+      },
+      {
+        "identifier": "a39f87d2-426e-4da8-bc82-d0b5321c1d13",
+        "name": "Save to JSON File",
+        "comments": "Generated from PIM sink 'sink_local_file' (File)",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "bundle": {
+          "group": "org.apache.nifi",
+          "artifact": "nifi-standard-nar",
+          "version": "2.7.2"
+        },
+        "position": {
+          "x": 840.0,
+          "y": 80.0
+        },
+        "style": {},
+        "properties": {
+          "Directory": "/data/output"
+        },
+        "propertyDescriptors": {},
+        "schedulingStrategy": "TIMER_DRIVEN",
+        "schedulingPeriod": "0 sec",
+        "executionNode": "ALL",
+        "penaltyDuration": "30 sec",
+        "yieldDuration": "1 sec",
+        "bulletinLevel": "WARN",
+        "runDurationMillis": 0,
+        "concurrentlySchedulableTaskCount": 1,
+        "autoTerminatedRelationships": [
+          "success",
+          "failure"
+        ]
+      }
+    ],
+    "connections": [
+      {
+        "identifier": "3beb39e5-b7d7-4a54-9a27-a25992bec20b",
+        "name": "Fetch Exchange Rates -> Save to JSON File",
+        "comments": "rates_json",
+        "source": {
+          "id": "291e5040-c8d7-4425-a4bd-a9e643b3d725",
+          "groupId": "8452cd57-d745-47ee-af0b-e077dd980bed",
+          "type": "PROCESSOR",
+          "name": "Fetch Exchange Rates"
+        },
+        "destination": {
+          "id": "a39f87d2-426e-4da8-bc82-d0b5321c1d13",
+          "groupId": "8452cd57-d745-47ee-af0b-e077dd980bed",
+          "type": "PROCESSOR",
+          "name": "Save to JSON File"
+        },
+        "selectedRelationships": [
+          "Response"
+        ],
+        "backPressureObjectThreshold": 10000,
+        "backPressureDataSizeThreshold": "1 GB",
+        "flowFileExpiration": "0 sec",
+        "labelIndex": 1,
+        "zIndex": 0,
+        "prioritizers": []
+      }
+    ],
+    "processGroups": [],
+    "remoteProcessGroups": [],
+    "inputPorts": [],
+    "outputPorts": [],
+    "labels": [],
+    "funnels": [],
+    "controllerServices": []
+  }
+}

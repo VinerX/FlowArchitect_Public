@@ -1,0 +1,69 @@
+flow:
+  id: kafka_orders_to_postgres
+  name: Kafka Orders to PostgreSQL
+  description: Считывание сообщений из Kafka topic orders.created, парсинг JSON, извлечение
+    полей order_id, user_id, amount, created_at и вставка строк в таблицу public.orders
+    в PostgreSQL
+triggers:
+- id: trigger_main
+  type: event
+  condition: New message in Kafka topic orders.created
+sources:
+- id: source_kafka_orders
+  name: Kafka Topic orders.created
+  type: Kafka
+  location: orders.created
+  connection:
+    properties:
+      brokers: '{{KAFKA_BROKERS}}'
+      group_id: '{{KAFKA_CONSUMER_GROUP_ID}}'
+      auto_offset_reset: earliest
+      security_protocol: '{{KAFKA_SECURITY_PROTOCOL}}'
+processing_elements:
+- id: process_parse_json
+  name: Parse JSON Message
+  operation: JsonParse
+  config:
+    input_format: json
+    description: Парсинг входящего JSON-сообщения из Kafka
+- id: process_extract_fields
+  name: Extract Fields
+  operation: FieldExtraction
+  config:
+    fields:
+    - order_id
+    - user_id
+    - amount
+    - created_at
+    description: Извлечение полей order_id, user_id, amount, created_at из распарсенного
+      JSON
+sinks:
+- id: sink_postgres_orders
+  name: PostgreSQL public.orders
+  type: PostgreSQL
+  location: public.orders
+  connection:
+    properties:
+      host: '{{DB_HOST}}'
+      port: '{{DB_PORT}}'
+      database: '{{DB_NAME}}'
+      username: '{{DB_USERNAME}}'
+      password: '{{DB_PASSWORD}}'
+      schema: public
+      table: orders
+      write_mode: insert
+processed_data:
+- id: raw_kafka_message
+  format: json
+- id: parsed_order_fields
+  format: json
+links:
+- from_id: source_kafka_orders
+  to_id: process_parse_json
+  data_ref: raw_kafka_message
+- from_id: process_parse_json
+  to_id: process_extract_fields
+  data_ref: parsed_order_fields
+- from_id: process_extract_fields
+  to_id: sink_postgres_orders
+  data_ref: parsed_order_fields

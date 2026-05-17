@@ -1,0 +1,50 @@
+
+================================================================
+Query  : ����� ��������� �� Kafka-������ events.all. ���� ���� type ����� purchas...
+Mode   : 2 � LLMx2 (NL->YAML->LLM->JSON)
+Presets: [1000]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1000, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1000: openrouter qwen/qwen3.6-plus  [qwen/qwen3.6-plus] ---
+  [1/2] USER_QUERY  mode=2  preset=1000
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  ... waiting for YAML PIM (20s elapsed, timeout=300s)
+  ... waiting for YAML PIM (30s elapsed, timeout=300s)
+  ... waiting for YAML PIM (40s elapsed, timeout=300s)
+  ... waiting for YAML PIM (50s elapsed, timeout=300s)
+  ... waiting for YAML PIM (60s elapsed, timeout=300s)
+  ... waiting for YAML PIM (70s elapsed, timeout=300s)
+  ... waiting for YAML PIM (80s elapsed, timeout=300s)
+  ... waiting for YAML PIM (90s elapsed, timeout=300s)
+  ... waiting for YAML PIM (100s elapsed, timeout=300s)
+  ... waiting for YAML PIM (110s elapsed, timeout=300s)
+  ... waiting for YAML PIM (120s elapsed, timeout=300s)
+  ... waiting for YAML PIM (130s elapsed, timeout=300s)
+  ... waiting for YAML PIM (140s elapsed, timeout=300s)
+  ... waiting for YAML PIM (150s elapsed, timeout=300s)
+  ... waiting for YAML PIM (160s elapsed, timeout=300s)
+  ... waiting for YAML PIM (170s elapsed, timeout=300s)
+  ... waiting for YAML PIM (180s elapsed, timeout=300s)
+  ... waiting for YAML PIM (190s elapsed, timeout=300s)
+  ... waiting for YAML PIM (200s elapsed, timeout=300s)
+  ... waiting for YAML PIM (210s elapsed, timeout=300s)
+  ... waiting for YAML PIM (220s elapsed, timeout=300s)
+  ... waiting for YAML PIM (230s elapsed, timeout=300s)
+  ... waiting for YAML PIM (240s elapsed, timeout=300s)
+  ... waiting for YAML PIM (250s elapsed, timeout=300s)
+  ... waiting for YAML PIM (260s elapsed, timeout=300s)
+  ... waiting for YAML PIM (270s elapsed, timeout=300s)
+  ... waiting for YAML PIM (280s elapsed, timeout=300s)
+  ... waiting for YAML PIM (290s elapsed, timeout=300s)
+  Result : [FAIL] timeout waiting for YAML PIM  (300.25s)
+
+================================================================
+Results: 0/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage2-extended-qwen36\runs\kafka-routing__m2__p1000__a1__sp329ea448\raw_report.json

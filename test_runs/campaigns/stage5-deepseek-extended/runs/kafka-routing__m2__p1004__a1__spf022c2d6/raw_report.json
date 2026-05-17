@@ -1,0 +1,38 @@
+{
+  "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T18:33:31.039858+00:00",
+      "success": false,
+      "yaml_pim": "flow:\n  id: event_router_pipeline\n  name: Event Router Pipeline\n  description: Read events from Kafka, route to PostgreSQL or Kafka based on type\n    field\ntriggers:\n- id: trigger_stream\n  type: schedule\n  condition: every 1 minute\nsources:\n- id: source_kafka\n  name: Kafka Source\n  type: Kafka\n  location: events.all\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      group_id: event_router_group\nprocessing_elements:\n- id: process_router\n  name: Type Router\n  operation: Router\n  config:\n    field: type\n    routes:\n      purchase: sink_pg_purchases\n      refund: sink_pg_refunds\n      default: sink_kafka_unknown\nsinks:\n- id: sink_pg_purchases\n  name: PostgreSQL Purchases\n  type: PostgreSQL\n  location: public.purchases\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\n- id: sink_pg_refunds\n  name: PostgreSQL Refunds\n  type: PostgreSQL\n  location: public.refunds\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\n- id: sink_kafka_unknown\n  name: Kafka Unknown Sink\n  type: Kafka\n  location: events.unknown\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\nprocessed_data:\n- id: events_json\n  format: json\nlinks:\n- from_id: source_kafka\n  to_id: process_router\n  data_ref: events_json\n- from_id: process_router\n  to_id: sink_pg_purchases\n  data_ref: events_json\n- from_id: process_router\n  to_id: sink_pg_refunds\n  data_ref: events_json\n- from_id: process_router\n  to_id: sink_kafka_unknown\n  data_ref: events_json",
+      "nifi_json": null,
+      "nifi_import": null,
+      "error": "timeout waiting for NiFi JSON",
+      "duration_sec": 410.62,
+      "stage1_duration_sec": 110.36,
+      "stage2_duration_sec": null,
+      "prompt_tokens": null,
+      "completion_tokens": null,
+      "total_tokens": null,
+      "cost_usd": null,
+      "nifi_processor_count": null,
+      "nifi_connection_count": null,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 3,
+      "stage_presets": {
+        "pim": 1004,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": null,
+      "llm_calls": [],
+      "llm_usage_by_purpose": {},
+      "preset_id": 1004,
+      "preset_name": "openrouter deepseek",
+      "preset_model": "deepseek/deepseek-v4-pro"
+    }
+  ]
+}

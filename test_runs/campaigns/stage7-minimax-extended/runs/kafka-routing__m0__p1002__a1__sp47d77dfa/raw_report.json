@@ -1,0 +1,191 @@
+{
+  "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+  "mode": 0,
+  "mode_name": "Direct (NL->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T20:04:24.903534+00:00",
+      "success": true,
+      "yaml_pim": null,
+      "nifi_json": {
+        "flow": {
+          "processors": [
+            {
+              "id": "consume-events",
+              "type": "ConsumeKafkaRecord_2_6",
+              "properties": {
+                "bootstrap.servers": "localhost:9092",
+                "topic": "events.all",
+                "group.id": "events-processor",
+                "record.reader": "json-reader",
+                "record.writer": "json-writer"
+              }
+            },
+            {
+              "id": "extract-type",
+              "type": "EvaluateJsonPath",
+              "properties": {
+                "destination": "flowfile-attribute",
+                "type": "$.type"
+              }
+            },
+            {
+              "id": "route-events",
+              "type": "RouteOnAttribute",
+              "properties": {
+                "purchase": "${type:equals('purchase')}",
+                "refund": "${type:equals('refund')}",
+                "unknown": "${type:equals('unknown')}"
+              }
+            },
+            {
+              "id": "purchase-reader",
+              "type": "JsonPathReader",
+              "properties": {
+                "schema.name": "purchase",
+                "schema.text": "{\"type\":\"record\",\"name\":\"purchase\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"type\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":\"double\"},{\"name\":\"customer_id\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]}"
+              }
+            },
+            {
+              "id": "refund-reader",
+              "type": "JsonPathReader",
+              "properties": {
+                "schema.name": "refund",
+                "schema.text": "{\"type\":\"record\",\"name\":\"refund\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"type\",\"type\":\"string\"},{\"name\":\"amount\",\"type\":\"double\"},{\"name\":\"customer_id\",\"type\":\"string\"},{\"name\":\"reason\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"}]}"
+              }
+            },
+            {
+              "id": "put-purchases",
+              "type": "PutDatabaseRecord",
+              "properties": {
+                "database-driver-class-name": "org.postgresql.Driver",
+                "database-url": "jdbc:postgresql://localhost:5432/events",
+                "table-name": "purchases",
+                "record-reader": "purchase-reader"
+              }
+            },
+            {
+              "id": "put-refunds",
+              "type": "PutDatabaseRecord",
+              "properties": {
+                "database-driver-class-name": "org.postgresql.Driver",
+                "database-url": "jdbc:postgresql://localhost:5432/events",
+                "table-name": "refunds",
+                "record-reader": "refund-reader"
+              }
+            },
+            {
+              "id": "publish-unknown",
+              "type": "PublishKafkaRecord_2_6",
+              "properties": {
+                "bootstrap.servers": "localhost:9092",
+                "topic": "events.unknown",
+                "record.reader": "json-reader",
+                "record.writer": "json-writer"
+              }
+            }
+          ],
+          "controller-services": [
+            {
+              "id": "json-reader",
+              "type": "JsonPathReader",
+              "properties": {
+                "schema.name": "events",
+                "schema.text": "{\"type\":\"record\",\"name\":\"Event\",\"fields\":[{\"name\":\"id\",\"type\":\"string\"},{\"name\":\"type\",\"type\":\"string\"},{\"name\":\"timestamp\",\"type\":\"string\"},{\"name\":\"data\",\"type\":{\"type\":\"map\",\"values\":\"string\"}}]}"
+              }
+            },
+            {
+              "id": "json-writer",
+              "type": "JsonRecordSetWriter",
+              "properties": {
+                "schema.name": "events"
+              }
+            }
+          ],
+          "connections": [
+            {
+              "from": "consume-events",
+              "to": "extract-type",
+              "name": "consume-to-extract"
+            },
+            {
+              "from": "extract-type",
+              "to": "route-events",
+              "name": "extract-to-route"
+            },
+            {
+              "from": "route-events",
+              "to": "put-purchases",
+              "relationship": "purchase",
+              "name": "route-to-purchase"
+            },
+            {
+              "from": "route-events",
+              "to": "put-refunds",
+              "relationship": "refund",
+              "name": "route-to-refund"
+            },
+            {
+              "from": "route-events",
+              "to": "publish-unknown",
+              "relationship": "unknown",
+              "name": "route-to-unknown"
+            }
+          ]
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "22f1549d-019e-1000-d512-17c48efc81ea",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 55.11,
+      "stage1_duration_sec": 21.21,
+      "stage2_duration_sec": null,
+      "prompt_tokens": 223,
+      "completion_tokens": 1217,
+      "total_tokens": 1440,
+      "cost_usd": 0.001527,
+      "nifi_processor_count": 0,
+      "nifi_connection_count": 0,
+      "pim_source_count": null,
+      "pim_step_count": null,
+      "pim_sink_count": null,
+      "stage_presets": {
+        "pim": 1002,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 199,
+      "llm_calls": [
+        {
+          "purpose": "direct",
+          "provider": "common",
+          "model": "minimax/minimax-m2.7",
+          "prompt_tokens": 125,
+          "completion_tokens": 5,
+          "total_tokens": 130,
+          "duration_ms": 20905,
+          "cost_usd": 4.4e-05
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "direct": {
+          "calls": 1,
+          "prompt_tokens": 125,
+          "completion_tokens": 5,
+          "total_tokens": 130,
+          "duration_ms": 20905,
+          "cost_usd": 4.4e-05
+        }
+      },
+      "preset_id": 1002,
+      "preset_name": "openrouter minimax/minimax-m2.7",
+      "preset_model": "minimax/minimax-m2.7"
+    }
+  ]
+}

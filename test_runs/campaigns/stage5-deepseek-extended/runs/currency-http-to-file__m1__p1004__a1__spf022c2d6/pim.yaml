@@ -1,0 +1,26 @@
+flow:
+  id: exchange_rates_pipeline
+  name: Exchange Rates Ingestion
+  description: Fetch latest exchange rates from API and save to file
+triggers:
+- id: trigger_hourly
+  type: schedule
+  condition: every 1 hour
+sources:
+- id: source_api
+  name: Exchange Rate API
+  type: REST API
+  location: https://api.exchangerate.host/latest
+processing_elements: []
+sinks:
+- id: sink_file
+  name: Save to rates.json
+  type: File
+  location: /data/output/rates.json
+processed_data:
+- id: rates_data
+  format: json
+links:
+- from_id: source_api
+  to_id: sink_file
+  data_ref: rates_data

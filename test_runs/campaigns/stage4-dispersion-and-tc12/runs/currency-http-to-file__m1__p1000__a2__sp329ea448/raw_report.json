@@ -1,0 +1,229 @@
+{
+  "query": "Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл /data/output/rates.json.",
+  "mode": 1,
+  "mode_name": "Adapter (NL->YAML->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-13T15:57:49.270261+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: currency_rates_pipeline\n  name: Currency Rates Fetcher\n  description: Fetches latest exchange rates from exchangerate.host and saves to /data/output/rates.json\ntriggers:\n- id: trigger_schedule\n  type: schedule\n  condition: daily\nsources:\n- id: source_exchangerate\n  name: Fetch Exchange Rates\n  type: HTTP\n  location: https://api.exchangerate.host/latest\n  connection:\n    properties:\n      method: GET\nprocessing_elements:\n- id: process_pass_through\n  name: Pass Through Response\n  operation: Pass-Through\n  config: {}\nsinks:\n- id: sink_json_file\n  name: Save to JSON File\n  type: FileSystem\n  location: /data/output/rates.json\nprocessed_data:\n- id: rates_json\n  format: json\nlinks:\n- from_id: source_exchangerate\n  to_id: process_pass_through\n  data_ref: rates_json\n- from_id: process_pass_through\n  to_id: sink_json_file\n  data_ref: rates_json",
+      "nifi_json": {
+        "flowContents": {
+          "identifier": "868cf066-e091-4cc4-b168-d06a6371ec81",
+          "name": "Currency Rates Fetcher",
+          "comments": "Fetches latest exchange rates from exchangerate.host and saves to /data/output/rates.json",
+          "processors": [
+            {
+              "identifier": "ea11077d-003e-4488-b3f5-baa20cc0e735",
+              "name": "Fetch Exchange Rates",
+              "comments": "Generated from PIM source 'source_exchangerate' (HTTP)",
+              "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 80.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "HTTP URL": "https://api.exchangerate.host/latest",
+                "HTTP Method": "GET",
+                "method": "GET"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "Original",
+                "Retry",
+                "No Retry",
+                "Failure"
+              ]
+            },
+            {
+              "identifier": "1b44061e-2584-4a36-b26c-fe4b31aa5e2b",
+              "name": "Pass Through Response",
+              "comments": "Generated from PIM processing element 'process_pass_through' (Pass-Through)",
+              "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-update-attribute-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 460.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {},
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": []
+            },
+            {
+              "identifier": "fdfd5b75-ad86-47c5-bc82-ad9589c39071",
+              "name": "Save to JSON File",
+              "comments": "Generated from PIM sink 'sink_json_file' (FileSystem)",
+              "type": "org.apache.nifi.processors.standard.PutFile",
+              "bundle": {
+                "group": "org.apache.nifi",
+                "artifact": "nifi-standard-nar",
+                "version": "2.7.2"
+              },
+              "position": {
+                "x": 840.0,
+                "y": 80.0
+              },
+              "style": {},
+              "properties": {
+                "Directory": "/data/output"
+              },
+              "propertyDescriptors": {},
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "penaltyDuration": "30 sec",
+              "yieldDuration": "1 sec",
+              "bulletinLevel": "WARN",
+              "runDurationMillis": 0,
+              "concurrentlySchedulableTaskCount": 1,
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          ],
+          "connections": [
+            {
+              "identifier": "495d5101-80ae-487d-9fda-a07686f2b4ea",
+              "name": "Fetch Exchange Rates -> Pass Through Response",
+              "comments": "rates_json",
+              "source": {
+                "id": "ea11077d-003e-4488-b3f5-baa20cc0e735",
+                "groupId": "868cf066-e091-4cc4-b168-d06a6371ec81",
+                "type": "PROCESSOR",
+                "name": "Fetch Exchange Rates"
+              },
+              "destination": {
+                "id": "1b44061e-2584-4a36-b26c-fe4b31aa5e2b",
+                "groupId": "868cf066-e091-4cc4-b168-d06a6371ec81",
+                "type": "PROCESSOR",
+                "name": "Pass Through Response"
+              },
+              "selectedRelationships": [
+                "Response"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            },
+            {
+              "identifier": "281a4273-16f2-4a07-b7d2-eabbb1b5b275",
+              "name": "Pass Through Response -> Save to JSON File",
+              "comments": "rates_json",
+              "source": {
+                "id": "1b44061e-2584-4a36-b26c-fe4b31aa5e2b",
+                "groupId": "868cf066-e091-4cc4-b168-d06a6371ec81",
+                "type": "PROCESSOR",
+                "name": "Pass Through Response"
+              },
+              "destination": {
+                "id": "fdfd5b75-ad86-47c5-bc82-ad9589c39071",
+                "groupId": "868cf066-e091-4cc4-b168-d06a6371ec81",
+                "type": "PROCESSOR",
+                "name": "Save to JSON File"
+              },
+              "selectedRelationships": [
+                "success"
+              ],
+              "backPressureObjectThreshold": 10000,
+              "backPressureDataSizeThreshold": "1 GB",
+              "flowFileExpiration": "0 sec",
+              "labelIndex": 1,
+              "zIndex": 0,
+              "prioritizers": []
+            }
+          ],
+          "processGroups": [],
+          "remoteProcessGroups": [],
+          "inputPorts": [],
+          "outputPorts": [],
+          "labels": [],
+          "funnels": [],
+          "controllerServices": []
+        }
+      },
+      "nifi_import": {
+        "success": true,
+        "pg_id": "220fdf91-019e-1000-05e9-827b1d0c93d1",
+        "validation_errors": [],
+        "error_count": 0,
+        "error": null,
+        "replace_existing": true
+      },
+      "error": null,
+      "duration_sec": 75.22,
+      "stage1_duration_sec": 41.15,
+      "stage2_duration_sec": 0.11,
+      "prompt_tokens": 1429,
+      "completion_tokens": 3015,
+      "total_tokens": 4444,
+      "cost_usd": 0.004384,
+      "nifi_processor_count": 3,
+      "nifi_connection_count": 2,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 1,
+      "stage_presets": {
+        "pim": 1000,
+        "error_corrector": 1003,
+        "nifi_corrector": 1003
+      },
+      "session_id": 149,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "qwen/qwen3.6-plus",
+          "prompt_tokens": 93,
+          "completion_tokens": 855,
+          "total_tokens": 948,
+          "duration_ms": 40719,
+          "cost_usd": 0.001142
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 93,
+          "completion_tokens": 855,
+          "total_tokens": 948,
+          "duration_ms": 40719,
+          "cost_usd": 0.001142
+        }
+      },
+      "preset_id": 1000,
+      "preset_name": "openrouter qwen/qwen3.6-plus",
+      "preset_model": "qwen/qwen3.6-plus"
+    }
+  ]
+}

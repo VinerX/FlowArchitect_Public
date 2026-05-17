@@ -1,0 +1,32 @@
+
+================================================================
+Query  : ����� ��������� �� Kafka-������ events.all. ���� ���� type ����� purchas...
+Mode   : 1 � Adapter (NL->YAML->JSON)
+Presets: [1002]
+NiFi   : https://localhost:8443
+================================================================
+
+Initialising backend...
+Stage presets: {'pim': 1002, 'error_corrector': 1003, 'nifi_corrector': 1003}
+Backend ready.
+
+--- Preset 1002: openrouter minimax/minimax-m2.7  [minimax/minimax-m2.7] ---
+  [1/2] USER_QUERY  mode=1  preset=1002
+  ... waiting for YAML PIM (10s elapsed, timeout=300s)
+  ... waiting for YAML PIM (20s elapsed, timeout=300s)
+  ... waiting for YAML PIM (30s elapsed, timeout=300s)
+  ... waiting for YAML PIM (40s elapsed, timeout=300s)
+  ... waiting for YAML PIM (50s elapsed, timeout=300s)
+  [1/2] PIM ready  (1724 chars, 50.91s)
+  [2/2] REQUEST_CONVERSION  mode=1  preset=1002
+  [2/2] NiFi JSON ready  (5 proc, 4 conn, 0.08s)
+  [3/3] Importing to NiFi...
+  [3/3] NiFi import: OK
+  tokens: 1394 in / 1132 out / 2526 total  |  cost: $0.001777
+  Result : [OK]  (87.69s)
+
+================================================================
+Results: 1/1 passed
+================================================================
+
+Report saved -> F:\Education\Diplom\FlowArchitect\test_runs\campaigns\stage7-minimax-extended\runs\kafka-routing__m1__p1002__a1__sp47d77dfa\raw_report.json

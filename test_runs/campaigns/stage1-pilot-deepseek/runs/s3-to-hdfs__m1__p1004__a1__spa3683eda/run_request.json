@@ -1,0 +1,67 @@
+{
+  "run_id": "s3-to-hdfs__m1__p1004__a1__spa3683eda",
+  "case_id": "s3-to-hdfs",
+  "title": "S3 to HDFS",
+  "query": "Забирай файлы из S3 бакета raw-data, при необходимости распаковывай их и складывай в HDFS в каталог /data/raw.",
+  "query_file": null,
+  "attempt": 1,
+  "mode": 1,
+  "preset_id": 1004,
+  "stage_presets": {
+    "pim": 1004,
+    "corrector": 1004
+  },
+  "timeout_sec": 300,
+  "nifi_validate": true,
+  "manual_nifi_required": true,
+  "requires_user_input": false,
+  "extra_metadata": {
+    "tags": [
+      "s3",
+      "hdfs",
+      "file-transfer"
+    ],
+    "expected_behavior": "Файлы попадают из S3 в HDFS /data/raw с учетом шага распаковки при необходимости.",
+    "manual_test_checklist": [
+      "Импортировать полученный nifi.json в тестовый NiFi.",
+      "Проверить, что поток отражает маршрут S3 -> optional unpack -> HDFS.",
+      "Проверить, что конфигурация не теряет целевой каталог /data/raw."
+    ]
+  },
+  "status": "running",
+  "comment_count": 0,
+  "history": [
+    {
+      "timestamp": "2026-05-11T16:11:44.576079+00:00",
+      "status": "queued",
+      "reason": "campaign_init"
+    },
+    {
+      "timestamp": "2026-05-11T17:53:56.041118+00:00",
+      "status": "running",
+      "reason": "runner_started"
+    }
+  ],
+  "started_at": "2026-05-11T17:53:56.041118+00:00",
+  "command": [
+    "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+    "F:\\Education\\Diplom\\FlowArchitect\\scripts\\run_nl_test.py",
+    "--query-file",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m1__p1004__a1__spa3683eda\\query.txt",
+    "--preset",
+    "1004",
+    "--mode",
+    "1",
+    "--timeout",
+    "300",
+    "--report",
+    "F:\\Education\\Diplom\\FlowArchitect\\test_runs\\campaigns\\stage1-pilot-deepseek\\runs\\s3-to-hdfs__m1__p1004__a1__spa3683eda\\raw_report.json",
+    "--pim-preset",
+    "1004",
+    "--corrector-preset",
+    "1004",
+    "--nifi"
+  ],
+  "python_executable": "F:\\Education\\Diplom\\FlowArchitect\\.venv\\Scripts\\python.exe",
+  "command_timeout_sec": 960
+}

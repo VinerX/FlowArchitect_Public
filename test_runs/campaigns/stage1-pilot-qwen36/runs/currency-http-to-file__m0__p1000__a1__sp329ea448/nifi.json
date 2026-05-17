@@ -1,0 +1,105 @@
+{
+  "flowContents": {
+    "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "name": "Currency Rates ETL",
+    "position": {
+      "x": 0,
+      "y": 0
+    },
+    "processors": [
+      {
+        "id": "proc-invoke-http",
+        "type": "org.apache.nifi.processors.standard.InvokeHTTP",
+        "name": "InvokeHTTP",
+        "position": {
+          "x": 100,
+          "y": 100
+        },
+        "config": {
+          "properties": {
+            "HTTP Method": "GET",
+            "Remote URL": "https://api.exchangerate.host/latest",
+            "Accept": "application/json",
+            "Connection Timeout": "5 secs",
+            "Read Timeout": "15 secs"
+          },
+          "schedulingPeriod": "1 min",
+          "autoTerminatedRelationships": [
+            "Failure",
+            "No Retry",
+            "Retry",
+            "Success"
+          ]
+        }
+      },
+      {
+        "id": "proc-update-attr",
+        "type": "org.apache.nifi.processors.attributes.UpdateAttribute",
+        "name": "Set Filename",
+        "position": {
+          "x": 350,
+          "y": 100
+        },
+        "config": {
+          "properties": {
+            "filename": "rates.json"
+          },
+          "autoTerminatedRelationships": []
+        }
+      },
+      {
+        "id": "proc-put-file",
+        "type": "org.apache.nifi.processors.standard.PutFile",
+        "name": "PutFile",
+        "position": {
+          "x": 600,
+          "y": 100
+        },
+        "config": {
+          "properties": {
+            "Directory": "/tmp/nifi/output",
+            "Conflict Resolution Strategy": "replace",
+            "Create Missing Directories": "true",
+            "Maximum File Count": "1000"
+          },
+          "autoTerminatedRelationships": [
+            "success",
+            "failure"
+          ]
+        }
+      }
+    ],
+    "connections": [
+      {
+        "id": "conn-1",
+        "source": {
+          "id": "proc-invoke-http",
+          "groupId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        },
+        "destination": {
+          "id": "proc-update-attr",
+          "groupId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        },
+        "selectedRelationships": [
+          "Response"
+        ],
+        "name": "Response to UpdateAttribute"
+      },
+      {
+        "id": "conn-2",
+        "source": {
+          "id": "proc-update-attr",
+          "groupId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        },
+        "destination": {
+          "id": "proc-put-file",
+          "groupId": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+        },
+        "selectedRelationships": [
+          "success"
+        ],
+        "name": "Update to PutFile"
+      }
+    ]
+  }
+}

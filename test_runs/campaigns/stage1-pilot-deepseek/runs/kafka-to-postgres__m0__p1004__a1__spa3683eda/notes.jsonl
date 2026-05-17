@@ -1,0 +1,1 @@
+{"timestamp": "2026-05-11T16:55:32.437066+00:00", "author": "codex", "kind": "status_change_note", "text": "Recovered status after interrupted batch run. raw_report.json shows the actual outcome: timeout waiting for NiFi JSON (direct mode) after 300.24s.", "run_id": "kafka-to-postgres__m0__p1004__a1__spa3683eda"}

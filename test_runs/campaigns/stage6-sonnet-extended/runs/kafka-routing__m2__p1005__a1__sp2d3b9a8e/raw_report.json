@@ -1,0 +1,503 @@
+{
+  "query": "Читай сообщения из Kafka-топика events.all. Если поле type равно purchase — пиши в PostgreSQL таблицу purchases. Если type равно refund — пиши в таблицу refunds. Всё остальное — в Kafka-топик events.unknown.",
+  "mode": 2,
+  "mode_name": "LLMx2 (NL->YAML->LLM->JSON)",
+  "runs": [
+    {
+      "timestamp": "2026-05-14T18:16:45.739697+00:00",
+      "success": true,
+      "yaml_pim": "flow:\n  id: events_routing_pipeline\n  name: Events Routing Pipeline\n  description: Read messages from Kafka topic events.all, route to PostgreSQL purchases\n    table, PostgreSQL refunds table, or Kafka events.unknown topic based on the 'type'\n    field\ntriggers:\n- id: trigger_main\n  type: event\n  condition: new message in Kafka topic events.all\nsources:\n- id: source_events_all\n  name: Read from Kafka events.all\n  type: Kafka\n  location: events.all\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\n      group_id: '{{KAFKA_CONSUMER_GROUP_ID}}'\n      auto_offset_reset: earliest\nprocessing_elements:\n- id: process_router\n  name: Route by Event Type\n  operation: ContentBasedRouter\n  config:\n    field: type\n    routes:\n      purchase: sink_postgres_purchases\n      refund: sink_postgres_refunds\n      default: sink_kafka_unknown\nsinks:\n- id: sink_postgres_purchases\n  name: Write to PostgreSQL purchases\n  type: PostgreSQL\n  location: public.purchases\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\n- id: sink_postgres_refunds\n  name: Write to PostgreSQL refunds\n  type: PostgreSQL\n  location: public.refunds\n  connection:\n    properties:\n      host: '{{DB_HOST}}'\n      port: '{{DB_PORT}}'\n      database: '{{DATABASE_NAME}}'\n      username: '{{DB_USERNAME}}'\n      password: '{{DB_PASSWORD}}'\n- id: sink_kafka_unknown\n  name: Write to Kafka events.unknown\n  type: Kafka\n  location: events.unknown\n  connection:\n    properties:\n      brokers: '{{KAFKA_BROKERS}}'\nprocessed_data:\n- id: event_message\n  format: json\n- id: event_purchase\n  format: json\n- id: event_refund\n  format: json\n- id: event_unknown\n  format: json\nlinks:\n- from_id: source_events_all\n  to_id: process_router\n  data_ref: event_message\n- from_id: process_router\n  to_id: sink_postgres_purchases\n  data_ref: event_purchase\n- from_id: process_router\n  to_id: sink_postgres_refunds\n  data_ref: event_refund\n- from_id: process_router\n  to_id: sink_kafka_unknown\n  data_ref: event_unknown",
+      "nifi_json": {
+        "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+        "name": "Events Routing Pipeline",
+        "comments": "Read messages from Kafka topic events.all, route to PostgreSQL purchases table, PostgreSQL refunds table, or Kafka events.unknown topic based on the 'type' field",
+        "position": {
+          "x": 0,
+          "y": 0
+        },
+        "processGroups": [],
+        "remoteProcessGroups": [],
+        "processors": [
+          {
+            "id": "11111111-1111-1111-1111-111111111001",
+            "name": "Read from Kafka events.all",
+            "type": "org.apache.nifi.kafka.processors.ConsumeKafka",
+            "position": {
+              "x": 400,
+              "y": 100
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "bulletinLevel": "WARN",
+              "properties": {
+                "kafka.connection.service": "22222222-2222-2222-2222-222222222001",
+                "topic": "events.all",
+                "topic_type": "names",
+                "group.id": "{{KAFKA_CONSUMER_GROUP_ID}}",
+                "auto.offset.reset": "earliest",
+                "key.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+                "value.deserializer": "org.apache.kafka.common.serialization.StringDeserializer",
+                "record-reader": "22222222-2222-2222-2222-222222222002",
+                "max.poll.records": "1000",
+                "Communications Timeout": "60 secs"
+              },
+              "autoTerminatedRelationships": []
+            }
+          },
+          {
+            "id": "11111111-1111-1111-1111-111111111002",
+            "name": "Route by Event Type",
+            "type": "org.apache.nifi.processors.standard.RouteOnAttribute",
+            "position": {
+              "x": 400,
+              "y": 300
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "bulletinLevel": "WARN",
+              "properties": {
+                "Routing Strategy": "Route to Property name",
+                "purchase": "${type:equals('purchase')}",
+                "refund": "${type:equals('refund')}",
+                "unknown": "${type:isEmpty():or(${type:equals('purchase'):not():and(${type:equals('refund'):not()})})}"
+              },
+              "autoTerminatedRelationships": []
+            }
+          },
+          {
+            "id": "11111111-1111-1111-1111-111111111003",
+            "name": "Extract type field to Attribute",
+            "type": "org.apache.nifi.processors.standard.EvaluateJsonPath",
+            "position": {
+              "x": 400,
+              "y": 200
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "bulletinLevel": "WARN",
+              "properties": {
+                "Destination": "flowfile-attribute",
+                "Return Type": "auto-detect",
+                "Path Not Found Behavior": "ignore",
+                "Null Value Representation": "empty string",
+                "type": "$.type"
+              },
+              "autoTerminatedRelationships": [
+                "failure"
+              ]
+            }
+          },
+          {
+            "id": "11111111-1111-1111-1111-111111111004",
+            "name": "Write to PostgreSQL purchases",
+            "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+            "position": {
+              "x": 100,
+              "y": 500
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "bulletinLevel": "WARN",
+              "properties": {
+                "record-reader": "22222222-2222-2222-2222-222222222002",
+                "database-connection-pooling-service": "22222222-2222-2222-2222-222222222003",
+                "db-type": "PostgreSQL",
+                "statement-type": "INSERT",
+                "table-name": "purchases",
+                "schema-name": "public",
+                "translate-field-names": "false",
+                "unmatched-field-behavior": "Ignore Unmatched Fields",
+                "unmatched-column-behavior": "Fail on Unmatched Columns",
+                "update-keys": "",
+                "field-containing-sql": "",
+                "allow-multiple-statements": "false",
+                "max-batch-size": "1000",
+                "auto-commit": "false"
+              },
+              "autoTerminatedRelationships": [
+                "success",
+                "failure",
+                "retry"
+              ]
+            }
+          },
+          {
+            "id": "11111111-1111-1111-1111-111111111005",
+            "name": "Write to PostgreSQL refunds",
+            "type": "org.apache.nifi.processors.standard.PutDatabaseRecord",
+            "position": {
+              "x": 400,
+              "y": 500
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "bulletinLevel": "WARN",
+              "properties": {
+                "record-reader": "22222222-2222-2222-2222-222222222002",
+                "database-connection-pooling-service": "22222222-2222-2222-2222-222222222004",
+                "db-type": "PostgreSQL",
+                "statement-type": "INSERT",
+                "table-name": "refunds",
+                "schema-name": "public",
+                "translate-field-names": "false",
+                "unmatched-field-behavior": "Ignore Unmatched Fields",
+                "unmatched-column-behavior": "Fail on Unmatched Columns",
+                "update-keys": "",
+                "field-containing-sql": "",
+                "allow-multiple-statements": "false",
+                "max-batch-size": "1000",
+                "auto-commit": "false"
+              },
+              "autoTerminatedRelationships": [
+                "success",
+                "failure",
+                "retry"
+              ]
+            }
+          },
+          {
+            "id": "11111111-1111-1111-1111-111111111006",
+            "name": "Write to Kafka events.unknown",
+            "type": "org.apache.nifi.kafka.processors.PublishKafka",
+            "position": {
+              "x": 700,
+              "y": 500
+            },
+            "config": {
+              "schedulingStrategy": "TIMER_DRIVEN",
+              "schedulingPeriod": "0 sec",
+              "executionNode": "ALL",
+              "bulletinLevel": "WARN",
+              "properties": {
+                "kafka.connection.service": "22222222-2222-2222-2222-222222222005",
+                "topic": "events.unknown",
+                "record-reader": "22222222-2222-2222-2222-222222222002",
+                "record-writer": "22222222-2222-2222-2222-222222222006",
+                "use-transactions": "true",
+                "delivery.guarantee": "GUARANTEE_REPLICATED_DELIVERY",
+                "attribute-name-regex": "",
+                "compression.type": "none",
+                "Communications Timeout": "60 secs"
+              },
+              "autoTerminatedRelationships": [
+                "success",
+                "failure"
+              ]
+            }
+          }
+        ],
+        "connections": [
+          {
+            "id": "33333333-3333-3333-3333-333333333001",
+            "name": "source_events_all -> EvaluateJsonPath",
+            "source": {
+              "id": "11111111-1111-1111-1111-111111111001",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "11111111-1111-1111-1111-111111111003",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "success"
+            ],
+            "flowFileExpiration": "0 sec",
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "labelIndex": 1,
+            "zIndex": 0
+          },
+          {
+            "id": "33333333-3333-3333-3333-333333333002",
+            "name": "EvaluateJsonPath -> Route by Event Type",
+            "source": {
+              "id": "11111111-1111-1111-1111-111111111003",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "11111111-1111-1111-1111-111111111002",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "matched"
+            ],
+            "flowFileExpiration": "0 sec",
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "labelIndex": 1,
+            "zIndex": 0
+          },
+          {
+            "id": "33333333-3333-3333-3333-333333333003",
+            "name": "Route by Event Type -> Write to PostgreSQL purchases",
+            "source": {
+              "id": "11111111-1111-1111-1111-111111111002",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "11111111-1111-1111-1111-111111111004",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "purchase"
+            ],
+            "flowFileExpiration": "0 sec",
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "labelIndex": 1,
+            "zIndex": 0
+          },
+          {
+            "id": "33333333-3333-3333-3333-333333333004",
+            "name": "Route by Event Type -> Write to PostgreSQL refunds",
+            "source": {
+              "id": "11111111-1111-1111-1111-111111111002",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "11111111-1111-1111-1111-111111111005",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "refund"
+            ],
+            "flowFileExpiration": "0 sec",
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "labelIndex": 1,
+            "zIndex": 0
+          },
+          {
+            "id": "33333333-3333-3333-3333-333333333005",
+            "name": "Route by Event Type -> Write to Kafka events.unknown",
+            "source": {
+              "id": "11111111-1111-1111-1111-111111111002",
+              "type": "PROCESSOR"
+            },
+            "destination": {
+              "id": "11111111-1111-1111-1111-111111111006",
+              "type": "PROCESSOR"
+            },
+            "selectedRelationships": [
+              "unknown",
+              "unmatched"
+            ],
+            "flowFileExpiration": "0 sec",
+            "backPressureDataSizeThreshold": "1 GB",
+            "backPressureObjectThreshold": 10000,
+            "labelIndex": 1,
+            "zIndex": 0
+          }
+        ],
+        "controllerServices": [
+          {
+            "id": "22222222-2222-2222-2222-222222222001",
+            "name": "Kafka3ConnectionService - Consumer (events.all)",
+            "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+            "comments": "Kafka connection service for consuming from events.all",
+            "properties": {
+              "bootstrap.servers": "{{KAFKA_BROKERS}}",
+              "security.protocol": "PLAINTEXT",
+              "sasl.mechanism": "{{KAFKA_SASL_MECHANISM}}",
+              "sasl.username": "{{KAFKA_SASL_USERNAME}}",
+              "sasl.password": "{{KAFKA_SASL_PASSWORD}}"
+            }
+          },
+          {
+            "id": "22222222-2222-2222-2222-222222222002",
+            "name": "JsonTreeReader",
+            "type": "org.apache.nifi.json.JsonTreeReader",
+            "comments": "Reads JSON records from FlowFile content",
+            "properties": {
+              "schema-access-strategy": "infer-schema",
+              "date-format": "yyyy-MM-dd",
+              "time-format": "HH:mm:ss",
+              "timestamp-format": "yyyy-MM-dd'T'HH:mm:ss'Z'"
+            }
+          },
+          {
+            "id": "22222222-2222-2222-2222-222222222003",
+            "name": "DBCPConnectionPool - purchases",
+            "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+            "comments": "JDBC connection pool for PostgreSQL public.purchases",
+            "properties": {
+              "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+              "Database Driver Class Name": "org.postgresql.Driver",
+              "database-driver-locations": "{{POSTGRESQL_JDBC_DRIVER_PATH}}",
+              "Database User": "{{DB_USERNAME}}",
+              "Password": "{{DB_PASSWORD}}",
+              "Max Wait Time": "500 millis",
+              "Max Total Connections": "8",
+              "Validation query": "SELECT 1"
+            }
+          },
+          {
+            "id": "22222222-2222-2222-2222-222222222004",
+            "name": "DBCPConnectionPool - refunds",
+            "type": "org.apache.nifi.dbcp.DBCPConnectionPool",
+            "comments": "JDBC connection pool for PostgreSQL public.refunds",
+            "properties": {
+              "Database Connection URL": "jdbc:postgresql://{{DB_HOST}}:{{DB_PORT}}/{{DATABASE_NAME}}",
+              "Database Driver Class Name": "org.postgresql.Driver",
+              "database-driver-locations": "{{POSTGRESQL_JDBC_DRIVER_PATH}}",
+              "Database User": "{{DB_USERNAME}}",
+              "Password": "{{DB_PASSWORD}}",
+              "Max Wait Time": "500 millis",
+              "Max Total Connections": "8",
+              "Validation query": "SELECT 1"
+            }
+          },
+          {
+            "id": "22222222-2222-2222-2222-222222222005",
+            "name": "Kafka3ConnectionService - Producer (events.unknown)",
+            "type": "org.apache.nifi.kafka.service.Kafka3ConnectionService",
+            "comments": "Kafka connection service for publishing to events.unknown",
+            "properties": {
+              "bootstrap.servers": "{{KAFKA_BROKERS}}",
+              "security.protocol": "PLAINTEXT",
+              "sasl.mechanism": "{{KAFKA_SASL_MECHANISM}}",
+              "sasl.username": "{{KAFKA_SASL_USERNAME}}",
+              "sasl.password": "{{KAFKA_SASL_PASSWORD}}"
+            }
+          },
+          {
+            "id": "22222222-2222-2222-2222-222222222006",
+            "name": "JsonRecordSetWriter",
+            "type": "org.apache.nifi.json.JsonRecordSetWriter",
+            "comments": "Writes records as JSON to FlowFile content",
+            "properties": {
+              "schema-access-strategy": "inherit-record-schema",
+              "output-grouping": "output-oneline",
+              "suppress-nulls": "never-suppress",
+              "pretty-print-json": "false",
+              "date-format": "yyyy-MM-dd",
+              "time-format": "HH:mm:ss",
+              "timestamp-format": "yyyy-MM-dd'T'HH:mm:ss'Z'"
+            }
+          }
+        ],
+        "labels": [
+          {
+            "id": "44444444-4444-4444-4444-444444444001",
+            "label": "STEP 1: Consume from Kafka events.all",
+            "position": {
+              "x": 280,
+              "y": 60
+            },
+            "width": 340,
+            "height": 60,
+            "style": {
+              "background-color": "#e0f7fa"
+            }
+          },
+          {
+            "id": "44444444-4444-4444-4444-444444444002",
+            "label": "STEP 2: Extract 'type' field & Route",
+            "position": {
+              "x": 280,
+              "y": 160
+            },
+            "width": 340,
+            "height": 160,
+            "style": {
+              "background-color": "#fff9c4"
+            }
+          },
+          {
+            "id": "44444444-4444-4444-4444-444444444003",
+            "label": "STEP 3: Sink — purchase -> PostgreSQL purchases | refund -> PostgreSQL refunds | default -> Kafka events.unknown",
+            "position": {
+              "x": 0,
+              "y": 440
+            },
+            "width": 900,
+            "height": 160,
+            "style": {
+              "background-color": "#e8f5e9"
+            }
+          }
+        ],
+        "funnels": []
+      },
+      "nifi_import": {
+        "success": false,
+        "error": "NiFi unreachable: Cannot connect to https://localhost:8443",
+        "pg_id": null,
+        "validation_errors": [],
+        "error_count": 0
+      },
+      "error": null,
+      "duration_sec": 57.99,
+      "stage1_duration_sec": 10.32,
+      "stage2_duration_sec": 43.26,
+      "prompt_tokens": 2773,
+      "completion_tokens": 5641,
+      "total_tokens": 8414,
+      "cost_usd": 0.092934,
+      "nifi_processor_count": 6,
+      "nifi_connection_count": 5,
+      "pim_source_count": 1,
+      "pim_step_count": 1,
+      "pim_sink_count": 3,
+      "stage_presets": {
+        "pim": 1005,
+        "error_corrector": 1005,
+        "nifi_corrector": 1005
+      },
+      "session_id": 230,
+      "llm_calls": [
+        {
+          "purpose": "pim_generation",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 1459,
+          "completion_tokens": 973,
+          "total_tokens": 2432,
+          "duration_ms": 9875,
+          "cost_usd": 0.018972
+        },
+        {
+          "purpose": "psm_conversion",
+          "provider": "common",
+          "model": "anthropic/claude-sonnet-4.6",
+          "prompt_tokens": 1178,
+          "completion_tokens": 4656,
+          "total_tokens": 5834,
+          "duration_ms": 42468,
+          "cost_usd": 0.073374
+        }
+      ],
+      "llm_usage_by_purpose": {
+        "pim_generation": {
+          "calls": 1,
+          "prompt_tokens": 1459,
+          "completion_tokens": 973,
+          "total_tokens": 2432,
+          "duration_ms": 9875,
+          "cost_usd": 0.018972
+        },
+        "psm_conversion": {
+          "calls": 1,
+          "prompt_tokens": 1178,
+          "completion_tokens": 4656,
+          "total_tokens": 5834,
+          "duration_ms": 42468,
+          "cost_usd": 0.073374
+        }
+      },
+      "preset_id": 1005,
+      "preset_name": "openrouter sonnet 4.6",
+      "preset_model": "anthropic/claude-sonnet-4.6"
+    }
+  ]
+}

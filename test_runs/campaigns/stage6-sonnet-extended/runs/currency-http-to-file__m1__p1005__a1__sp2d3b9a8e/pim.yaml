@@ -1,0 +1,48 @@
+flow:
+  id: exchange_rates_pipeline
+  name: Exchange Rates Pipeline
+  description: Fetch latest currency exchange rates from exchangerate.host API and
+    save the result to a local JSON file
+triggers:
+- id: trigger_schedule
+  type: schedule
+  condition: every 1 hour
+sources:
+- id: source_exchange_api
+  name: Fetch Exchange Rates
+  type: HTTP_REST
+  location: https://api.exchangerate.host/latest
+  connection:
+    properties:
+      method: GET
+      headers: '{}'
+      timeout_seconds: '30'
+processing_elements:
+- id: process_parse_response
+  name: Parse API Response
+  operation: Transform
+  config:
+    input_format: json
+    action: parse_and_validate
+    description: Parse JSON response from exchangerate.host and validate required
+      fields (base, date, rates)
+sinks:
+- id: sink_json_file
+  name: Write Rates to JSON File
+  type: FileSystem
+  location: /data/output/rates.json
+  connection:
+    properties:
+      format: json
+      write_mode: overwrite
+      pretty_print: 'true'
+processed_data:
+- id: exchange_rates_json
+  format: json
+links:
+- from_id: source_exchange_api
+  to_id: process_parse_response
+  data_ref: exchange_rates_json
+- from_id: process_parse_response
+  to_id: sink_json_file
+  data_ref: exchange_rates_json

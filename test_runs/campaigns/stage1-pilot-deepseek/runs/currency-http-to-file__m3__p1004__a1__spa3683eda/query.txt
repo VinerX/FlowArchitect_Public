@@ -1,0 +1,1 @@
+Получай курсы валют с https://api.exchangerate.host/latest и сохраняй результат в файл rates.json.
