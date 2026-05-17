@@ -4,6 +4,14 @@
 **Автор:** Макаров Дмитрий · **Научный руководитель:** Бабкин Эдуард Александрович
 
 FlowArchitect — desktop-приложение на PyQt6 для генерации ETL-потоков Apache NiFi из описания на естественном языке. Основной сценарий работы проходит через GUI: пользователь формулирует задачу в чате, получает промежуточную YAML-модель, редактирует ее при необходимости и затем конвертирует в NiFi JSON.
+---
+<img width="1919" height="1041" alt="image" src="https://github.com/user-attachments/assets/cf987187-2831-4685-8205-6806fa0601ad" />
+<img width="1920" height="1038" alt="image" src="https://github.com/user-attachments/assets/09ce1b04-adf1-41fd-8004-8dd9bfcf3971" />
+<img width="903" height="886" alt="image" src="https://github.com/user-attachments/assets/28a34dd6-d7c5-433b-aece-14fa5ab010da" />
+
+
+
+---
 
 Исследовательская гипотеза проекта: двухэтапная схема `NL → YAML → NiFi JSON` снижает число галлюцинаций LLM и повышает структурную корректность по сравнению с прямой генерацией `NL → JSON`.
 
